@@ -149,7 +149,7 @@ export default function QuizPage() {
           width={70}
           height={70}
         />
-        <Progress value={progress} className="mt-4 h-2 w-full max-w-md" />
+        <Progress value={progress} className="mt-4 h-2 w-10/12 max-w-xs" />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4">
