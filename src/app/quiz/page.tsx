@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -141,14 +142,14 @@ export default function QuizPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex w-full flex-col items-center">
+      <div className="flex w-full flex-col items-center bg-background p-0">
         <Image
           src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
           alt="Mounjaro de Pobre Logo"
-          width={50}
-          height={50}
+          width={70}
+          height={70}
         />
-        <Progress value={progress} className="h-2 w-full max-w-md" />
+        <Progress value={progress} className="mt-4 h-2 w-full max-w-md" />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4">
