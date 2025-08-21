@@ -137,36 +137,37 @@ export default function QuizPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-2xl mx-auto">
-        
-        <div className="mb-8 flex flex-col items-center">
-          <Image 
-            src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
-            alt="Mounjaro de Pobre Logo"
-            width={100}
-            height={100}
-            className="mb-4"
-          />
-          <Progress value={progress} className="w-full h-2" />
-        </div>
+    <div className="flex min-h-screen flex-col bg-background">
+      <div className="flex w-full flex-col items-center p-4">
+        <Image 
+          src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
+          alt="Mounjaro de Pobre Logo"
+          width={100}
+          height={100}
+          className="mb-4"
+        />
+        <Progress value={progress} className="h-2 w-full max-w-2xl" />
+      </div>
 
-        <div className="text-center">
-            <h1 className="text-2xl font-bold md:text-3xl">{question.question}</h1>
-            {question.subtitle && <p className="mt-2 text-muted-foreground md:text-lg">{question.subtitle}</p>}
-        </div>
-
-        <div className="my-8 flex items-center justify-center">
-          {renderQuestion()}
-        </div>
-
-        {question.buttonText && (
+      <div className="flex flex-1 flex-col items-center justify-center p-4">
+        <div className="mx-auto w-full max-w-2xl">
           <div className="text-center">
-            <Button onClick={handleNext} disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}>
-              {question.buttonText}
-            </Button>
+              <h1 className="text-2xl font-bold md:text-3xl">{question.question}</h1>
+              {question.subtitle && <p className="mt-2 text-muted-foreground md:text-lg">{question.subtitle}</p>}
           </div>
-        )}
+
+          <div className="my-8 flex items-center justify-center">
+            {renderQuestion()}
+          </div>
+
+          {question.buttonText && (
+            <div className="text-center">
+              <Button onClick={handleNext} disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}>
+                {question.buttonText}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
