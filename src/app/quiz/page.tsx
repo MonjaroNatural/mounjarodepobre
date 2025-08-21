@@ -144,7 +144,7 @@ export default function QuizPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <div className="flex w-full flex-col items-center bg-background p-0">
         <Image
-          src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
+          src="/novologo.webp"
           alt="Mounjaro de Pobre Logo"
           width={70}
           height={70}
