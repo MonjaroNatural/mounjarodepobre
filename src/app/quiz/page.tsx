@@ -138,13 +138,13 @@ export default function QuizPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex w-full flex-col items-center pb-4">
+      <div className="flex w-full flex-col items-center pt-0">
         <Image 
           src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
           alt="Mounjaro de Pobre Logo"
           width={100}
           height={100}
-          className="my-4"
+          className="mb-4"
         />
         <Progress value={progress} className="h-2 w-full max-w-2xl" />
       </div>
