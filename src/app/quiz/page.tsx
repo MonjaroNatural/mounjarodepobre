@@ -53,6 +53,7 @@ export default function QuizPage() {
 
 
   const question = quizQuestions[currentStep];
+  const progress = ((currentStep + 1) / quizQuestions.length) * 100;
 
   const renderQuestion = () => {
     switch (question.type) {
@@ -136,6 +137,18 @@ export default function QuizPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-2xl mx-auto">
+        
+        <div className="mb-8 flex flex-col items-center">
+          <Image 
+            src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
+            alt="Mounjaro de Pobre Logo"
+            width={150}
+            height={50}
+            className="mb-4"
+          />
+          <Progress value={progress} className="w-full h-2" />
+        </div>
+
         <div className="text-center">
             <h1 className="text-2xl font-bold md:text-3xl">{question.question}</h1>
             {question.subtitle && <p className="mt-2 text-muted-foreground md:text-lg">{question.subtitle}</p>}
