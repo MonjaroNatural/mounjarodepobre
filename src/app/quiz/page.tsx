@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
+import { ChevronRight } from 'lucide-react';
 
 export default function QuizPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -65,14 +66,16 @@ export default function QuizPage() {
           <div className="w-full">
             <RadioGroup onValueChange={handleSingleChoice} className={`flex ${question.type === 'single-choice-column' ? 'flex-col' : 'flex-wrap'} justify-center gap-4`}>
               {question.options?.map((option) => (
-                <div key={option.label} className="w-full md:w-auto">
+                <div key={option.label} className="w-full">
                   <RadioGroupItem value={option.label} id={option.label} className="peer sr-only" />
                   <Label
                     htmlFor={option.label}
-                    className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                    className="flex cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
-                    {option.label}
-                    {option.sublabel && <span className="mt-2 text-sm text-muted-foreground">{option.sublabel}</span>}
+                    <span>{option.label}</span>
+                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
+                      <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-white" />
+                    </div>
                   </Label>
                 </div>
               ))}
@@ -138,22 +141,25 @@ export default function QuizPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex w-full flex-col items-center">
+      <div className="flex w-full flex-col items-center pt-4">
         <Image 
           src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
           alt="Mounjaro de Pobre Logo"
-          width={100}
-          height={100}
-          className="mb-0"
+          width={150}
+          height={50}
+          className="mb-4"
         />
-        <Progress value={progress} className="h-2 w-full max-w-2xl" />
+        <Progress value={progress} className="h-2 w-full max-w-md" />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4">
-        <div className="mx-auto w-full max-w-2xl">
-          <div className="text-center">
-              <h1 className="text-2xl font-bold md:text-3xl">{question.question}</h1>
-              {question.subtitle && <p className="mt-2 text-muted-foreground md:text-lg">{question.subtitle}</p>}
+        <div className="mx-auto w-full max-w-md">
+           <div className="text-center">
+              <h1 className="text-3xl font-bold md:text-4xl">
+                {question.question.split(' ').slice(0, -2).join(' ')}
+                <span className="block text-primary">{question.question.split(' ').slice(-2).join(' ')}</span>
+              </h1>
+              {question.subtitle && <p className="mt-4 text-muted-foreground underline md:text-lg">{question.subtitle}</p>}
           </div>
 
           <div className="my-8 flex items-center justify-center">
