@@ -36,6 +36,8 @@ export default function QuizPage() {
     setCurrentAnswer(value);
     setTimeout(() => {
        if (currentStep < quizQuestions.length - 1) {
+        const newAnswers = [...answers, { questionId: quizQuestions[currentStep].id, value: value }];
+        setAnswers(newAnswers);
         setCurrentStep(currentStep + 1);
         setCurrentAnswer(null);
       }
@@ -142,8 +144,8 @@ export default function QuizPage() {
           <Image 
             src="/503483360_718535070923706_3652698252817683314_n (1).jpg"
             alt="Mounjaro de Pobre Logo"
-            width={150}
-            height={50}
+            width={200}
+            height={200}
             className="mb-4"
           />
           <Progress value={progress} className="w-full h-2" />
