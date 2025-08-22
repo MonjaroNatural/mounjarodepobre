@@ -638,24 +638,30 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   }
 
   const heightInM = heightInCm / 100;
-  const imc = parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1));
+  const imc = heightInM > 0 ? parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1)) : 0;
 
   let imcCategory: 'Abaixo do peso' | 'Normal' | 'Sobrepeso' | 'Obesidade';
   let categoryPercentage: number;
 
   if (imc < 18.5) {
     imcCategory = 'Abaixo do peso';
+    // Position within the first 25% of the bar
     categoryPercentage = (imc / 18.5) * 25;
   } else if (imc < 25) {
     imcCategory = 'Normal';
-    categoryPercentage = 25 + ((imc - 18.5) / (25 - 18.5)) * 25;
+    // Position within the second 25% of the bar (25% to 50%)
+    categoryPercentage = 25 + ((imc - 18.5) / (24.9 - 18.5)) * 25;
   } else if (imc < 30) {
     imcCategory = 'Sobrepeso';
-    categoryPercentage = 50 + ((imc - 25) / (30 - 25)) * 25;
+    // Position within the third 25% of the bar (50% to 75%)
+    categoryPercentage = 50 + ((imc - 25) / (29.9 - 25)) * 25;
   } else {
     imcCategory = 'Obesidade';
-    categoryPercentage = 75 + Math.min(((imc - 30) / (40 - 30)) * 25, 25);
+    // Position within the last 25% of the bar (75% to 100%)
+    // We cap it slightly below 100 to not overflow
+    categoryPercentage = 75 + Math.min(((imc - 30) / (40 - 30)) * 25, 24);
   }
+  // Clamp the value to be within a visible range (e.g., 5% to 95%) to avoid edge cases
   categoryPercentage = Math.max(5, Math.min(95, categoryPercentage));
 
   return (
