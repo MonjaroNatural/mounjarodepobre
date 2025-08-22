@@ -112,8 +112,9 @@ function QuizComponent() {
     if (currentStep < quizQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-       // Last step, what to do?
-       console.log("End of quiz");
+      // Last step, what to do?
+      const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value as string || '';
+      router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
     }
   };
 
@@ -132,7 +133,7 @@ function QuizComponent() {
     setAnswers(newAnswers);
 
     setTimeout(() => {
-       if (question.id === 16) { // "Corpo dos sonhos" question
+       if (question.id === 16) { 
           const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value as string || '';
           router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
           return;
@@ -141,7 +142,8 @@ function QuizComponent() {
        if (currentStep < quizQuestions.length - 1) {
         setCurrentStep(currentStep + 1);
       } else {
-        console.log("End of quiz");
+        const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value as string || '';
+        router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
       }
     }, 500);
   };
@@ -555,14 +557,14 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
       if (newProgress >= 100) {
         setProgress(100);
         clearInterval(interval);
-        setTimeout(onComplete, 500); // Give a brief moment before completing
+        // Do not call onComplete here anymore
       } else {
         setProgress(newProgress);
       }
     }, intervalTime);
   
     return () => clearInterval(interval);
-  }, [onComplete]);
+  }, []);
 
   useEffect(() => {
     if (!api) {
@@ -645,24 +647,23 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
 
   if (imc < 18.5) {
     imcCategory = 'Abaixo do peso';
-    // Position within the first 25% of the bar
     categoryPercentage = (imc / 18.5) * 25;
   } else if (imc < 25) {
     imcCategory = 'Normal';
-    // Position within the second 25% of the bar (25% to 50%)
     categoryPercentage = 25 + ((imc - 18.5) / (24.9 - 18.5)) * 25;
   } else if (imc < 30) {
     imcCategory = 'Sobrepeso';
-    // Position within the third 25% of the bar (50% to 75%)
     categoryPercentage = 50 + ((imc - 25) / (29.9 - 25)) * 25;
   } else {
     imcCategory = 'Obesidade';
     // Position within the last 25% of the bar (75% to 100%)
-    // We cap it slightly below 100 to not overflow
-    categoryPercentage = 75 + Math.min(((imc - 30) / (40 - 30)) * 25, 24);
+    // Cap the position at 95% to ensure the "Você está aqui" marker doesn't overflow the visual bar.
+    categoryPercentage = 75 + Math.min(((imc - 30) / (40 - 30)) * 25, 20);
   }
-  // Clamp the value to be within a visible range (e.g., 5% to 95%) to avoid edge cases
+  
+  // Clamp the value to be within a visible range (e.g., 5% to 95%) to avoid edge cases visually.
   categoryPercentage = Math.max(5, Math.min(95, categoryPercentage));
+
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
