@@ -49,31 +49,6 @@ function ResultsContent() {
   return (
     <main className="container mx-auto max-w-2xl bg-white p-4 text-center">
       
-      {/* Seção A: Introdução e Prova Social */}
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Veja a transformação da Silvia!</h1>
-        <Image
-          src="/silvia.webp"
-          alt="Transformação da Silvia"
-          width={580}
-          height={400}
-          className="mx-auto rounded-lg"
-          data-ai-hint="woman before after weight loss"
-        />
-        <p className="text-gray-600">
-          A partir dos dados coletados e do resultado do seu IMC, nós elaboramos um programa de acompanhamento individual para que você alcance seus resultados no menor tempo possível, com a melhor qualidade de vida projetada de acordo com seus objetivos — em apenas 4 semanas.
-        </p>
-
-        <div className="rounded-lg border bg-gray-50 p-4 text-left">
-          <p className="font-bold">Nível de Sucesso com o Mounjaro dos Pobres</p>
-          <p className="text-sm text-gray-500">Baseado nos dados de clientes do Mounjaro dos Pobres que registram seu progresso no aplicativo.</p>
-          <div className="mt-2 flex items-center gap-2">
-            <Progress value={93} className="h-4 flex-1" style={{ backgroundColor: '#e0e0e0' }} />
-            <span className="font-bold text-green-700">93%</span>
-          </div>
-        </div>
-      </div>
-
       {/* Seção B: Análise Detalhada do Perfil */}
       <div className="mt-10 space-y-6">
         <h2 className="text-left text-xl font-bold">4, aqui está a análise do seu perfil:</h2>
@@ -143,6 +118,32 @@ function ResultsContent() {
           </div>
         </div>
       </div>
+
+       {/* Seção A: Introdução e Prova Social */}
+       <div className="space-y-6 mt-10">
+        <h1 className="text-2xl font-bold">Veja a transformação da Silvia!</h1>
+        <Image
+          src="/silvia.webp"
+          alt="Transformação da Silvia"
+          width={580}
+          height={400}
+          className="mx-auto rounded-lg"
+          data-ai-hint="woman before after weight loss"
+        />
+        <p className="text-gray-600">
+          A partir dos dados coletados e do resultado do seu IMC, nós elaboramos um programa de acompanhamento individual para que você alcance seus resultados no menor tempo possível, com a melhor qualidade de vida projetada de acordo com seus objetivos — em apenas 4 semanas.
+        </p>
+
+        <div className="rounded-lg border bg-gray-50 p-4 text-left">
+          <p className="font-bold">Nível de Sucesso com o Mounjaro dos Pobres</p>
+          <p className="text-sm text-gray-500">Baseado nos dados de clientes do Mounjaro dos Pobres que registram seu progresso no aplicativo.</p>
+          <div className="mt-2 flex items-center gap-2">
+            <Progress value={93} className="h-4 flex-1" style={{ backgroundColor: '#e0e0e0' }} />
+            <span className="font-bold text-green-700">93%</span>
+          </div>
+        </div>
+      </div>
+
     </main>
   );
 }
