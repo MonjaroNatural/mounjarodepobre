@@ -53,7 +53,7 @@ function ResultsContent() {
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">Veja a transformação da Silvia!</h1>
         <Image
-          src="https://placehold.co/600x400.png"
+          src="/silvia.webp"
           alt="Transformação da Silvia"
           width={580}
           height={400}
