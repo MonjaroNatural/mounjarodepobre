@@ -6,7 +6,7 @@ export type Answer = {
 
 export type QuizQuestion = {
   id: number;
-  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading' | 'weight-slider';
+  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading' | 'weight-slider' | 'height-slider';
   question: string;
   subtitle?: string;
   options?: { label: string; sublabel?: string; imageUrl?: string, icon?: string, emoji?: string }[];
@@ -68,7 +68,7 @@ export const quizQuestions: QuizQuestion[] = [
     id: 4,
     type: 'text',
     question: 'Qual seu nome?',
-    subtitle: 'Para montar seu plano personalizado, precisamos do seu nome. Fique tranquila, seus dados estão protegidos 🔒',
+    subtitle: 'Para montar seu plano personalizado, precisamos do seu nome. Fique tranquila, seus dados estão protegidos🔒',
     placeholder: 'Digite seu nome...',
     buttonText: 'Continuar',
   },
@@ -155,10 +155,12 @@ export const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 12,
-    type: 'number',
+    type: 'height-slider',
     question: 'Qual é a sua altura?',
-    subtitle: 'Isso vai nos ajudar a calcular a quantidade exata do Mounjaro dos Pobres para seu corpo.',
-    placeholder: 'Sua altura em cm',
+    options: [
+        { label: 'cm', sublabel: 'Isso vai nos ajudar a calcular a quantidade exata do Mounjaro dos Pobres para seu corpo.' },
+        { label: 'pol', sublabel: 'Arraste para ajustar' },
+    ],
     buttonText: 'Continuar',
   },
   {

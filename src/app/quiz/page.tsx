@@ -28,7 +28,9 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [currentAnswer, setCurrentAnswer] = useState<string | string[] | number | null>(null);
   const [weight, setWeight] = useState(70);
-  const [unit, setUnit] = useState<'kg' | 'lb'>('kg');
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lb'>('kg');
+  const [height, setHeight] = useState(165);
+  const [heightUnit, setHeightUnit] = useState<'cm' | 'pol'>('cm');
   const router = useRouter();
 
   useEffect(() => {
@@ -36,16 +38,17 @@ export default function QuizPage() {
     const previousAnswer = answers.find(a => a.questionId === question.id);
 
     if (previousAnswer) {
-      if (question.type === 'weight-slider') {
+      if (question.type === 'weight-slider' || question.type === 'height-slider') {
         const value = previousAnswer.value as string;
-        const matchedWeight = value.match(/(\d+)/);
-        if (matchedWeight) {
-          setWeight(parseInt(matchedWeight[0], 10));
-        }
-        if(value.includes('lb')){
-          setUnit('lb');
-        } else {
-          setUnit('kg');
+        const matchedValue = value.match(/(\d+)/);
+        if (matchedValue) {
+          if (question.type === 'weight-slider') {
+            setWeight(parseInt(matchedValue[0], 10));
+            if (value.includes('lb')) setWeightUnit('lb'); else setWeightUnit('kg');
+          } else {
+            setHeight(parseInt(matchedValue[0], 10));
+            if (value.includes('pol')) setHeightUnit('pol'); else setHeightUnit('cm');
+          }
         }
       } else {
         setCurrentAnswer(previousAnswer.value);
@@ -55,10 +58,13 @@ export default function QuizPage() {
         setCurrentAnswer([]);
       } else if (question.type === 'weight-slider') {
         setWeight(70);
-        setUnit('kg');
+        setWeightUnit('kg');
         setCurrentAnswer(null); 
-      }
-      else {
+      } else if (question.type === 'height-slider') {
+        setHeight(165);
+        setHeightUnit('cm');
+        setCurrentAnswer(null);
+      } else {
         setCurrentAnswer(null);
       }
     }
@@ -70,7 +76,10 @@ export default function QuizPage() {
     let answerToStore: Answer | null = null;
     
     if (question.type === 'weight-slider') {
-      const value = `${weight}${unit}`;
+      const value = `${weight}${weightUnit}`;
+      answerToStore = { questionId: question.id, value };
+    } else if (question.type === 'height-slider') {
+      const value = `${height}${heightUnit}`;
       answerToStore = { questionId: question.id, value };
     } else if (currentAnswer !== null && currentAnswer !== '' && (!Array.isArray(currentAnswer) || currentAnswer.length > 0)) {
        answerToStore = { questionId: question.id, value: currentAnswer };
@@ -189,58 +198,33 @@ export default function QuizPage() {
        case 'text':
        case 'number':
          return (
-          <div className="w-full max-w-md flex flex-col items-center gap-4 text-center">
-            {question.id === 4 ? (
-              <>
-                <Input
-                    type="text"
-                    placeholder={question.placeholder}
-                    value={typeof currentAnswer === 'string' ? currentAnswer : ''}
-                    onChange={(e) => setCurrentAnswer(e.target.value)}
-                    className="h-12 text-lg text-center"
-                    required
-                />
-                <p className="text-center text-sm text-gray-600">
-                    {question.subtitle?.replace('🔒', '🔒')}
-                </p>
-              </>
-            ) : (
-               <>
-                  <Input 
-                    type={question.type === 'number' ? 'number' : 'text'}
-                    placeholder={question.placeholder} 
-                    value={typeof currentAnswer === 'string' ? currentAnswer : ''}
-                    onChange={(e) => setCurrentAnswer(e.target.value)}
-                    className="h-12 text-lg"
-                    required
-                  />
-                  {question.subtitle && 
-                     <p className="text-center text-sm text-gray-600 flex items-center gap-1">
-                         {question.subtitle}
-                     </p>}
-                </>
-              )}
-           </div>
+            <Input 
+              type={question.type === 'number' ? 'number' : 'text'}
+              placeholder={question.placeholder} 
+              value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+              onChange={(e) => setCurrentAnswer(e.target.value)}
+              className="h-12 text-lg"
+              required
+            />
          );
       case 'weight-slider':
         return (
           <div className="w-full max-w-md flex flex-col items-center gap-6 text-center">
-              <p className="text-muted-foreground">{question.options?.[0].sublabel}</p>
               <RadioGroup
-                value={unit}
-                onValueChange={(value) => setUnit(value as 'kg' | 'lb')}
+                value={weightUnit}
+                onValueChange={(value) => setWeightUnit(value as 'kg' | 'lb')}
                 className="flex items-center space-x-1 rounded-full border border-gray-300 bg-gray-100 p-1"
               >
                   <RadioGroupItem value="kg" id="kg" className="sr-only" />
-                  <Label htmlFor="kg" className={`cursor-pointer rounded-full px-6 py-2 transition-colors ${unit === 'kg' ? 'bg-[#5a8230] text-white' : 'bg-transparent text-black'}`}>
+                  <Label htmlFor="kg" className={`cursor-pointer rounded-full px-6 py-2 transition-colors ${weightUnit === 'kg' ? 'bg-[#5a8230] text-white' : 'bg-transparent text-black'}`}>
                       kg
                   </Label>
                   <RadioGroupItem value="lb" id="lb" className="sr-only" />
-                  <Label htmlFor="lb" className={`cursor-pointer rounded-full px-6 py-2 transition-colors ${unit === 'lb' ? 'bg-[#5a8230] text-white' : 'bg-transparent text-black'}`}>
+                  <Label htmlFor="lb" className={`cursor-pointer rounded-full px-6 py-2 transition-colors ${weightUnit === 'lb' ? 'bg-[#5a8230] text-white' : 'bg-transparent text-black'}`}>
                       lb
                   </Label>
               </RadioGroup>
-              <div className="text-5xl font-bold text-black">{weight}{unit}</div>
+              <div className="text-5xl font-bold text-black">{weight}{weightUnit}</div>
               <Slider
                 value={[weight]}
                 onValueChange={(value) => setWeight(value[0])}
@@ -250,7 +234,36 @@ export default function QuizPage() {
                 className="w-full"
               />
               <p className="text-sm text-gray-500">Arraste para ajustar</p>
-              <p className="text-muted-foreground">{question.options?.[1].sublabel}</p>
+              {question.options?.[1]?.sublabel && <p className="text-muted-foreground">{question.options[1].sublabel}</p>}
+          </div>
+        );
+      case 'height-slider':
+        return (
+          <div className="w-full max-w-md flex flex-col items-center gap-6 text-center">
+              <RadioGroup
+                value={heightUnit}
+                onValueChange={(value) => setHeightUnit(value as 'cm' | 'pol')}
+                className="flex items-center space-x-1 rounded-full border border-gray-300 bg-gray-100 p-1"
+              >
+                  <RadioGroupItem value="cm" id="cm" className="sr-only" />
+                  <Label htmlFor="cm" className={`cursor-pointer rounded-full px-6 py-2 transition-colors ${heightUnit === 'cm' ? 'bg-[#5a8230] text-white' : 'bg-transparent text-black'}`}>
+                      cm
+                  </Label>
+                  <RadioGroupItem value="pol" id="pol" className="sr-only" />
+                  <Label htmlFor="pol" className={`cursor-pointer rounded-full px-6 py-2 transition-colors ${heightUnit === 'pol' ? 'bg-[#5a8230] text-white' : 'bg-transparent text-black'}`}>
+                      pol
+                  </Label>
+              </RadioGroup>
+              <div className="text-5xl font-bold text-black">{height}{heightUnit}</div>
+              <Slider
+                value={[height]}
+                onValueChange={(value) => setHeight(value[0])}
+                min={140}
+                max={220}
+                step={1}
+                className="w-full"
+              />
+              <p className="text-sm text-gray-500">{question.options?.[1]?.sublabel}</p>
           </div>
         );
       case 'promise':
@@ -286,8 +299,8 @@ export default function QuizPage() {
   };
   
   const isButtonDisabled = () => {
-    if (question.type === 'promise' || question.type === 'testimonial' || question.type === 'weight-slider') {
-        return false;
+    if (['promise', 'testimonial', 'weight-slider', 'height-slider'].includes(question.type)) {
+      return false;
     }
     if (['text', 'number', 'multiple-choice'].includes(question.type)) {
       return currentAnswer === null || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0);
@@ -325,6 +338,8 @@ export default function QuizPage() {
           </>;
         case 'Qual é o seu peso atual?':
           return <>Qual é o seu <span style={{ color: '#28a745' }}>peso atual?</span></>;
+        case 'Qual é a sua altura?':
+          return <>Qual é a <span style={{ color: '#28a745' }}>sua altura?</span></>;
         default:
           return question.question;
       }
@@ -340,14 +355,24 @@ export default function QuizPage() {
   };
   
   const getSubtitle = () => {
-      if (!question.subtitle) return null;
-      if (['promise', 'text', 'number', 'weight-slider'].includes(question.type)) return null;
+      if (!question.subtitle && !(question.type === 'weight-slider' || question.type === 'height-slider')) return null;
+      
+      let subtitleText = question.subtitle;
+      if (question.type === 'weight-slider') {
+        subtitleText = question.options?.[0]?.sublabel;
+      } else if (question.type === 'height-slider') {
+        subtitleText = question.options?.[0]?.sublabel;
+      }
+
+      if (!subtitleText) return null;
+      if (['promise', 'text', 'number'].includes(question.type) && question.id !== 4) return null;
+
 
       const subtitleAlignmentClass = question.type === 'testimonial' ? 'text-left' : 'text-center justify-center';
       
-      const subtitleContent = question.subtitle.startsWith('📌') 
-          ? <><span className="text-2xl">📌</span> {question.subtitle.substring(1)}</>
-          : question.subtitle;
+      const subtitleContent = subtitleText.startsWith('📌') 
+          ? <><span className="text-2xl">📌</span> {subtitleText.substring(1)}</>
+          : subtitleText;
 
       return (
           <div className={`mb-6 ${subtitleAlignmentClass}`}>
@@ -381,12 +406,24 @@ export default function QuizPage() {
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
         <div className={`mx-auto w-full ${question.id === 4 ? 'max-w-xs' : 'max-w-md'}`}>
            {getQuestionTitle()}
-           {question.id !== 4 && getSubtitle()}
+           {getSubtitle()}
 
-          <div className={`flex items-center justify-center ${question.type === 'text' || question.type === 'number' || question.type === 'testimonial' || question.type === 'weight-slider' ? 'flex-col' : ''}`}>
-             {question.id === 4 && <div className='mb-4 w-full'>{renderQuestion()}</div>}
-             {question.id === 4 && getSubtitle()}
-             {question.id !== 4 && renderQuestion()}
+          <div className={`flex items-center justify-center ${question.type === 'text' || question.type === 'number' || question.type === 'testimonial' || question.type === 'weight-slider' || question.type === 'height-slider' ? 'flex-col' : ''}`}>
+             {question.id === 4 ? (
+                <div className="w-full flex flex-col items-center gap-4">
+                    <Input
+                        type="text"
+                        placeholder={question.placeholder}
+                        value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+                        onChange={(e) => setCurrentAnswer(e.target.value)}
+                        className="h-12 text-lg text-center"
+                        required
+                    />
+                    <p className="text-center text-sm text-gray-600">
+                        {question.subtitle?.replace('🔒', '🔒')}
+                    </p>
+                </div>
+             ) : renderQuestion()}
           </div>
           
           {showButton && (
@@ -395,7 +432,7 @@ export default function QuizPage() {
                  onClick={handleNext} 
                  disabled={isButtonDisabled()}
                  size="lg"
-                 className={`w-full h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90 ${question.id === 4 ? 'max-w-xs' : 'max-w-xs'}`}
+                 className="w-full max-w-xs h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
                >
                  {question.buttonText}
                   <ChevronRight className="h-6 w-6" />
