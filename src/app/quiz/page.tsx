@@ -20,9 +20,12 @@ export default function QuizPage() {
   const router = useRouter();
 
   const handleNext = () => {
-    if (currentAnswer !== null) {
+    if (currentAnswer !== null && currentAnswer !== '' && (!Array.isArray(currentAnswer) || currentAnswer.length > 0)) {
       const newAnswers = [...answers, { questionId: quizQuestions[currentStep].id, value: currentAnswer }];
       setAnswers(newAnswers);
+    } else {
+      // Maybe show a message to the user
+      return;
     }
 
     if (currentStep < quizQuestions.length - 1) {
@@ -74,7 +77,7 @@ export default function QuizPage() {
                     className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
                     <div className="flex items-center gap-4">
-                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-auto w-16 rounded-md object-cover" />}
+                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
                       <span className="flex-1">{option.label}</span>
                     </div>
                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
@@ -92,7 +95,7 @@ export default function QuizPage() {
             {question.options?.map((option) => (
                 <Label key={option.label} htmlFor={option.label} className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary">
                   <div className="flex items-center gap-4">
-                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-auto w-16 rounded-md object-cover" />}
+                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
                     <span className="flex-1">{option.label}</span>
                   </div>
                   <Checkbox 
@@ -108,12 +111,27 @@ export default function QuizPage() {
       case 'text':
       case 'number':
         return (
-          <Input 
-            type={question.type === 'number' ? 'number' : 'text'}
-            placeholder={question.placeholder} 
-            onChange={(e) => setCurrentAnswer(e.target.value)}
-            className="max-w-md text-center h-12 text-lg"
-          />
+          <div className="w-full max-w-md flex flex-col items-center">
+            <Input 
+              type={question.type === 'number' ? 'number' : 'text'}
+              placeholder={question.placeholder} 
+              onChange={(e) => setCurrentAnswer(e.target.value)}
+              className="max-w-md text-center h-12 text-lg mb-4"
+              required
+            />
+            {question.subtitle && <p className="text-center text-sm text-muted-foreground mb-6">{question.subtitle}</p>}
+            {question.buttonText && (
+              <Button 
+                onClick={handleNext} 
+                disabled={currentAnswer === null || currentAnswer === ''}
+                size="lg"
+                className="w-full h-14 text-lg"
+              >
+                {question.buttonText}
+                <ChevronRight className="h-6 w-6" />
+              </Button>
+            )}
+          </div>
         );
       case 'promise':
         return (
@@ -151,14 +169,13 @@ export default function QuizPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="fixed top-0 left-0 right-0 z-10 bg-background p-2">
+      <div className="fixed top-0 left-0 right-0 z-10 bg-background pt-2">
         <div className="flex items-center justify-center">
             <Image
               src="/novologo.webp"
               alt="Mounjaro de Pobre Logo"
               width={70}
               height={70}
-              className="mx-auto"
             />
         </div>
         <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" />
@@ -166,24 +183,32 @@ export default function QuizPage() {
 
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
         <div className="mx-auto w-full max-w-md">
-           <div className="text-center">
-              <h1 className="text-3xl font-bold md:text-4xl mb-6">
-                {question.question.split(' ').slice(0, -2).join(' ')}
-                <span className="block text-primary">{question.question.split(' ').slice(-2).join(' ')}</span>
+           <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold md:text-4xl">
+                {question.question}
               </h1>
-              
               {!isInputType && question.subtitle && <p className="mt-4 text-muted-foreground md:text-lg underline">{question.subtitle}</p>}
           </div>
 
-          <div className="my-8 flex items-center justify-center">
+          <div className="flex items-center justify-center">
             {renderQuestion()}
           </div>
 
-          {isInputType && question.subtitle && <p className="text-center text-sm text-muted-foreground mb-6">{question.subtitle}</p>}
-
-
-          {question.buttonText && (
-            <div className="text-center">
+          {!question.buttonText && !isInputType && (
+            <div className="text-center mt-8">
+              <Button 
+                onClick={handleNext} 
+                disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}
+                size="lg"
+                className="w-full max-w-xs h-14 text-lg"
+              >
+                Continuar
+                <ChevronRight className="h-6 w-6" />
+              </Button>
+            </div>
+          )}
+          {question.type !== 'text' && question.type !== 'number' && question.buttonText && (
+            <div className="text-center mt-8">
               <Button 
                 onClick={handleNext} 
                 disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}
@@ -226,3 +251,5 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
     </div>
   );
 }
+
+    
