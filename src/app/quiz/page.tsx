@@ -647,22 +647,17 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
 
   if (imc < 18.5) {
     imcCategory = 'Abaixo do peso';
-    categoryPercentage = (imc / 18.5) * 25;
+    categoryPercentage = 12.5;
   } else if (imc < 25) {
     imcCategory = 'Normal';
-    categoryPercentage = 25 + ((imc - 18.5) / (24.9 - 18.5)) * 25;
+    categoryPercentage = 37.5;
   } else if (imc < 30) {
     imcCategory = 'Sobrepeso';
-    categoryPercentage = 50 + ((imc - 25) / (29.9 - 25)) * 25;
+    categoryPercentage = 62.5;
   } else {
     imcCategory = 'Obesidade';
-    // Position within the last 25% of the bar (75% to 100%)
-    // Cap the position at 95% to ensure the "Você está aqui" marker doesn't overflow the visual bar.
-    categoryPercentage = 75 + Math.min(((imc - 30) / (40 - 30)) * 25, 20);
+    categoryPercentage = 87.5;
   }
-  
-  // Clamp the value to be within a visible range (e.g., 5% to 95%) to avoid edge cases visually.
-  categoryPercentage = Math.max(5, Math.min(95, categoryPercentage));
 
 
   return (
