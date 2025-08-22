@@ -494,7 +494,7 @@ function QuizComponent() {
         {(question.type !== 'loading' && question.type !== 'results') && (
            <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" style={{backgroundColor: '#e0e0e0'}} />
         )}
-         {question.type === 'results' && quizQuestions.length > currentStep + 1 && (
+         {question.type === 'results' && (
              <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" style={{backgroundColor: '#e0e0e0'}} />
          )}
 
@@ -670,20 +670,33 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   }
 
   const calculateMarkerPosition = (imc: number) => {
-    if (imc <= 0) return 0;
-    if (imc < 18.5) { // Abaixo do peso: 0%-25%
-        return Math.max(0, Math.min(25, (imc / 18.5) * 25));
-    } else if (imc < 25) { // Normal: 25%-50%
-        return 25 + ((imc - 18.5) / (25 - 18.5)) * 25;
-    } else if (imc < 30) { // Sobrepeso: 50%-75%
-        return 50 + ((imc - 25) / (30 - 25)) * 25;
-    } else { // Obesidade: 75%-100%
-        const basePosition = 75;
-        // Use a logarithmic scale for values above 30 to prevent overflow
-        // This makes the marker move slower as IMC increases, but it will still move
-        const additional = Math.min(24, (Math.log(imc - 29) / Math.log(40)) * 25); // Cap at 99%
-        return Math.min(99, basePosition + additional);
+    const belowWeightMax = 18.5;
+    const normalMax = 25;
+    const overweightMax = 30;
+    const obesity1Max = 35;
+    const obesity2Max = 40;
+    
+    if (imc >= obesity2Max) {
+        return 97; 
     }
+    if (imc >= obesity1Max) {
+        const segment = (imc - obesity1Max) / (obesity2Max - obesity1Max);
+        return 87.5 + segment * 9.5; 
+    }
+    if (imc >= overweightMax) {
+        const segment = (imc - overweightMax) / (obesity1Max - overweightMax);
+        return 75 + segment * 12.5;
+    }
+    if (imc >= normalMax) {
+        const segment = (imc - normalMax) / (overweightMax - normalMax);
+        return 50 + segment * 25;
+    }
+    if (imc >= belowWeightMax) {
+        const segment = (imc - belowWeightMax) / (normalMax - belowWeightMax);
+        return 25 + segment * 25;
+    }
+    const segment = imc / belowWeightMax;
+    return Math.max(0, segment * 25);
   }
 
   const imcCategory = getImcCategory(imc);
@@ -700,30 +713,26 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
         </div>
 
         <div className="w-full text-left">
-           <div className="relative w-full">
-            <div className="absolute top-0 left-0 right-0 flex justify-between text-xs text-gray-500">
-                <span className="text-yellow-500 font-bold">Zona de Alerta</span>
-                <span className="text-red-500 font-bold">65%</span>
-            </div>
-            <div className="mt-6 h-4 w-full flex rounded-full overflow-hidden">
+           <div className="relative w-full pt-8">
+            <div className="h-4 w-full flex rounded-full overflow-hidden">
                 <div className="w-1/4 bg-yellow-400"></div>
                 <div className="w-1/4 bg-green-500"></div>
                 <div className="w-1/4 bg-orange-400"></div>
                 <div className="w-1/4 bg-red-500"></div>
             </div>
-             <div className="relative h-4" style={{ left: `${markerPosition}%`, transform: 'translateX(-50%)' }}>
-                <div className="absolute top-[-10px] flex flex-col items-center">
-                    <div className="whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white shadow-lg">
+             <div className="absolute top-0 h-full" style={{ left: `${markerPosition}%`, transform: 'translateX(-50%)' }}>
+                 <div className="relative flex flex-col items-center">
+                    <div className="whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white shadow-lg z-10">
                         Você está aqui
                     </div>
                     <div className="h-3 w-3 -mt-1 rotate-45 transform bg-black"></div>
                 </div>
             </div>
-            <div className="mt-8 flex justify-between text-xs text-gray-500">
-                <span>Abaixo do peso</span>
-                <span>Normal</span>
-                <span>Sobrepeso</span>
-                <span>Obesidade</span>
+            <div className="mt-2 flex justify-between text-xs text-gray-500">
+                <span className="w-1/4 text-center">Abaixo do peso</span>
+                <span className="w-1/4 text-center">Normal</span>
+                <span className="w-1/4 text-center">Sobrepeso</span>
+                <span className="w-1/4 text-center">Obesidade</span>
             </div>
           </div>
         </div>
