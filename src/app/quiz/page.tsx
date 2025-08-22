@@ -92,15 +92,20 @@ export default function QuizPage() {
        }
     }
 
+    let newAnswers = [...answers];
     if (answerToStore) {
         const otherAnswers = answers.filter(a => a.questionId !== question.id);
-        const newAnswers = [...otherAnswers, answerToStore];
+        newAnswers = [...otherAnswers, answerToStore];
         setAnswers(newAnswers);
     }
     
     if (question.type === 'promise' || question.type === 'testimonial' || question.type === 'loading') {
        if (currentStep < quizQuestions.length - 1) {
             setCurrentStep(currentStep + 1);
+        } else {
+          const weightAnswer = newAnswers.find(a => a.questionId === 11)?.value;
+          const heightAnswer = newAnswers.find(a => a.questionId === 12)?.value;
+          router.push(`/quiz/results?weight=${weightAnswer}&height=${heightAnswer}`);
         }
         return;
     }
@@ -108,7 +113,9 @@ export default function QuizPage() {
     if (currentStep < quizQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      console.log('Quiz finished', answers);
+       const weightAnswer = newAnswers.find(a => a.questionId === 11)?.value;
+       const heightAnswer = newAnswers.find(a => a.questionId === 12)?.value;
+       router.push(`/quiz/results?weight=${weightAnswer}&height=${heightAnswer}`);
     }
   };
 
