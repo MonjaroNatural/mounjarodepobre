@@ -46,6 +46,7 @@ export default function QuizPage() {
 
 
   const handleNext = () => {
+    const question = quizQuestions[currentStep];
     // For promise type, we need to check if the button is clicked, not the answer state
     if (question.type === 'promise' || question.type === 'testimonial' || question.type === 'loading') {
        if (currentStep < quizQuestions.length - 1) {
@@ -211,9 +212,8 @@ export default function QuizPage() {
     }
   };
   
-  const isInputType = question.type === 'text' || question.type === 'number';
-  const isActionNeeded = currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0);
-  const isButtonDisabled = isActionNeeded && question.type !== 'promise' && question.type !== 'testimonial';
+  const isButtonDisabled = currentAnswer === null || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0);
+  const showButton = question.buttonText && (question.type !== 'single-choice' && question.type !== 'single-choice-column');
 
 
   return (
@@ -270,37 +270,23 @@ export default function QuizPage() {
                   question.question
                 )}
               </h1>
-              {question.subtitle && question.type !== 'promise' && !isInputType && <p className="mt-4 text-muted-foreground md:text-lg">{question.subtitle}</p>}
+              {question.subtitle && question.type !== 'promise' && <p className="mt-4 text-muted-foreground md:text-lg">{question.subtitle}</p>}
           </div>
 
           <div className="flex items-center justify-center">
             {renderQuestion()}
           </div>
 
-          {!isInputType && question.type !== 'single-choice' && question.type !== 'single-choice-column' && (
+          {showButton && (
             <div className="text-center mt-8">
               <Button 
                 onClick={handleNext} 
-                disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}
+                disabled={isButtonDisabled}
                 size="lg"
                 className="w-full max-w-xs h-14 text-lg"
-              >
-                Continuar
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-            </div>
-          )}
-          {question.buttonText && (
-            <div className="text-center mt-8">
-              <Button 
-                onClick={handleNext} 
-                disabled={isButtonDisabled && question.type !== 'promise'}
-                size="lg"
-                className="w-full max-w-xs h-14 text-lg"
-                style={{ backgroundColor: '#5a8230', color: 'white' }}
               >
                 {question.buttonText}
-                 {question.type !== 'promise' && <ChevronRight className="h-6 w-6" />}
+                 <ChevronRight className="h-6 w-6" />
               </Button>
             </div>
           )}
@@ -335,3 +321,5 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
     </div>
   );
 }
+
+    
