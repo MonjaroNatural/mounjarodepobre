@@ -6,7 +6,7 @@ export type Answer = {
 
 export type QuizQuestion = {
   id: number;
-  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading' | 'weight-slider' | 'height-slider' | 'results';
+  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading' | 'weight-slider' | 'height-slider' | 'results' | 'single-choice-image';
   question: string;
   subtitle?: string;
   options?: { label: string; sublabel?: string; imageUrl?: string, icon?: string, emoji?: string }[];
@@ -177,6 +177,17 @@ export const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 14,
+    type: 'single-choice-image',
+    question: 'Qual é o corpo dos seus sonhos?',
+    subtitle: 'Escolha uma opção abaixo:',
+    options: [
+      { label: 'Em forma', imageUrl: '/enforma.webp' },
+      { label: 'Natural', imageUrl: '/natural.webp' },
+    ],
+    autoAdvance: true,
+  },
+  {
+    id: 15,
     type: 'single-choice-column',
     question: 'Como é o seu dia a dia?',
     subtitle: 'Sua rotina diária também influencia!',
@@ -189,7 +200,7 @@ export const quizQuestions: QuizQuestion[] = [
     autoAdvance: true,
   },
   {
-    id: 15,
+    id: 16,
     type: 'single-choice',
     question: 'Quantas horas você dorme por noite?',
     subtitle: 'A qualidade do seu sono impacta diretamente na sua perda de peso!',
@@ -202,7 +213,7 @@ export const quizQuestions: QuizQuestion[] = [
     autoAdvance: true,
   },
   {
-    id: 16,
+    id: 17,
     type: 'single-choice',
     question: 'Quantos copos de água você bebe por dia?',
     subtitle: 'Seu nível de hidratação também influencia na sua perda de peso.',
@@ -214,13 +225,13 @@ export const quizQuestions: QuizQuestion[] = [
     autoAdvance: true,
   },
   {
-    id: 17,
+    id: 18,
     type: 'loading',
     question: 'Aguarde enquanto preparamos o seu Mounjaro dos Pobres…',
     subtitle: 'Analisando as suas respostas...',
   },
   {
-    id: 18,
+    id: 19,
     type: 'results',
     question: 'Seus Resultados',
     buttonText: 'Continuar para a oferta',

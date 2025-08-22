@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -77,7 +78,7 @@ export default function QuizPage() {
   useEffect(() => {
     if (quizQuestions[currentStep]?.type === 'loading') {
       const timer = setTimeout(() => {
-          handleNext();
+        handleNext();
       }, 11000);
       return () => clearTimeout(timer);
     }
@@ -185,6 +186,33 @@ export default function QuizPage() {
                   </div>
                 )
             })}
+            </RadioGroup>
+          </div>
+        );
+    case 'single-choice-image':
+        return (
+          <div className="w-full">
+            <RadioGroup onValueChange={handleSingleChoice} value={typeof currentAnswer === 'string' ? currentAnswer : ''} className="flex flex-wrap justify-center gap-4">
+              {question.options?.map((option) => (
+                <div key={option.label} className="w-full max-w-[150px]">
+                  <RadioGroupItem value={option.label} id={option.label} className="peer sr-only" />
+                  <Label
+                    htmlFor={option.label}
+                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg hover:bg-primary/10 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
+                  >
+                    {option.imageUrl && (
+                      <Image
+                        src={option.imageUrl}
+                        alt={option.label}
+                        width={120}
+                        height={120}
+                        className="h-auto w-full rounded-md object-contain"
+                      />
+                    )}
+                    <span className="mt-2 text-center text-base font-medium">{option.label}</span>
+                  </Label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
         );
@@ -343,7 +371,7 @@ export default function QuizPage() {
     return false;
   };
 
-  const showButton = question.buttonText && !['single-choice', 'single-choice-column', 'loading'].includes(question.type);
+  const showButton = question.buttonText && !['single-choice', 'single-choice-column', 'single-choice-image', 'loading'].includes(question.type);
 
   const getQuestionTitle = () => {
     const titleAlignmentClass = question.type === 'testimonial' ? 'text-left' : 'text-center';
@@ -386,7 +414,9 @@ export default function QuizPage() {
         case 'Quantas horas você dorme por noite?':
           return <>Quantas <span style={{ color: '#28a745' }}>horas</span> você dorme por noite?</>;
         case 'Quantos copos de água você bebe por dia?':
-            return <><span style={{ color: '#28a745' }}>Quantos copos de água</span> você bebe por dia?</>;
+            return <>Quantos <span style={{ color: '#28a745' }}>copos de água</span> você bebe por dia?</>;
+        case 'Qual é o corpo dos seus sonhos?':
+            return <>Qual é o <span style={{ color: '#28a745' }}>corpo dos seus sonhos?</span></>;
         case '🔥 Histórias Reais de Transformação!':
             return <><span className="text-2xl">🔥</span> {question.question.substring(2)}</>;
         default:
