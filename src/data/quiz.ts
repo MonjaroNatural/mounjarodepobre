@@ -110,7 +110,7 @@ export const quizQuestions: QuizQuestion[] = [
     type: 'promise',
     question: 'Nosso protocolo Resolve isso para você!',
     subtitle: 'O Mounjaro dos Pobres age enquanto você dorme, queimando gordura de forma acelerada.',
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: '/monjaro.webp',
     buttonText: 'Continuar',
   },
   {

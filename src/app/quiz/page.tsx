@@ -149,7 +149,7 @@ export default function QuizPage() {
       case 'number':
         return (
           <div className="w-full max-w-md flex flex-col items-center">
-            <Input 
+             <Input 
               type={question.type === 'number' ? 'number' : 'text'}
               placeholder={question.placeholder} 
               value={typeof currentAnswer === 'string' ? currentAnswer : ''}
@@ -173,9 +173,13 @@ export default function QuizPage() {
         );
       case 'promise':
         return (
-           <div className="w-full text-center">
-            {question.imageUrl && <Image src={question.imageUrl} alt="Promise Image" width={300} height={200} className="mx-auto mb-4" data-ai-hint="woman celebrating" />}
-            <p className="text-lg">{question.subtitle}</p>
+           <div className="w-full text-center flex flex-col items-center gap-4">
+            {question.imageUrl && <Image src={question.imageUrl} alt="Promise Image" width={502} height={497} className="mx-auto mb-4" data-ai-hint="woman celebrating" />}
+            <p className="text-lg">
+                O Mounjaro dos Pobres age enquanto{' '}
+                <span style={{ color: '#0000FF' }}>você dorme</span>,{' '}
+                <span style={{ color: '#e53935' }}>queimando gordura</span> de forma acelerada.
+            </p>
           </div>
         );
       case 'testimonial':
@@ -228,7 +232,13 @@ export default function QuizPage() {
         <div className="mx-auto w-full max-w-md">
            <div className="text-center mb-6">
               <h1 className="text-3xl font-bold md:text-4xl">
-                 {question.question.includes('impacta sua vida') ? (
+                 {question.type === 'promise' ? (
+                  <>
+                    <span style={{ color: '#000000' }}>Nosso protocolo</span>
+                    <br />
+                    <span style={{ color: '#28a745' }}>Resolve isso para você!</span>
+                  </>
+                ) : question.question.includes('impacta sua vida') ? (
                   <>
                     Como o seu peso <span style={{ color: '#6c9a42' }}>impacta sua vida?</span>
                   </>
@@ -248,7 +258,7 @@ export default function QuizPage() {
                   question.question
                 )}
               </h1>
-              {!isInputType && question.subtitle && <p className="mt-4 text-muted-foreground md:text-lg underline">{question.subtitle}</p>}
+              {!isInputType && question.subtitle && question.type !== 'promise' && <p className="mt-4 text-muted-foreground md:text-lg underline">{question.subtitle}</p>}
           </div>
 
           <div className="flex items-center justify-center">
@@ -268,16 +278,17 @@ export default function QuizPage() {
               </Button>
             </div>
           )}
-          {question.type !== 'text' && question.type !== 'number' && question.buttonText && (
+          {question.buttonText && (
             <div className="text-center mt-8">
               <Button 
                 onClick={handleNext} 
-                disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}
+                disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0) && !isInputType }
                 size="lg"
                 className="w-full max-w-xs h-14 text-lg"
+                style={{ backgroundColor: '#5a8230', color: 'white' }}
               >
                 {question.buttonText}
-                <ChevronRight className="h-6 w-6" />
+                 {question.type !== 'promise' && <ChevronRight className="h-6 w-6" />}
               </Button>
             </div>
           )}
