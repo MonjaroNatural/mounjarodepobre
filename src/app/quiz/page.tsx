@@ -11,13 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
-import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, Clock } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
   HeartCrack: HeartCrack,
   Frown: Frown,
   Hand: Hand,
+  Clock: Clock,
 };
 
 
@@ -110,7 +111,10 @@ export default function QuizPage() {
                         {IconComponent && <IconComponent className="h-6 w-6 text-primary" />}
                         {option.emoji && <span className="text-2xl">{option.emoji}</span>}
                         {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
-                        <span className="flex-1 text-left">{option.label}</span>
+                        <div className="flex-1 text-left">
+                          <span className={option.sublabel ? "font-bold" : ""}>{option.label}</span>
+                          {option.sublabel && <p className="text-sm font-normal">{option.sublabel}</p>}
+                        </div>
                       </div>
                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
                         <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-white" />
@@ -236,7 +240,11 @@ export default function QuizPage() {
                   <>
                     Você está realmente <span style={{ color: '#6c9a42' }}>feliz</span> com <span style={{ color: '#e53935' }}>sua aparência?</span>
                   </>
-                ): (
+                ): question.question.includes('impede de perder peso') ? (
+                  <>
+                    O que mais te <span style={{ color: '#e53935' }}>impede de perder peso?</span>
+                  </>
+                ) : (
                   question.question
                 )}
               </h1>
