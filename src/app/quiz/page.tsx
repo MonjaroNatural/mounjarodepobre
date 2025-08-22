@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { quizQuestions, QuizQuestion, Answer } from '@/data/quiz';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import { Slider } from '@/components/ui/slider';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, Clock, GlassWater } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -317,8 +318,11 @@ export default function QuizPage() {
   };
   
   const isButtonDisabled = () => {
-    if (['promise', 'testimonial', 'loading'].includes(question.type)) {
-      return false;
+    if (question.type === 'promise' || question.type === 'testimonial') {
+        return false;
+    }
+    if (question.type === 'loading') {
+      return true; // Always disable for loading
     }
     if (['text', 'number', 'multiple-choice'].includes(question.type)) {
       return currentAnswer === null || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0);
@@ -326,7 +330,7 @@ export default function QuizPage() {
     return false;
   };
 
-  const showButton = question.buttonText && !['single-choice', 'single-choice-column'].includes(question.type);
+  const showButton = question.buttonText && !['single-choice', 'single-choice-column', 'loading'].includes(question.type);
 
   const getQuestionTitle = () => {
     const titleAlignmentClass = question.type === 'testimonial' ? 'text-left' : 'text-center';
@@ -370,6 +374,8 @@ export default function QuizPage() {
           return <>Quantas <span style={{ color: '#28a745' }}>horas</span> você dorme por noite?</>;
         case 'Quantos copos de água você bebe por dia?':
             return <><span style={{ color: '#28a745' }}>Quantos copos de água</span> você bebe por dia?</>;
+        case '🔥 Histórias Reais de Transformação!':
+            return <><span className="text-2xl">🔥</span> {question.question.substring(2)}</>;
         default:
           return question.question;
       }
@@ -400,6 +406,8 @@ export default function QuizPage() {
       
       const subtitleContent = subtitleText.startsWith('📌') 
           ? <><span className="text-2xl">📌</span> {subtitleText.substring(1)}</>
+          : subtitleText.startsWith('📍')
+          ? <><span className="text-2xl">📍</span> {subtitleText.substring(2)}</>
           : subtitleText;
 
       return (
@@ -415,7 +423,7 @@ export default function QuizPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="fixed top-0 left-0 right-0 z-10 bg-background pt-2">
-         {currentStep > 0 && (
+         {currentStep > 0 && question.type !== 'loading' && (
           <button onClick={handleBack} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-primary">
             <ChevronLeft className="h-8 w-8" />
           </button>
@@ -428,13 +436,15 @@ export default function QuizPage() {
               height={70}
             />
         </div>
-        <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" style={{backgroundColor: '#e0e0e0'}} />
+        {question.type !== 'loading' && (
+           <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" style={{backgroundColor: '#e0e0e0'}} />
+        )}
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
         <div className={`mx-auto w-full ${question.type === 'text' ? 'max-w-xs' : 'max-w-md'}`}>
-           {getQuestionTitle()}
-           {getSubtitle()}
+           {question.type !== 'loading' && getQuestionTitle()}
+           {question.type !== 'loading' && getSubtitle()}
 
           <div className={`flex items-center justify-center ${['text', 'number', 'testimonial', 'weight-slider', 'height-slider'].includes(question.type) ? 'flex-col' : ''}`}>
              {renderQuestion()}
@@ -463,8 +473,24 @@ export default function QuizPage() {
 
 function LoadingStep({ onComplete }: { onComplete: () => void }) {
   const [progress, setProgress] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [api, setApi] = useState<CarouselApi>()
+
+  const testimonials = [
+    '/dep1.webp',
+    '/dep2.webp',
+    '/dep3.webp',
+    '/dep4.webp',
+    '/dep5.webp',
+    '/dep6.webp',
+  ];
 
   useEffect(() => {
+    const totalDuration = 11000; // 11 seconds
+    const intervalTime = 100; // update every 100ms
+    const totalSteps = totalDuration / intervalTime;
+    const progressIncrement = 100 / totalSteps;
+
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -472,17 +498,64 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
           onComplete();
           return 100;
         }
-        return prev + 10;
+        return prev + progressIncrement;
       });
-    }, 300);
+    }, intervalTime);
 
     return () => clearInterval(interval);
   }, [onComplete]);
 
+  useEffect(() => {
+    if (!api) {
+      return
+    }
+
+    const autoplay = setInterval(() => {
+        api.scrollNext()
+    }, 2000)
+
+    api.on("select", () => {
+      setCurrentSlide(api.selectedScrollSnap())
+    })
+
+    return () => {
+        clearInterval(autoplay)
+    }
+  }, [api])
+
+
   return (
-    <div className="w-full max-w-md">
-      <Progress value={progress} />
+    <div className="w-full max-w-md flex flex-col items-center text-center gap-6">
+      <h2 className="text-xl font-bold">Aguarde enquanto preparamos o seu Mounjaro dos Pobres...</h2>
+      <p className="text-muted-foreground">Analisando as suas respostas...</p>
+      
+      <div className="w-full flex items-center gap-2">
+        <Progress value={progress} className="h-4 flex-1" style={{backgroundColor: '#e0e0e0'}} />
+        <span className="font-bold text-gray-600">{Math.round(progress)}%</span>
+      </div>
+
+      <Carousel setApi={setApi} className="w-full max-w-xs">
+        <CarouselContent>
+          {testimonials.map((src, index) => (
+            <CarouselItem key={index}>
+              <div className="p-1">
+                 <Image src={src} alt={`Depoimento ${index + 1}`} width={400} height={200} className="w-full h-auto rounded-lg" />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+         <div className="flex justify-center gap-2 mt-4">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => api?.scrollTo(index)}
+              className={`h-2 w-2 rounded-full transition-colors ${
+                currentSlide === index ? 'bg-[#6c9a42]' : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
+      </Carousel>
     </div>
   );
 }
-
