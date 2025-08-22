@@ -259,9 +259,6 @@ function QuizComponent() {
                 className="h-12 text-lg text-center"
                 required
               />
-              <p className="text-center text-sm text-gray-600">
-                {question.subtitle?.replace('🔒', '🔒')}
-              </p>
             </div>
          );
        case 'number':
