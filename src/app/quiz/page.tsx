@@ -34,19 +34,33 @@ export default function QuizPage() {
     if (previousAnswer) {
       setCurrentAnswer(previousAnswer.value);
     } else {
-      setCurrentAnswer(null); // Reset if no previous answer
+      const question = quizQuestions[currentStep];
+      // For multiple choice, initialize with an empty array
+      if (question.type === 'multiple-choice') {
+        setCurrentAnswer([]);
+      } else {
+        setCurrentAnswer(null); // Reset for other types
+      }
     }
   }, [currentStep, answers]);
 
 
   const handleNext = () => {
+    // For promise type, we need to check if the button is clicked, not the answer state
+    if (question.type === 'promise' || question.type === 'testimonial' || question.type === 'loading') {
+       if (currentStep < quizQuestions.length - 1) {
+            setCurrentStep(currentStep + 1);
+        }
+        return;
+    }
+    
     if (currentAnswer !== null && currentAnswer !== '' && (!Array.isArray(currentAnswer) || currentAnswer.length > 0)) {
       // Filter out any previous answer for this question before adding the new one
       const otherAnswers = answers.filter(a => a.questionId !== quizQuestions[currentStep].id);
       const newAnswers = [...otherAnswers, { questionId: quizQuestions[currentStep].id, value: currentAnswer }];
       setAnswers(newAnswers);
-    } else if (question.type !== 'promise' && question.type !== 'testimonial' && question.type !== 'loading') {
-      // Maybe show a message to the user, but allow advancing on promise/testimonial/loading screens
+    } else {
+       // Maybe show a message to the user
       return;
     }
 
@@ -130,8 +144,9 @@ export default function QuizPage() {
         return (
           <div className="w-full space-y-4">
             {question.options?.map((option) => (
-                <Label key={option.label} htmlFor={option.label} className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary">
+                <Label key={option.label} htmlFor={option.label} className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary">
                   <div className="flex items-center gap-4">
+                     {option.emoji && <span className="text-2xl">{option.emoji}</span>}
                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
                     <span className="flex-1 text-left">{option.label}</span>
                   </div>
@@ -157,18 +172,7 @@ export default function QuizPage() {
               className="max-w-md text-center h-12 text-lg mb-4"
               required
             />
-            {question.subtitle && <p className="text-center text-sm text-muted-foreground mb-6">{question.subtitle}</p>}
-            {question.buttonText && (
-              <Button 
-                onClick={handleNext} 
-                disabled={currentAnswer === null || currentAnswer === ''}
-                size="lg"
-                className="w-full h-14 text-lg max-w-md"
-              >
-                {question.buttonText}
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-            )}
+            {question.subtitle && <p className="text-center text-sm text-gray-600 mb-6">{question.subtitle}</p>}
           </div>
         );
       case 'promise':
@@ -257,18 +261,23 @@ export default function QuizPage() {
                   <>
                     O que mais te <span style={{ color: '#e53935' }}>impede de perder peso?</span>
                   </>
+                ) : question.question.includes('Quais desses benefícios') ? (
+                  <>
+                    <span style={{ color: '#28a745' }}>Quais desses benefícios</span>
+                    <span style={{ color: '#000000' }}> você gostaria de ter?</span>
+                  </>
                 ) : (
                   question.question
                 )}
               </h1>
-              {!isInputType && question.subtitle && question.type !== 'promise' && <p className="mt-4 text-muted-foreground md:text-lg underline">{question.subtitle}</p>}
+              {question.subtitle && question.type !== 'promise' && !isInputType && <p className="mt-4 text-muted-foreground md:text-lg">{question.subtitle}</p>}
           </div>
 
           <div className="flex items-center justify-center">
             {renderQuestion()}
           </div>
 
-          {!question.buttonText && !isInputType && question.type !== 'single-choice' && question.type !== 'single-choice-column' && (
+          {!isInputType && question.type !== 'single-choice' && question.type !== 'single-choice-column' && (
             <div className="text-center mt-8">
               <Button 
                 onClick={handleNext} 
@@ -285,7 +294,7 @@ export default function QuizPage() {
             <div className="text-center mt-8">
               <Button 
                 onClick={handleNext} 
-                disabled={isButtonDisabled}
+                disabled={isButtonDisabled && question.type !== 'promise'}
                 size="lg"
                 className="w-full max-w-xs h-14 text-lg"
                 style={{ backgroundColor: '#5a8230', color: 'white' }}
