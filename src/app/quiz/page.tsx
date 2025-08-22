@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
@@ -648,17 +649,16 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   if (imc < 18.5) {
     imcCategory = 'Abaixo do peso';
     categoryPercentage = 12.5;
-  } else if (imc >= 18.5 && imc < 25) {
+  } else if (imc < 25) {
     imcCategory = 'Normal';
     categoryPercentage = 37.5;
-  } else if (imc >= 25 && imc < 30) {
+  } else if (imc < 30) {
     imcCategory = 'Sobrepeso';
     categoryPercentage = 62.5;
   } else {
     imcCategory = 'Obesidade';
     categoryPercentage = 87.5;
   }
-
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
@@ -757,3 +757,5 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
     </div>
   );
 }
+
+    
