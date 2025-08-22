@@ -147,6 +147,7 @@ export const quizQuestions: QuizQuestion[] = [
     id: 11,
     type: 'weight-slider',
     question: 'Qual é o seu peso atual?',
+    subtitle: 'Já estamos quase terminando! Vamos ajustar seu plano de acordo com o seu corpo.',
     options: [
         { label: '', sublabel: 'Já estamos quase terminando! Vamos ajustar seu plano de acordo com o seu corpo.' },
         { label: '', sublabel: 'Com base nisso, vamos ajustar a dose ideal para que você obtenha os melhores resultados.' },
@@ -165,10 +166,13 @@ export const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 13,
-    type: 'number',
+    type: 'weight-slider',
     question: 'Qual é o seu objetivo de peso (desejado)?',
-    subtitle: 'Isso vai nos ajudar a personalizar um plano especificamente para você. Com base nisso, vamos ajudar a dose ideal para que você obtenha os melhores resultados.',
-    placeholder: 'Seu peso desejado em kg',
+    subtitle: 'Isso vai nos ajudar a personalizar um plano especificamente para você.',
+    options: [
+      { label: 'kg', sublabel: 'Isso vai nos ajudar a personalizar um plano especificamente para você.' },
+      { label: 'lb', sublabel: 'Com base nisso, vamos ajustar a dose ideal para que você obtenha os melhores resultados.' },
+    ],
     buttonText: 'Continuar',
   },
   {

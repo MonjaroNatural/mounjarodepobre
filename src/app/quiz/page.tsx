@@ -57,7 +57,7 @@ export default function QuizPage() {
       if (question.type === 'multiple-choice') {
         setCurrentAnswer([]);
       } else if (question.type === 'weight-slider') {
-        setWeight(70);
+        setWeight(question.id === 11 ? 70 : 60);
         setWeightUnit('kg');
         setCurrentAnswer(null); 
       } else if (question.type === 'height-slider') {
@@ -196,6 +196,21 @@ export default function QuizPage() {
           </div>
         );
        case 'text':
+         return (
+            <div className="w-full flex flex-col items-center gap-4">
+              <Input
+                type="text"
+                placeholder={question.placeholder}
+                value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+                onChange={(e) => setCurrentAnswer(e.target.value)}
+                className="h-12 text-lg text-center"
+                required
+              />
+              <p className="text-center text-sm text-gray-600">
+                {question.subtitle?.replace('🔒', '🔒')}
+              </p>
+            </div>
+         );
        case 'number':
          return (
             <Input 
@@ -208,6 +223,8 @@ export default function QuizPage() {
             />
          );
       case 'weight-slider':
+        const minWeight = question.id === 11 ? 40 : 50;
+        const maxWeight = question.id === 11 ? 250 : 150;
         return (
           <div className="w-full max-w-md flex flex-col items-center gap-6 text-center">
               <RadioGroup
@@ -228,8 +245,8 @@ export default function QuizPage() {
               <Slider
                 value={[weight]}
                 onValueChange={(value) => setWeight(value[0])}
-                min={40}
-                max={250}
+                min={minWeight}
+                max={maxWeight}
                 step={1}
                 className="w-full"
               />
@@ -308,7 +325,7 @@ export default function QuizPage() {
     return false;
   };
 
-  const showButton = question.buttonText && (question.type !== 'single-choice' && question.type !== 'single-choice-column');
+  const showButton = question.buttonText && !['single-choice', 'single-choice-column'].includes(question.type);
 
   const getQuestionTitle = () => {
     const titleAlignmentClass = question.type === 'testimonial' ? 'text-left' : 'text-center';
@@ -340,6 +357,14 @@ export default function QuizPage() {
           return <>Qual é o seu <span style={{ color: '#28a745' }}>peso atual?</span></>;
         case 'Qual é a sua altura?':
           return <>Qual é a <span style={{ color: '#28a745' }}>sua altura?</span></>;
+        case 'Qual é o seu objetivo de peso (desejado)?':
+          return (
+            <>
+              Qual é o <span style={{ color: '#28a745' }}>seu objetivo</span>
+              <br />
+              de peso <span style={{ color: '#28a745' }}>(desejado)?</span>
+            </>
+          );
         default:
           return question.question;
       }
@@ -358,14 +383,12 @@ export default function QuizPage() {
       if (!question.subtitle && !(question.type === 'weight-slider' || question.type === 'height-slider')) return null;
       
       let subtitleText = question.subtitle;
-      if (question.type === 'weight-slider') {
-        subtitleText = question.options?.[0]?.sublabel;
-      } else if (question.type === 'height-slider') {
+      if (question.type === 'weight-slider' || question.type === 'height-slider') {
         subtitleText = question.options?.[0]?.sublabel;
       }
 
       if (!subtitleText) return null;
-      if (['promise', 'text', 'number'].includes(question.type) && question.id !== 4) return null;
+      if (question.type === 'text' && question.id !== 4) return null;
 
 
       const subtitleAlignmentClass = question.type === 'testimonial' ? 'text-left' : 'text-center justify-center';
@@ -404,26 +427,12 @@ export default function QuizPage() {
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
-        <div className={`mx-auto w-full ${question.id === 4 ? 'max-w-xs' : 'max-w-md'}`}>
+        <div className={`mx-auto w-full ${question.type === 'text' ? 'max-w-xs' : 'max-w-md'}`}>
            {getQuestionTitle()}
            {getSubtitle()}
 
-          <div className={`flex items-center justify-center ${question.type === 'text' || question.type === 'number' || question.type === 'testimonial' || question.type === 'weight-slider' || question.type === 'height-slider' ? 'flex-col' : ''}`}>
-             {question.id === 4 ? (
-                <div className="w-full flex flex-col items-center gap-4">
-                    <Input
-                        type="text"
-                        placeholder={question.placeholder}
-                        value={typeof currentAnswer === 'string' ? currentAnswer : ''}
-                        onChange={(e) => setCurrentAnswer(e.target.value)}
-                        className="h-12 text-lg text-center"
-                        required
-                    />
-                    <p className="text-center text-sm text-gray-600">
-                        {question.subtitle?.replace('🔒', '🔒')}
-                    </p>
-                </div>
-             ) : renderQuestion()}
+          <div className={`flex items-center justify-center ${['text', 'number', 'testimonial', 'weight-slider', 'height-slider'].includes(question.type) ? 'flex-col' : ''}`}>
+             {renderQuestion()}
           </div>
           
           {showButton && (
@@ -471,3 +480,4 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
     </div>
   );
 }
+
