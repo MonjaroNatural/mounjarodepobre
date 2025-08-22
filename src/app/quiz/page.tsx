@@ -167,19 +167,37 @@ export default function QuizPage() {
        case 'text':
        case 'number':
          return (
-           <div className="w-full max-w-md flex flex-col items-center gap-4">
-             <Input 
-               type={question.type === 'number' ? 'number' : 'text'}
-               placeholder={question.placeholder} 
-               value={typeof currentAnswer === 'string' ? currentAnswer : ''}
-               onChange={(e) => setCurrentAnswer(e.target.value)}
-               className="h-12 text-lg"
-               required
-             />
-             {question.subtitle && 
-                <p className="text-center text-sm text-gray-600 flex items-center gap-1">
-                    {question.subtitle}
-                </p>}
+          <div className="w-full max-w-md flex flex-col items-center gap-4">
+             {question.id === 4 ? (
+               <>
+                 <Input 
+                   type="text"
+                   placeholder={question.placeholder} 
+                   value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+                   onChange={(e) => setCurrentAnswer(e.target.value)}
+                   className="h-12 text-lg"
+                   required
+                 />
+                 <p className="text-center text-sm text-gray-600">
+                   {question.subtitle}
+                 </p>
+               </>
+             ) : (
+               <>
+                  <Input 
+                    type={question.type === 'number' ? 'number' : 'text'}
+                    placeholder={question.placeholder} 
+                    value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+                    onChange={(e) => setCurrentAnswer(e.target.value)}
+                    className="h-12 text-lg"
+                    required
+                  />
+                  {question.subtitle && 
+                     <p className="text-center text-sm text-gray-600 flex items-center gap-1">
+                         {question.subtitle}
+                     </p>}
+                </>
+              )}
            </div>
          );
       case 'promise':
@@ -195,20 +213,16 @@ export default function QuizPage() {
         );
       case 'testimonial':
         return (
-          <div className="w-full max-w-lg rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-            <div className="mb-4 flex justify-between items-center">
-               <p className="font-bold text-sm text-muted-foreground">{question.testimonial?.title}</p>
-               <div className="flex">
-                {'★★★★★'.split('').map((star, i) => <span key={i} className="text-yellow-400">{star}</span>)}
-               </div>
+          <div className="w-full max-w-lg flex flex-col gap-4 text-left">
+            {question.imageUrl && <Image src={question.imageUrl} alt="Testimonial Image" width={580} height={476} className="mx-auto rounded-lg" data-ai-hint="woman smiling" />}
+            <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
+                <div className="flex mb-2">
+                  {'★★★★★'.split('').map((star, i) => <span key={i} className="text-yellow-400">{star}</span>)}
+                </div>
+                <p className="font-bold">{question.testimonial?.name}</p>
+                <p className="text-sm text-muted-foreground mb-2">{question.testimonial?.handle}</p>
+                <p className="text-sm">{question.testimonial?.text}</p>
             </div>
-            <div className="mb-4 flex gap-4">
-              <Image src={question.testimonial?.beforeImageUrl || ''} alt="Before" width={150} height={150} className="rounded-md" data-ai-hint="woman portrait" />
-              <Image src={question.testimonial?.afterImageUrl || ''} alt="After" width={150} height={150} className="rounded-md" data-ai-hint="fit woman" />
-            </div>
-            <p className="font-bold">{question.testimonial?.name}</p>
-            <p className="text-sm text-muted-foreground mb-2">{question.testimonial?.handle}</p>
-            <p className="text-sm">{question.testimonial?.text}</p>
           </div>
         )
       case 'loading':
@@ -221,6 +235,62 @@ export default function QuizPage() {
   const needsAnswer = ['text', 'number', 'multiple-choice'].includes(question.type);
   const isButtonDisabled = needsAnswer && (currentAnswer === null || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0));
   const showButton = question.buttonText && (question.type !== 'single-choice' && question.type !== 'single-choice-column');
+
+  const getQuestionTitle = () => {
+    const titleAlignmentClass = question.type === 'testimonial' ? 'text-left' : 'text-center';
+    
+    const titleContent = (() => {
+      switch (question.question) {
+        case 'Nosso protocolo Resolve isso para você!':
+          return (
+            <>
+              <span style={{ color: '#000000', fontWeight: 'bold' }}>Nosso protocolo</span>
+              <br />
+              <span style={{ color: '#28a745', fontWeight: 'bold' }}>Resolve isso para você!</span>
+            </>
+          );
+        case 'Como o seu peso impacta sua vida?':
+          return <>Como o seu peso <span style={{ color: '#6c9a42' }}>impacta sua vida?</span></>;
+        case 'Qual seu nome?':
+          return <>Qual seu <span style={{ fontWeight: 'bold' }}>nome?</span></>;
+        case 'Você está realmente feliz com sua aparência?':
+          return <>Você está realmente <span style={{ color: '#6c9a42' }}>feliz</span> com <span style={{ color: '#e53935' }}>sua aparência?</span></>;
+        case 'O que mais te impede de perder peso?':
+           return <>O que mais te <span style={{ color: '#e53935' }}>impede de perder peso?</span></>;
+        case 'Quais desses benefícios você gostaria de ter?':
+          return <>
+            <span style={{ color: '#28a745' }}>Quais desses benefícios</span>
+            <span style={{ color: '#000000' }}> você gostaria de ter?</span>
+          </>;
+        default:
+          return question.question;
+      }
+    })();
+    
+    return (
+        <div className={`mb-6 ${titleAlignmentClass}`}>
+            <h1 className="text-3xl font-bold md:text-4xl">
+              {titleContent}
+            </h1>
+        </div>
+    );
+  };
+  
+  const getSubtitle = () => {
+      if (!question.subtitle) return null;
+      if (['promise', 'text', 'number'].includes(question.type)) return null;
+
+      const subtitleAlignmentClass = question.type === 'testimonial' ? 'text-left' : 'text-center justify-center';
+      
+      return (
+          <div className={`mb-6 ${subtitleAlignmentClass}`}>
+            <p className="mt-4 text-muted-foreground md:text-lg flex items-center gap-2">
+              {question.subtitle}
+            </p>
+          </div>
+      );
+  }
+
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -243,46 +313,10 @@ export default function QuizPage() {
 
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
         <div className="mx-auto w-full max-w-md">
-           <div className="text-center mb-6">
-              <h1 className="text-3xl font-bold md:text-4xl">
-                 {question.type === 'promise' ? (
-                  <>
-                    <span style={{ color: '#000000', fontWeight: 'bold' }}>Nosso protocolo</span>
-                    <br />
-                    <span style={{ color: '#28a745', fontWeight: 'bold' }}>Resolve isso para você!</span>
-                  </>
-                ) : question.question.includes('impacta sua vida') ? (
-                  <>
-                    Como o seu peso <span style={{ color: '#6c9a42' }}>impacta sua vida?</span>
-                  </>
-                ) : question.question.includes('Qual seu nome?') ? (
-                  <>
-                    Qual seu <span style={{ fontWeight: 'bold' }}>nome?</span>
-                  </>
-                ) : question.question.includes('Você está realmente feliz com sua aparência?') ? (
-                  <>
-                    Você está realmente <span style={{ color: '#6c9a42' }}>feliz</span> com <span style={{ color: '#e53935' }}>sua aparência?</span>
-                  </>
-                ): question.question.includes('impede de perder peso') ? (
-                  <>
-                    O que mais te <span style={{ color: '#e53935' }}>impede de perder peso?</span>
-                  </>
-                ) : question.question.includes('Quais desses benefícios') ? (
-                  <>
-                    <span style={{ color: '#28a745' }}>Quais desses benefícios</span>
-                    <span style={{ color: '#000000' }}> você gostaria de ter?</span>
-                  </>
-                ) : (
-                  question.question
-                )}
-              </h1>
-              {question.subtitle && !['promise', 'text', 'number'].includes(question.type) && <p className="mt-4 text-muted-foreground md:text-lg flex items-center justify-center gap-2">
-                {question.subtitle?.includes("personalizar a sua fórmula") && "📌"}
-                {question.subtitle}
-              </p>}
-          </div>
+           {getQuestionTitle()}
+           {getSubtitle()}
 
-          <div className={`flex items-center justify-center ${question.type === 'text' || question.type === 'number' ? 'flex-col' : ''}`}>
+          <div className={`flex items-center justify-center ${question.type === 'text' || question.type === 'number' || question.type === 'testimonial' ? 'flex-col' : ''}`}>
             {renderQuestion()}
           </div>
           
@@ -290,7 +324,7 @@ export default function QuizPage() {
              <div className="text-center mt-8">
                <Button 
                  onClick={handleNext} 
-                 disabled={isButtonDisabled}
+                 disabled={isButtonDisabled && !(question.type === 'promise' || question.type === 'testimonial')}
                  size="lg"
                  className="w-full max-w-xs h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
                >

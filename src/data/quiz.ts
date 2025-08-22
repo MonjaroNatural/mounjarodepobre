@@ -1,3 +1,4 @@
+
 export type Answer = {
   questionId: number;
   value: string | string[];
@@ -130,12 +131,14 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 10,
     type: 'testimonial',
-    question: 'Histórias Reais de Transformação!',
+    question: '🔥 Histórias Reais de Transformação!',
+    subtitle: '📍 Depoimento: Lorena dos Santos | Porto Alegre-RS',
+    imageUrl: '/pir.webp',
     testimonial: {
       title: 'Depoimento: Lorena dos Santos | Porto Alegre-RS',
       name: 'Lorena dos Santos',
-      handle: '@bra.dasantos21',
-      text: 'Eu já tinha tentado de tudo para emagrecer, mas nada funcionava. Depois de incluir a fórmula do Mounjaro de pobre na minha rotina, perdi 10kg sem mudar nada na minha alimentação! O mais incrível é que minha forma e ansiedade diminuíram naturalmente!',
+      handle: '@lore.dossantos21',
+      text: 'Eu já tinha tentado de tudo para emagrecer, mas nada funcionava. Depois de incluir a fórmula do Mounjaro de pobre na minha rotina, perdi 11kg sem mudar nada na minha alimentação! O mais incrível é que minha fome e ansiedade diminuíram naturalmente!',
       beforeImageUrl: 'https://placehold.co/300x300.png',
       afterImageUrl: 'https://placehold.co/300x300.png',
     },
