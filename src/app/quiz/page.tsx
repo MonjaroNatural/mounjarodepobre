@@ -659,27 +659,16 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   const heightInM = heightInCm / 100;
   const imc = heightInM > 0 ? parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1)) : 0;
 
-  let imcCategory: 'Abaixo do peso' | 'Normal' | 'Sobrepeso' | 'Obesidade';
-  
-  if (imc < 18.5) {
-    imcCategory = 'Abaixo do peso';
-  } else if (imc < 25) {
-    imcCategory = 'Normal';
-  } else if (imc < 30) {
-    imcCategory = 'Sobrepeso';
-  } else {
-    imcCategory = 'Obesidade';
+  const getImcDetails = (imc: number) => {
+    if (imc < 18.5) return { category: 'Abaixo do peso', position: 12.5 };
+    if (imc < 25) return { category: 'Normal', position: 37.5 };
+    if (imc < 30) return { category: 'Sobrepeso', position: 62.5 };
+    if (imc < 35) return { category: 'Obesidade Grau I', position: 81.25 };
+    if (imc < 40) return { category: 'Obesidade Grau II', position: 87.5 };
+    return { category: 'Obesidade Grau III', position: 93.75 };
   }
-  
-  const categoryPositions: Record<typeof imcCategory, number> = {
-    'Abaixo do peso': 12.5,
-    'Normal': 37.5,
-    'Sobrepeso': 62.5,
-    'Obesidade': 87.5
-  };
 
-  const categoryPercentage = categoryPositions[imcCategory];
-
+  const { category: imcCategory, position: markerPosition } = getImcDetails(imc);
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
@@ -702,7 +691,7 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
                 <div className="w-1/4 bg-orange-400"></div>
                 <div className="w-1/4 bg-red-500"></div>
             </div>
-            <div className="relative h-4" style={{ left: `${categoryPercentage}%`, transform: 'translateX(-50%)' }}>
+            <div className="relative h-4" style={{ left: `${markerPosition}%`, transform: 'translateX(-50%)' }}>
                 <div className="absolute top-0 flex flex-col items-center">
                     <div className="h-2 w-2 rounded-full bg-black"></div>
                     <div className="mt-1 whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white">
