@@ -59,7 +59,7 @@ export default function QuizPage() {
       if (question.type === 'multiple-choice') {
         setCurrentAnswer([]);
       } else if (question.type === 'weight-slider') {
-        setWeight(question.id === 11 ? 70 : 60);
+        setWeight(question.id === 11 ? 70 : (question.id === 13 ? 60 : 70));
         setWeightUnit('kg');
         setCurrentAnswer(null); 
       } else if (question.type === 'height-slider') {
@@ -99,23 +99,22 @@ export default function QuizPage() {
         setAnswers(newAnswers);
     }
     
-    if (question.type === 'promise' || question.type === 'testimonial' || question.type === 'loading') {
-       if (currentStep < quizQuestions.length - 1) {
-            setCurrentStep(currentStep + 1);
-        } else {
-          const weightAnswer = newAnswers.find(a => a.questionId === 11)?.value;
-          const heightAnswer = newAnswers.find(a => a.questionId === 12)?.value;
-          router.push(`/quiz/results?weight=${weightAnswer}&height=${heightAnswer}`);
-        }
-        return;
-    }
+    const navigateToResults = () => {
+        const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value || '';
+        const weightAnswer = newAnswers.find(a => a.questionId === 11)?.value;
+        const heightAnswer = newAnswers.find(a => a.questionId === 12)?.value;
+        router.push(`/quiz/results?name=${encodeURIComponent(nameAnswer as string)}&weight=${weightAnswer}&height=${heightAnswer}`);
+    };
 
+    if (question.type === 'loading') {
+       navigateToResults();
+       return;
+    }
+    
     if (currentStep < quizQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-       const weightAnswer = newAnswers.find(a => a.questionId === 11)?.value;
-       const heightAnswer = newAnswers.find(a => a.questionId === 12)?.value;
-       router.push(`/quiz/results?weight=${weightAnswer}&height=${heightAnswer}`);
+       navigateToResults();
     }
   };
 
@@ -127,12 +126,19 @@ export default function QuizPage() {
 
   const handleSingleChoice = (value: string) => {
     setCurrentAnswer(value);
+    const questionId = quizQuestions[currentStep].id;
+    const otherAnswers = answers.filter(a => a.questionId !== questionId);
+    const newAnswers = [...otherAnswers, { questionId: questionId, value: value }];
+    setAnswers(newAnswers);
+
     setTimeout(() => {
        if (currentStep < quizQuestions.length - 1) {
-        const otherAnswers = answers.filter(a => a.questionId !== quizQuestions[currentStep].id);
-        const newAnswers = [...otherAnswers, { questionId: quizQuestions[currentStep].id, value: value }];
-        setAnswers(newAnswers);
         setCurrentStep(currentStep + 1);
+      } else {
+        const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value || '';
+        const weightAnswer = newAnswers.find(a => a.questionId === 11)?.value;
+        const heightAnswer = newAnswers.find(a => a.questionId === 12)?.value;
+        router.push(`/quiz/results?name=${encodeURIComponent(nameAnswer as string)}&weight=${weightAnswer}&height=${heightAnswer}`);
       }
     }, 500);
   };

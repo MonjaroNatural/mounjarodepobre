@@ -10,6 +10,7 @@ import { AlertCircle, Siren, Lightbulb, XCircle } from 'lucide-react';
 function ResultsContent() {
   const searchParams = useSearchParams();
 
+  const name = searchParams.get('name') || 'Olá';
   const weightStr = searchParams.get('weight') || '70kg';
   const heightStr = searchParams.get('height') || '165cm';
 
@@ -49,9 +50,8 @@ function ResultsContent() {
   return (
     <main className="container mx-auto max-w-2xl bg-white p-4 text-center">
       
-      {/* Seção B: Análise Detalhada do Perfil */}
       <div className="mt-10 space-y-6">
-        <h2 className="text-left text-xl font-bold">4, aqui está a análise do seu perfil:</h2>
+        <h2 className="text-left text-xl font-bold">{name}, aqui está a análise do seu perfil:</h2>
 
         <div className="rounded-lg bg-[#e8f5e9] p-4 text-center">
           <p className="font-medium">Seu IMC (Índice de Massa Corporal) é: <span className="font-bold">{imc}</span></p>
@@ -119,7 +119,6 @@ function ResultsContent() {
         </div>
       </div>
 
-       {/* Seção A: Introdução e Prova Social */}
        <div className="space-y-6 mt-10">
         <h1 className="text-2xl font-bold">Veja a transformação da Silvia!</h1>
         <Image
