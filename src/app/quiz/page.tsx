@@ -12,7 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import { Slider } from '@/components/ui/slider';
-import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, Clock } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, Clock, GlassWater } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
@@ -20,6 +20,7 @@ const iconMap: { [key: string]: React.ElementType } = {
   Frown: Frown,
   Hand: Hand,
   Clock: Clock,
+  GlassWater: GlassWater,
 };
 
 
@@ -367,6 +368,8 @@ export default function QuizPage() {
           );
         case 'Quantas horas você dorme por noite?':
           return <>Quantas <span style={{ color: '#28a745' }}>horas</span> você dorme por noite?</>;
+        case 'Quantos copos de água você bebe por dia?':
+            return <><span style={{ color: '#28a745' }}>Quantos copos de água</span> você bebe por dia?</>;
         default:
           return question.question;
       }

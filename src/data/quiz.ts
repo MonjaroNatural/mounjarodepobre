@@ -207,9 +207,9 @@ export const quizQuestions: QuizQuestion[] = [
     question: 'Quantos copos de água você bebe por dia?',
     subtitle: 'Seu nível de hidratação também influencia na sua perda de peso.',
     options: [
-      { label: '1-2 copos por dia' },
-      { label: '2-6 copos por dia' },
-      { label: 'Mais de 6 copos por dia' },
+      { label: '1-2 copos por dia', icon: 'GlassWater' },
+      { label: '2-6 copos por dia', icon: 'GlassWater' },
+      { label: 'Mais de 6 copos por dia', icon: 'GlassWater' },
     ],
     autoAdvance: true,
   },
