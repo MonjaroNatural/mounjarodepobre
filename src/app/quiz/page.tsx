@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
-import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, Clock } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, Clock, Lock } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
@@ -47,7 +47,7 @@ export default function QuizPage() {
 
   const handleNext = () => {
     const question = quizQuestions[currentStep];
-    // For promise type, we need to check if the button is clicked, not the answer state
+    // For promise type, we just advance
     if (question.type === 'promise' || question.type === 'testimonial' || question.type === 'loading') {
        if (currentStep < quizQuestions.length - 1) {
             setCurrentStep(currentStep + 1);
@@ -61,13 +61,16 @@ export default function QuizPage() {
       const newAnswers = [...otherAnswers, { questionId: quizQuestions[currentStep].id, value: currentAnswer }];
       setAnswers(newAnswers);
     } else {
-       // Maybe show a message to the user
-      return;
+       // Maybe show a message to the user that an answer is required for this question type
+       if(question.type === 'text' || question.type === 'number' || question.type === 'multiple-choice'){
+         // You could show a toast or alert here
+         console.warn("Answer is required");
+         return;
+       }
     }
 
     if (currentStep < quizQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
-      // We don't reset currentAnswer here, useEffect will handle it
     } else {
       // TODO: Handle quiz completion, maybe redirect to a results page
       console.log('Quiz finished', answers);
@@ -125,7 +128,7 @@ export default function QuizPage() {
                       <div className="flex items-center gap-4">
                         {IconComponent && <IconComponent className="h-6 w-6 text-primary" />}
                         {option.emoji && <span className="text-2xl">{option.emoji}</span>}
-                        {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
+                        {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-auto w-16 rounded-md object-contain" />}
                         <div className="flex-1 text-left">
                           <span className={option.sublabel ? "font-bold" : ""}>{option.label}</span>
                           {option.sublabel && <p className="text-sm font-normal">{option.sublabel}</p>}
@@ -148,7 +151,7 @@ export default function QuizPage() {
                 <Label key={option.label} htmlFor={option.label} className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary">
                   <div className="flex items-center gap-4">
                      {option.emoji && <span className="text-2xl">{option.emoji}</span>}
-                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
+                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-auto w-16 rounded-md object-contain" />}
                     <span className="flex-1 text-left">{option.label}</span>
                   </div>
                   <Checkbox 
@@ -161,25 +164,28 @@ export default function QuizPage() {
               ))}
           </div>
         );
-      case 'text':
-      case 'number':
-        return (
-          <div className="w-full max-w-md flex flex-col items-center">
+       case 'text':
+       case 'number':
+         return (
+           <div className="w-full max-w-md flex flex-col items-center gap-4">
              <Input 
-              type={question.type === 'number' ? 'number' : 'text'}
-              placeholder={question.placeholder} 
-              value={typeof currentAnswer === 'string' ? currentAnswer : ''}
-              onChange={(e) => setCurrentAnswer(e.target.value)}
-              className="max-w-md text-center h-12 text-lg mb-4"
-              required
-            />
-            {question.subtitle && <p className="text-center text-sm text-gray-600 mb-6">{question.subtitle}</p>}
-          </div>
-        );
+               type={question.type === 'number' ? 'number' : 'text'}
+               placeholder={question.placeholder} 
+               value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+               onChange={(e) => setCurrentAnswer(e.target.value)}
+               className="h-12 text-lg"
+               required
+             />
+             {question.subtitle && 
+                <p className="text-center text-sm text-gray-600 flex items-center gap-1">
+                    {question.subtitle}
+                </p>}
+           </div>
+         );
       case 'promise':
         return (
-           <div className="w-full text-center flex flex-col items-center gap-4">
-            {question.imageUrl && <Image src={question.imageUrl} alt="Promise Image" width={502} height={497} className="mx-auto mb-4" data-ai-hint="woman celebrating" />}
+           <div className="w-full text-center flex flex-col items-center gap-6">
+            {question.imageUrl && <Image src={question.imageUrl} alt="Promise Image" width={502} height={497} className="mx-auto" data-ai-hint="woman celebrating" />}
             <p className="text-lg">
                 O Mounjaro dos Pobres age enquanto{' '}
                 <span style={{ color: '#0000FF' }}>você dorme</span>,{' '}
@@ -212,9 +218,9 @@ export default function QuizPage() {
     }
   };
   
-  const isButtonDisabled = currentAnswer === null || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0);
+  const needsAnswer = ['text', 'number', 'multiple-choice'].includes(question.type);
+  const isButtonDisabled = needsAnswer && (currentAnswer === null || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0));
   const showButton = question.buttonText && (question.type !== 'single-choice' && question.type !== 'single-choice-column');
-
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -241,9 +247,9 @@ export default function QuizPage() {
               <h1 className="text-3xl font-bold md:text-4xl">
                  {question.type === 'promise' ? (
                   <>
-                    <span style={{ color: '#000000' }}>Nosso protocolo</span>
+                    <span style={{ color: '#000000', fontWeight: 'bold' }}>Nosso protocolo</span>
                     <br />
-                    <span style={{ color: '#28a745' }}>Resolve isso para você!</span>
+                    <span style={{ color: '#28a745', fontWeight: 'bold' }}>Resolve isso para você!</span>
                   </>
                 ) : question.question.includes('impacta sua vida') ? (
                   <>
@@ -270,26 +276,30 @@ export default function QuizPage() {
                   question.question
                 )}
               </h1>
-              {question.subtitle && question.type !== 'promise' && <p className="mt-4 text-muted-foreground md:text-lg">{question.subtitle}</p>}
+              {question.subtitle && !['promise', 'text', 'number'].includes(question.type) && <p className="mt-4 text-muted-foreground md:text-lg flex items-center justify-center gap-2">
+                {question.subtitle?.includes("personalizar a sua fórmula") && "📌"}
+                {question.subtitle}
+              </p>}
           </div>
 
-          <div className="flex items-center justify-center">
+          <div className={`flex items-center justify-center ${question.type === 'text' || question.type === 'number' ? 'flex-col' : ''}`}>
             {renderQuestion()}
           </div>
-
+          
           {showButton && (
-            <div className="text-center mt-8">
-              <Button 
-                onClick={handleNext} 
-                disabled={isButtonDisabled}
-                size="lg"
-                className="w-full max-w-xs h-14 text-lg"
-              >
-                {question.buttonText}
-                 <ChevronRight className="h-6 w-6" />
-              </Button>
-            </div>
-          )}
+             <div className="text-center mt-8">
+               <Button 
+                 onClick={handleNext} 
+                 disabled={isButtonDisabled}
+                 size="lg"
+                 className="w-full max-w-xs h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
+               >
+                 {question.buttonText}
+                  <ChevronRight className="h-6 w-6" />
+               </Button>
+             </div>
+           )}
+
         </div>
       </div>
     </div>
@@ -321,5 +331,3 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
     </div>
   );
 }
-
-    
