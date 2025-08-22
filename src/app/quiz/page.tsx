@@ -74,7 +74,8 @@ function QuizComponent() {
   }, [currentStep, answers]);
 
   useEffect(() => {
-    if (quizQuestions[currentStep]?.type === 'loading') {
+    const question = quizQuestions[currentStep];
+    if (question?.type === 'loading') {
       const timer = setTimeout(() => {
         handleNext();
       }, 11000);
@@ -112,7 +113,7 @@ function QuizComponent() {
     if (currentStep < quizQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Last step, what to do?
+      // Last step, navigate to offer
       const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value as string || '';
       router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
     }
@@ -133,7 +134,7 @@ function QuizComponent() {
     setAnswers(newAnswers);
 
     setTimeout(() => {
-       if (question.id === 16) { 
+       if (question.id === 16) { // Last question
           const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value as string || '';
           router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
           return;
@@ -557,7 +558,6 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
       if (newProgress >= 100) {
         setProgress(100);
         clearInterval(interval);
-        // Do not call onComplete here anymore
       } else {
         setProgress(newProgress);
       }
@@ -648,10 +648,10 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   if (imc < 18.5) {
     imcCategory = 'Abaixo do peso';
     categoryPercentage = 12.5;
-  } else if (imc < 25) {
+  } else if (imc >= 18.5 && imc < 25) {
     imcCategory = 'Normal';
     categoryPercentage = 37.5;
-  } else if (imc < 30) {
+  } else if (imc >= 25 && imc < 30) {
     imcCategory = 'Sobrepeso';
     categoryPercentage = 62.5;
   } else {
@@ -662,7 +662,7 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
-      <div className="space-y-6">
+       <div className="space-y-6">
         <h2 className="text-left text-xl font-bold">{name}, aqui está a análise do seu perfil:</h2>
 
         <div className="rounded-lg bg-[#e8f5e9] p-4 text-center">
