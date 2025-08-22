@@ -1,4 +1,3 @@
-
 export type Answer = {
   questionId: number;
   value: string | string[] | number;
@@ -176,29 +175,6 @@ export const quizQuestions: QuizQuestion[] = [
     buttonText: 'Continuar',
   },
   {
-    id: 14,
-    type: 'loading',
-    question: 'Aguarde enquanto preparamos o seu Mounjaro dos Pobres…',
-    subtitle: 'Analisando as suas respostas...',
-  },
-  {
-    id: 15,
-    type: 'results',
-    question: 'Seus Resultados',
-    buttonText: 'Continuar para a oferta',
-  },
-  {
-    id: 16,
-    type: 'single-choice-image',
-    question: 'Qual é o corpo dos seus sonhos?',
-    subtitle: 'Escolha uma opção abaixo:',
-    options: [
-      { label: 'Em forma', imageUrl: '/enforma.webp' },
-      { label: 'Natural', imageUrl: '/natural.webp' },
-    ],
-    autoAdvance: true,
-  },
-  {
     id: 17,
     type: 'single-choice-column',
     question: 'Como é o seu dia a dia?',
@@ -236,4 +212,27 @@ export const quizQuestions: QuizQuestion[] = [
     ],
     autoAdvance: true,
   },
+  {
+    id: 14,
+    type: 'loading',
+    question: 'Aguarde enquanto preparamos o seu Mounjaro dos Pobres…',
+    subtitle: 'Analisando as suas respostas...',
+  },
+  {
+    id: 15,
+    type: 'results',
+    question: 'Seus Resultados',
+    buttonText: 'Continuar para a oferta',
+  },
+  {
+    id: 16,
+    type: 'single-choice-image',
+    question: 'Qual é o corpo dos seus sonhos?',
+    subtitle: 'Escolha uma opção abaixo:',
+    options: [
+      { label: 'Em forma', imageUrl: '/enforma.webp' },
+      { label: 'Natural', imageUrl: '/natural.webp' },
+    ],
+    autoAdvance: true,
+  }
 ];

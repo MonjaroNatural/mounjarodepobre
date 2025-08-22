@@ -1,9 +1,7 @@
-
-
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { quizQuestions, QuizQuestion, Answer } from '@/data/quiz';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -14,19 +12,19 @@ import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import { Slider } from '@/components/ui/slider';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
-import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, Clock, GlassWater, AlertCircle, Siren, Lightbulb, XCircle } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand, GlassWater, AlertCircle, Siren, Lightbulb, XCircle } from 'lucide-react';
+import { Meter } from '@/components/ui/meter';
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
   HeartCrack: HeartCrack,
   Frown: Frown,
   Hand: Hand,
-  Clock: Clock,
   GlassWater: GlassWater,
 };
 
 
-export default function QuizPage() {
+function QuizComponent() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [currentAnswer, setCurrentAnswer] = useState<string | string[] | number | null>(null);
@@ -104,9 +102,11 @@ export default function QuizPage() {
        }
     }
 
+    let newAnswers = answers;
     if (answerToStore) {
         const otherAnswers = answers.filter(a => a.questionId !== question.id);
-        setAnswers([...otherAnswers, answerToStore]);
+        newAnswers = [...otherAnswers, answerToStore];
+        setAnswers(newAnswers);
     }
     
     if (currentStep < quizQuestions.length - 1) {
@@ -124,13 +124,20 @@ export default function QuizPage() {
   };
 
   const handleSingleChoice = (value: string) => {
+    const question = quizQuestions[currentStep];
     setCurrentAnswer(value);
-    const questionId = quizQuestions[currentStep].id;
+    const questionId = question.id;
     const otherAnswers = answers.filter(a => a.questionId !== questionId);
     const newAnswers = [...otherAnswers, { questionId: questionId, value: value }];
     setAnswers(newAnswers);
 
     setTimeout(() => {
+       if (question.id === 16) { // "Corpo dos sonhos" question
+          const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value as string || '';
+          router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
+          return;
+       }
+
        if (currentStep < quizQuestions.length - 1) {
         setCurrentStep(currentStep + 1);
       } else {
@@ -350,7 +357,7 @@ export default function QuizPage() {
           </div>
         )
       case 'loading':
-        return <LoadingStep />;
+        return <LoadingStep onComplete={handleNext} />;
       case 'results':
         return <ResultsStep answers={answers} />;
       default:
@@ -513,8 +520,16 @@ export default function QuizPage() {
   );
 }
 
+export default function QuizPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <QuizComponent />
+    </Suspense>
+  );
+}
 
-function LoadingStep() {
+
+function LoadingStep({ onComplete }: { onComplete: () => void }) {
   const [progress, setProgress] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [api, setApi] = useState<CarouselApi>()
@@ -531,21 +546,23 @@ function LoadingStep() {
   useEffect(() => {
     const totalDuration = 11000; // 11 seconds
     const intervalTime = 100; // update every 100ms
-    const totalSteps = totalDuration / intervalTime;
-    const progressIncrement = 100 / totalSteps;
-
+    let elapsedTime = 0;
+  
     const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + progressIncrement;
-      });
+      elapsedTime += intervalTime;
+      const newProgress = (elapsedTime / totalDuration) * 100;
+  
+      if (newProgress >= 100) {
+        setProgress(100);
+        clearInterval(interval);
+        setTimeout(onComplete, 500); // Give a brief moment before completing
+      } else {
+        setProgress(newProgress);
+      }
     }, intervalTime);
-
+  
     return () => clearInterval(interval);
-  }, []);
+  }, [onComplete]);
 
   useEffect(() => {
     if (!api) {
@@ -642,9 +659,8 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   categoryPercentage = Math.max(5, Math.min(95, categoryPercentage));
 
   return (
-    <main className="container mx-auto max-w-2xl bg-white p-4 text-center">
-      
-      <div className="mt-10 space-y-6">
+    <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
+      <div className="space-y-6">
         <h2 className="text-left text-xl font-bold">{name}, aqui está a análise do seu perfil:</h2>
 
         <div className="rounded-lg bg-[#e8f5e9] p-4 text-center">
@@ -736,7 +752,6 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
           </div>
         </div>
       </div>
-
-    </main>
+    </div>
   );
 }
