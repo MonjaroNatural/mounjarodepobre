@@ -99,7 +99,7 @@ export const quizQuestions: QuizQuestion[] = [
     type: 'single-choice-column',
     question: 'O que mais te impede de perder peso?',
     options: [
-      { label: 'Falta de tempo', sublabel: 'Rotina agitada.', icon: 'Clock' },
+      { label: 'Falta de tempo', sublabel: 'Rotina agitada.', emoji: '⏰' },
       { label: 'Autocontrole', sublabel: 'Dificuldade em resistir a tentações alimentares.', emoji: '😬' },
       { label: 'Financeiro', sublabel: 'Achar opções saudáveis mais caras do que alimentos processados.', emoji: '💸' },
     ],
