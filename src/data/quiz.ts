@@ -67,8 +67,8 @@ export const quizQuestions: QuizQuestion[] = [
     id: 4,
     type: 'text',
     question: 'Qual seu nome?',
-    subtitle: 'Para montar seu plano personalizado, precisamos do seu nome. Fique tranquilo, seus dados estão protegidos.',
-    placeholder: 'Digite seu nome',
+    subtitle: 'Para montar seu plano personalizado, precisamos do seu nome. Fique tranquila, seus dados estão protegidos 🔐',
+    placeholder: 'Digite seu nome...',
     buttonText: 'Continuar',
   },
   {

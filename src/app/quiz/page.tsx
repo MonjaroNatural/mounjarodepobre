@@ -71,11 +71,11 @@ export default function QuizPage() {
                   <RadioGroupItem value={option.label} id={option.label} className="peer sr-only" />
                   <Label
                     htmlFor={option.label}
-                    className="flex cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
+                    className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
                     <div className="flex items-center gap-4">
-                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
-                      <span>{option.label}</span>
+                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-auto w-16 rounded-md object-cover" />}
+                      <span className="flex-1">{option.label}</span>
                     </div>
                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
                       <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-white" />
@@ -90,9 +90,9 @@ export default function QuizPage() {
         return (
           <div className="w-full space-y-4">
             {question.options?.map((option) => (
-                <Label key={option.label} htmlFor={option.label} className="flex cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary">
+                <Label key={option.label} htmlFor={option.label} className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary">
                   <div className="flex items-center gap-4">
-                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
+                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-auto w-16 rounded-md object-cover" />}
                     <span className="flex-1">{option.label}</span>
                   </div>
                   <Checkbox 
@@ -108,12 +108,14 @@ export default function QuizPage() {
       case 'text':
       case 'number':
         return (
-          <Input 
-            type={question.type === 'number' ? 'number' : 'text'}
-            placeholder={question.placeholder} 
-            onChange={(e) => setCurrentAnswer(e.target.value)}
-            className="max-w-md text-center"
-            />
+          <div className="flex w-full flex-col items-center gap-4">
+            <Input 
+              type={question.type === 'number' ? 'number' : 'text'}
+              placeholder={question.placeholder} 
+              onChange={(e) => setCurrentAnswer(e.target.value)}
+              className="max-w-md text-center"
+              />
+          </div>
         );
       case 'promise':
         return (
@@ -146,6 +148,8 @@ export default function QuizPage() {
         return null;
     }
   };
+  
+  const isInputType = question.type === 'text' || question.type === 'number';
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -165,11 +169,11 @@ export default function QuizPage() {
       <div className="flex flex-1 flex-col items-center justify-center p-4">
         <div className="mx-auto w-full max-w-md">
            <div className="text-center">
-              <h1 className="text-3xl font-bold md:text-4xl">
+              <h1 className={`text-3xl font-bold md:text-4xl ${isInputType ? 'mb-4' : 'mb-0'}`}>
                 {question.question.split(' ').slice(0, -2).join(' ')}
                 <span className="block text-primary">{question.question.split(' ').slice(-2).join(' ')}</span>
               </h1>
-              {question.subtitle && <p className="mt-4 text-muted-foreground underline md:text-lg">{question.subtitle}</p>}
+              {question.subtitle && <p className={`mt-4 text-muted-foreground md:text-lg ${isInputType ? 'text-center text-sm' : 'underline'}`}>{question.subtitle}</p>}
           </div>
 
           <div className="my-8 flex items-center justify-center">
