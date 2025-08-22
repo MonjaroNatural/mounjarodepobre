@@ -90,14 +90,18 @@ export default function QuizPage() {
         return (
           <div className="w-full space-y-4">
             {question.options?.map((option) => (
-                <div key={option.label} className="flex items-center space-x-2 rounded-md border p-4">
+                <Label key={option.label} htmlFor={option.label} className="flex cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary">
+                  <div className="flex items-center gap-4">
+                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={50} height={50} className="rounded-md" />}
+                    <span className="flex-1">{option.label}</span>
+                  </div>
                   <Checkbox 
                     id={option.label} 
                     onCheckedChange={() => handleMultipleChoice(option.label)}
                     checked={Array.isArray(currentAnswer) && currentAnswer.includes(option.label)}
+                    className="h-6 w-6 shrink-0 rounded-md border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white"
                     />
-                  <Label htmlFor={option.label} className="w-full cursor-pointer">{option.label}</Label>
-                </div>
+                </Label>
               ))}
           </div>
         );
@@ -145,14 +149,15 @@ export default function QuizPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex w-full flex-col items-center bg-background p-0">
+      <div className="w-full bg-background p-4">
         <Image
           src="/novologo.webp"
           alt="Mounjaro de Pobre Logo"
           width={70}
           height={70}
+          className="mx-auto"
         />
-        <Progress value={progress} className="mt-4 h-2 w-10/12 max-w-xs" />
+        <Progress value={progress} className="mt-2 h-2 w-full max-w-xs mx-auto" />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4">
