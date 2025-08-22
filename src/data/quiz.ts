@@ -1,12 +1,12 @@
 
 export type Answer = {
   questionId: number;
-  value: string | string[];
+  value: string | string[] | number;
 };
 
 export type QuizQuestion = {
   id: number;
-  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading';
+  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading' | 'weight-slider';
   question: string;
   subtitle?: string;
   options?: { label: string; sublabel?: string; imageUrl?: string, icon?: string, emoji?: string }[];
@@ -110,7 +110,6 @@ export const quizQuestions: QuizQuestion[] = [
     id: 8,
     type: 'promise',
     question: 'Nosso protocolo Resolve isso para você!',
-    subtitle: 'O Mounjaro dos Pobres age enquanto você dorme, queimando gordura de forma acelerada.',
     imageUrl: '/monjaro.webp',
     buttonText: 'Continuar',
   },
@@ -146,10 +145,12 @@ export const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 11,
-    type: 'number',
+    type: 'weight-slider',
     question: 'Qual é o seu peso atual?',
-    subtitle: 'Já estamos quase terminando! Vamos ajustar seu plano de acordo com o seu corpo. Com base nisso, vamos ajustar a dose ideal para que você obtenha os melhores resultados.',
-    placeholder: 'Seu peso em kg',
+    options: [
+        { label: '', sublabel: 'Já estamos quase terminando! Vamos ajustar seu plano de acordo com o seu corpo.' },
+        { label: '', sublabel: 'Com base nisso, vamos ajustar a dose ideal para que você obtenha os melhores resultados.' },
+    ],
     buttonText: 'Continuar',
   },
   {
