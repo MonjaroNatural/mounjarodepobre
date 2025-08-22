@@ -45,8 +45,8 @@ export default function QuizPage() {
       const otherAnswers = answers.filter(a => a.questionId !== quizQuestions[currentStep].id);
       const newAnswers = [...otherAnswers, { questionId: quizQuestions[currentStep].id, value: currentAnswer }];
       setAnswers(newAnswers);
-    } else {
-      // Maybe show a message to the user
+    } else if (question.type !== 'promise' && question.type !== 'testimonial' && question.type !== 'loading') {
+      // Maybe show a message to the user, but allow advancing on promise/testimonial/loading screens
       return;
     }
 
@@ -208,6 +208,9 @@ export default function QuizPage() {
   };
   
   const isInputType = question.type === 'text' || question.type === 'number';
+  const isActionNeeded = currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0);
+  const isButtonDisabled = isActionNeeded && question.type !== 'promise' && question.type !== 'testimonial';
+
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -282,7 +285,7 @@ export default function QuizPage() {
             <div className="text-center mt-8">
               <Button 
                 onClick={handleNext} 
-                disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0) && !isInputType }
+                disabled={isButtonDisabled}
                 size="lg"
                 className="w-full max-w-xs h-14 text-lg"
                 style={{ backgroundColor: '#5a8230', color: 'white' }}
