@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
-import { ChevronRight, Camera, HeartCrack, Frown, Hand } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Camera, HeartCrack, Frown, Hand } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
@@ -27,9 +27,22 @@ export default function QuizPage() {
   const [currentAnswer, setCurrentAnswer] = useState<string | string[] | null>(null);
   const router = useRouter();
 
+  useEffect(() => {
+    // When step changes, try to find a previous answer for this step
+    const previousAnswer = answers.find(a => a.questionId === quizQuestions[currentStep].id);
+    if (previousAnswer) {
+      setCurrentAnswer(previousAnswer.value);
+    } else {
+      setCurrentAnswer(null); // Reset if no previous answer
+    }
+  }, [currentStep, answers]);
+
+
   const handleNext = () => {
     if (currentAnswer !== null && currentAnswer !== '' && (!Array.isArray(currentAnswer) || currentAnswer.length > 0)) {
-      const newAnswers = [...answers, { questionId: quizQuestions[currentStep].id, value: currentAnswer }];
+      // Filter out any previous answer for this question before adding the new one
+      const otherAnswers = answers.filter(a => a.questionId !== quizQuestions[currentStep].id);
+      const newAnswers = [...otherAnswers, { questionId: quizQuestions[currentStep].id, value: currentAnswer }];
       setAnswers(newAnswers);
     } else {
       // Maybe show a message to the user
@@ -38,10 +51,16 @@ export default function QuizPage() {
 
     if (currentStep < quizQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
-      setCurrentAnswer(null);
+      // We don't reset currentAnswer here, useEffect will handle it
     } else {
       // TODO: Handle quiz completion, maybe redirect to a results page
       console.log('Quiz finished', answers);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -49,10 +68,11 @@ export default function QuizPage() {
     setCurrentAnswer(value);
     setTimeout(() => {
        if (currentStep < quizQuestions.length - 1) {
-        const newAnswers = [...answers, { questionId: quizQuestions[currentStep].id, value: value }];
+        // Filter out any previous answer for this question before adding the new one
+        const otherAnswers = answers.filter(a => a.questionId !== quizQuestions[currentStep].id);
+        const newAnswers = [...otherAnswers, { questionId: quizQuestions[currentStep].id, value: value }];
         setAnswers(newAnswers);
         setCurrentStep(currentStep + 1);
-        setCurrentAnswer(null);
       }
     }, 500);
   };
@@ -76,7 +96,7 @@ export default function QuizPage() {
       case 'single-choice-column':
         return (
           <div className="w-full">
-            <RadioGroup onValueChange={handleSingleChoice} className={`flex ${question.type === 'single-choice-column' ? 'flex-col' : 'flex-wrap'} justify-center gap-4`}>
+            <RadioGroup onValueChange={handleSingleChoice} value={typeof currentAnswer === 'string' ? currentAnswer : ''} className={`flex ${question.type === 'single-choice-column' ? 'flex-col' : 'flex-wrap'} justify-center gap-4`}>
               {question.options?.map((option) => {
                 const IconComponent = option.icon && iconMap[option.icon] ? iconMap[option.icon] : null;
                 return (
@@ -127,6 +147,7 @@ export default function QuizPage() {
             <Input 
               type={question.type === 'number' ? 'number' : 'text'}
               placeholder={question.placeholder} 
+              value={typeof currentAnswer === 'string' ? currentAnswer : ''}
               onChange={(e) => setCurrentAnswer(e.target.value)}
               className="max-w-md text-center h-12 text-lg mb-4"
               required
@@ -182,6 +203,11 @@ export default function QuizPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="fixed top-0 left-0 right-0 z-10 bg-background pt-2">
+         {currentStep > 0 && (
+          <button onClick={handleBack} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-primary">
+            <ChevronLeft className="h-8 w-8" />
+          </button>
+        )}
         <div className="flex items-center justify-center">
             <Image
               src="/novologo.webp"
@@ -201,7 +227,11 @@ export default function QuizPage() {
                   <>
                     Como o seu peso <span style={{ color: '#6c9a42' }}>impacta sua vida?</span>
                   </>
-                ) : (
+                ) : question.question.includes('Qual seu nome?') ? (
+                  <>
+                    Qual seu <span style={{ fontWeight: 'bold' }}>nome?</span>
+                  </>
+                ): (
                   question.question
                 )}
               </h1>
@@ -212,7 +242,7 @@ export default function QuizPage() {
             {renderQuestion()}
           </div>
 
-          {!question.buttonText && !isInputType && (
+          {!question.buttonText && !isInputType && question.type !== 'single-choice' && question.type !== 'single-choice-column' && (
             <div className="text-center mt-8">
               <Button 
                 onClick={handleNext} 
