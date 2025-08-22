@@ -37,6 +37,8 @@ export default function QuizPage() {
 
   useEffect(() => {
     const question = quizQuestions[currentStep];
+    if (!question) return;
+    
     const previousAnswer = answers.find(a => a.questionId === question.id);
 
     if (previousAnswer) {
@@ -59,7 +61,7 @@ export default function QuizPage() {
       if (question.type === 'multiple-choice') {
         setCurrentAnswer([]);
       } else if (question.type === 'weight-slider') {
-        setWeight(question.id === 11 ? 70 : (question.id === 13 ? 60 : 70));
+        setWeight(question.id === 11 ? 70 : (question.id === 13 ? 70 : 70));
         setWeightUnit('kg');
         setCurrentAnswer(null); 
       } else if (question.type === 'height-slider') {
@@ -71,6 +73,15 @@ export default function QuizPage() {
       }
     }
   }, [currentStep, answers]);
+
+  useEffect(() => {
+    if (quizQuestions[currentStep]?.type === 'loading') {
+      const timer = setTimeout(() => {
+          handleNext();
+      }, 11000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
 
 
   const handleNext = () => {
@@ -99,22 +110,17 @@ export default function QuizPage() {
         setAnswers(newAnswers);
     }
     
-    const navigateToResults = () => {
-        const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value || '';
-        const weightAnswer = newAnswers.find(a => a.questionId === 11)?.value;
-        const heightAnswer = newAnswers.find(a => a.questionId === 12)?.value;
+    const navigateToResults = (finalAnswers: Answer[]) => {
+        const nameAnswer = finalAnswers.find(a => a.questionId === 4)?.value || '';
+        const weightAnswer = finalAnswers.find(a => a.questionId === 11)?.value;
+        const heightAnswer = finalAnswers.find(a => a.questionId === 12)?.value;
         router.push(`/quiz/results?name=${encodeURIComponent(nameAnswer as string)}&weight=${weightAnswer}&height=${heightAnswer}`);
     };
-
-    if (question.type === 'loading') {
-       navigateToResults();
-       return;
-    }
     
     if (currentStep < quizQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-       navigateToResults();
+       navigateToResults(newAnswers);
     }
   };
 
@@ -153,6 +159,9 @@ export default function QuizPage() {
   };
 
   const question = quizQuestions[currentStep];
+  if (!question) {
+    return <div>Carregando...</div>; 
+  }
   const progress = ((currentStep + 1) / quizQuestions.length) * 100;
 
   const renderQuestion = () => {
@@ -324,7 +333,7 @@ export default function QuizPage() {
           </div>
         )
       case 'loading':
-        return <LoadingStep onComplete={handleNext} />;
+        return <LoadingStep />;
       default:
         return null;
     }
@@ -484,7 +493,7 @@ export default function QuizPage() {
 }
 
 
-function LoadingStep({ onComplete }: { onComplete: () => void }) {
+function LoadingStep() {
   const [progress, setProgress] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [api, setApi] = useState<CarouselApi>()
@@ -508,7 +517,6 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          onComplete();
           return 100;
         }
         return prev + progressIncrement;
@@ -516,7 +524,7 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
     }, intervalTime);
 
     return () => clearInterval(interval);
-  }, [onComplete]);
+  }, []);
 
   useEffect(() => {
     if (!api) {
