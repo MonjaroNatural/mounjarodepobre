@@ -11,7 +11,15 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Camera, HeartCrack, Frown, Hand } from 'lucide-react';
+
+const iconMap: { [key: string]: React.ElementType } = {
+  Camera: Camera,
+  HeartCrack: HeartCrack,
+  Frown: Frown,
+  Hand: Hand,
+};
+
 
 export default function QuizPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -69,23 +77,27 @@ export default function QuizPage() {
         return (
           <div className="w-full">
             <RadioGroup onValueChange={handleSingleChoice} className={`flex ${question.type === 'single-choice-column' ? 'flex-col' : 'flex-wrap'} justify-center gap-4`}>
-              {question.options?.map((option) => (
-                <div key={option.label} className="w-full">
-                  <RadioGroupItem value={option.label} id={option.label} className="peer sr-only" />
-                  <Label
-                    htmlFor={option.label}
-                    className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
-                  >
-                    <div className="flex items-center gap-4">
-                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
-                      <span className="flex-1">{option.label}</span>
-                    </div>
-                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
-                      <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-white" />
-                    </div>
-                  </Label>
-                </div>
-              ))}
+              {question.options?.map((option) => {
+                const IconComponent = option.icon && iconMap[option.icon] ? iconMap[option.icon] : null;
+                return (
+                  <div key={option.label} className="w-full">
+                    <RadioGroupItem value={option.label} id={option.label} className="peer sr-only" />
+                    <Label
+                      htmlFor={option.label}
+                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
+                    >
+                      <div className="flex items-center gap-4">
+                        {IconComponent && <IconComponent className="h-6 w-6 text-primary" />}
+                        {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
+                        <span className="flex-1 text-left">{option.label}</span>
+                      </div>
+                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
+                        <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-white" />
+                      </div>
+                    </Label>
+                  </div>
+                )
+            })}
             </RadioGroup>
           </div>
         );
@@ -96,7 +108,7 @@ export default function QuizPage() {
                 <Label key={option.label} htmlFor={option.label} className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary">
                   <div className="flex items-center gap-4">
                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
-                    <span className="flex-1">{option.label}</span>
+                    <span className="flex-1 text-left">{option.label}</span>
                   </div>
                   <Checkbox 
                     id={option.label} 
@@ -125,7 +137,7 @@ export default function QuizPage() {
                 onClick={handleNext} 
                 disabled={currentAnswer === null || currentAnswer === ''}
                 size="lg"
-                className="w-full h-14 text-lg"
+                className="w-full h-14 text-lg max-w-md"
               >
                 {question.buttonText}
                 <ChevronRight className="h-6 w-6" />
@@ -178,14 +190,20 @@ export default function QuizPage() {
               height={70}
             />
         </div>
-        <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" />
+        <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" style={{backgroundColor: '#e0e0e0'}} />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
         <div className="mx-auto w-full max-w-md">
            <div className="text-center mb-6">
               <h1 className="text-3xl font-bold md:text-4xl">
-                {question.question}
+                 {question.question.includes('impacta sua vida') ? (
+                  <>
+                    Como o seu peso <span style={{ color: '#6c9a42' }}>impacta sua vida?</span>
+                  </>
+                ) : (
+                  question.question
+                )}
               </h1>
               {!isInputType && question.subtitle && <p className="mt-4 text-muted-foreground md:text-lg underline">{question.subtitle}</p>}
           </div>
@@ -251,5 +269,3 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
     </div>
   );
 }
-
-    

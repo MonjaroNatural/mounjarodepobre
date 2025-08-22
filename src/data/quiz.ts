@@ -8,7 +8,7 @@ export type QuizQuestion = {
   type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading';
   question: string;
   subtitle?: string;
-  options?: { label: string; sublabel?: string; imageUrl?: string }[];
+  options?: { label: string; sublabel?: string; imageUrl?: string, icon?: string }[];
   placeholder?: string;
   buttonText?: string;
   autoAdvance?: boolean;
@@ -76,10 +76,10 @@ export const quizQuestions: QuizQuestion[] = [
     type: 'single-choice-column',
     question: 'Como o seu peso impacta sua vida?',
     options: [
-      { label: 'Evito tirar fotos porque tenho vergonha' },
-      { label: 'Meu parceiro não me olha mais com desejo como antes' },
-      { label: 'Evito encontros sociais porque não me sinto bem comigo mesma.' },
-      { label: 'Nenhuma das opções.' },
+      { label: 'Evito tirar fotos porque tenho vergonha', icon: 'Camera' },
+      { label: 'Meu parceiro não me olha mais com desejo como antes', icon: 'HeartCrack' },
+      { label: 'Evito encontros sociais porque não me sinto bem comigo mesma.', icon: 'Frown' },
+      { label: 'Nenhuma das opções.', icon: 'Hand' },
     ],
     autoAdvance: true,
   },
