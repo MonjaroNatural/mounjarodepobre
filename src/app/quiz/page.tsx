@@ -108,14 +108,12 @@ export default function QuizPage() {
       case 'text':
       case 'number':
         return (
-          <div className="flex w-full flex-col items-center gap-4">
-            <Input 
-              type={question.type === 'number' ? 'number' : 'text'}
-              placeholder={question.placeholder} 
-              onChange={(e) => setCurrentAnswer(e.target.value)}
-              className="max-w-md text-center"
-              />
-          </div>
+          <Input 
+            type={question.type === 'number' ? 'number' : 'text'}
+            placeholder={question.placeholder} 
+            onChange={(e) => setCurrentAnswer(e.target.value)}
+            className="max-w-md text-center h-12 text-lg"
+          />
         );
       case 'promise':
         return (
@@ -153,8 +151,8 @@ export default function QuizPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="w-full bg-background p-0">
-        <div className="flex items-center justify-center p-2">
+      <div className="fixed top-0 left-0 right-0 z-10 bg-background p-2">
+        <div className="flex items-center justify-center">
             <Image
               src="/novologo.webp"
               alt="Mounjaro de Pobre Logo"
@@ -166,24 +164,34 @@ export default function QuizPage() {
         <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" />
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center p-4">
+      <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
         <div className="mx-auto w-full max-w-md">
            <div className="text-center">
-              <h1 className={`text-3xl font-bold md:text-4xl ${isInputType ? 'mb-4' : 'mb-0'}`}>
+              <h1 className="text-3xl font-bold md:text-4xl mb-6">
                 {question.question.split(' ').slice(0, -2).join(' ')}
                 <span className="block text-primary">{question.question.split(' ').slice(-2).join(' ')}</span>
               </h1>
-              {question.subtitle && <p className={`mt-4 text-muted-foreground md:text-lg ${isInputType ? 'text-center text-sm' : 'underline'}`}>{question.subtitle}</p>}
+              
+              {!isInputType && question.subtitle && <p className="mt-4 text-muted-foreground md:text-lg underline">{question.subtitle}</p>}
           </div>
 
           <div className="my-8 flex items-center justify-center">
             {renderQuestion()}
           </div>
 
+          {isInputType && question.subtitle && <p className="text-center text-sm text-muted-foreground mb-6">{question.subtitle}</p>}
+
+
           {question.buttonText && (
             <div className="text-center">
-              <Button onClick={handleNext} disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}>
+              <Button 
+                onClick={handleNext} 
+                disabled={currentAnswer === null || (Array.isArray(currentAnswer) && currentAnswer.length === 0)}
+                size="lg"
+                className="w-full max-w-xs h-14 text-lg"
+              >
                 {question.buttonText}
+                <ChevronRight className="h-6 w-6" />
               </Button>
             </div>
           )}
