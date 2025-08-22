@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
+import { MetaPixel } from '@/components/meta-pixel';
 
 export const metadata: Metadata = {
   title: 'Mounjaro Quiz',
@@ -17,7 +18,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="font-body antialiased">{children}</body>
+      <body className="font-body antialiased">
+        {children}
+        <MetaPixel />
+      </body>
     </html>
   );
 }
