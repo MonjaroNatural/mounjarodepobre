@@ -74,7 +74,7 @@ export default function QuizPage() {
                     className="flex cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
                     <div className="flex items-center gap-4">
-                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={50} height={50} className="rounded-md" />}
+                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
                       <span>{option.label}</span>
                     </div>
                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
@@ -92,7 +92,7 @@ export default function QuizPage() {
             {question.options?.map((option) => (
                 <Label key={option.label} htmlFor={option.label} className="flex cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary">
                   <div className="flex items-center gap-4">
-                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={50} height={50} className="rounded-md" />}
+                     {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
                     <span className="flex-1">{option.label}</span>
                   </div>
                   <Checkbox 
@@ -149,15 +149,17 @@ export default function QuizPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="w-full bg-background p-4">
-        <Image
-          src="/novologo.webp"
-          alt="Mounjaro de Pobre Logo"
-          width={70}
-          height={70}
-          className="mx-auto"
-        />
-        <Progress value={progress} className="mt-2 h-2 w-full max-w-xs mx-auto" />
+      <div className="w-full bg-background p-0">
+        <div className="flex items-center justify-center p-2">
+            <Image
+              src="/novologo.webp"
+              alt="Mounjaro de Pobre Logo"
+              width={70}
+              height={70}
+              className="mx-auto"
+            />
+        </div>
+        <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4">
