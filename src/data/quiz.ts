@@ -8,7 +8,7 @@ export type QuizQuestion = {
   type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading';
   question: string;
   subtitle?: string;
-  options?: { label: string; sublabel?: string; imageUrl?: string, icon?: string }[];
+  options?: { label: string; sublabel?: string; imageUrl?: string, icon?: string, emoji?: string }[];
   placeholder?: string;
   buttonText?: string;
   autoAdvance?: boolean;
@@ -88,9 +88,9 @@ export const quizQuestions: QuizQuestion[] = [
     type: 'single-choice-column',
     question: 'Você está realmente feliz com sua aparência?',
     options: [
-      { label: 'Não, porque me sinto acima do peso' },
-      { label: 'Sim, mas sei que posso melhorar minha saúde' },
-      { label: 'Não, gostaria de perder peso para me sentir melhor comigo mesma.' },
+      { label: 'Não, porque me sinto acima do peso', emoji: '😭' },
+      { label: 'Sim, mas sei que posso melhorar minha saúde', emoji: '💔' },
+      { label: 'Não, gostaria de perder peso para me sentir melhor comigo mesma.', emoji: '😔' },
     ],
     autoAdvance: true,
   },

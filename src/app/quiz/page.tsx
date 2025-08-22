@@ -104,10 +104,11 @@ export default function QuizPage() {
                     <RadioGroupItem value={option.label} id={option.label} className="peer sr-only" />
                     <Label
                       htmlFor={option.label}
-                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
+                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
                     >
                       <div className="flex items-center gap-4">
                         {IconComponent && <IconComponent className="h-6 w-6 text-primary" />}
+                        {option.emoji && <span className="text-2xl">{option.emoji}</span>}
                         {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={60} height={60} className="h-16 w-16 rounded-md object-cover" />}
                         <span className="flex-1 text-left">{option.label}</span>
                       </div>
@@ -230,6 +231,10 @@ export default function QuizPage() {
                 ) : question.question.includes('Qual seu nome?') ? (
                   <>
                     Qual seu <span style={{ fontWeight: 'bold' }}>nome?</span>
+                  </>
+                ) : question.question.includes('Você está realmente feliz com sua aparência?') ? (
+                  <>
+                    Você está realmente <span style={{ color: '#6c9a42' }}>feliz</span> com <span style={{ color: '#e53935' }}>sua aparência?</span>
                   </>
                 ): (
                   question.question
