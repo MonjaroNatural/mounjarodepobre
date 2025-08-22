@@ -316,7 +316,7 @@ export default function QuizPage() {
   };
   
   const isButtonDisabled = () => {
-    if (['promise', 'testimonial', 'weight-slider', 'height-slider'].includes(question.type)) {
+    if (['promise', 'testimonial', 'loading'].includes(question.type)) {
       return false;
     }
     if (['text', 'number', 'multiple-choice'].includes(question.type)) {
@@ -365,6 +365,8 @@ export default function QuizPage() {
               de peso <span style={{ color: '#28a745' }}>(desejado)?</span>
             </>
           );
+        case 'Quantas horas você dorme por noite?':
+          return <>Quantas <span style={{ color: '#28a745' }}>horas</span> você dorme por noite?</>;
         default:
           return question.question;
       }
