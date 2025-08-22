@@ -480,7 +480,7 @@ function QuizComponent() {
         )}
         <div className="flex items-center justify-center">
             <Image
-              src="/novologo.webp"
+              src="/logonovinha.webp"
               alt="Mounjaro de Pobre Logo"
               width={70}
               height={70}

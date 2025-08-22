@@ -109,7 +109,7 @@ export const quizQuestions: QuizQuestion[] = [
     id: 8,
     type: 'promise',
     question: 'Nosso protocolo Resolve isso para você!',
-    imageUrl: '/monjaro.webp',
+    imageUrl: '/monjar2o.webp',
     buttonText: 'Continuar',
   },
   {
