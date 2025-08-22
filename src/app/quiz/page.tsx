@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
@@ -659,16 +660,35 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   const heightInM = heightInCm / 100;
   const imc = heightInM > 0 ? parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1)) : 0;
 
-  const getImcDetails = (imc: number) => {
-    if (imc < 18.5) return { category: 'Abaixo do peso', position: 12.5 };
-    if (imc < 25) return { category: 'Normal', position: 37.5 };
-    if (imc < 30) return { category: 'Sobrepeso', position: 62.5 };
-    if (imc < 35) return { category: 'Obesidade Grau I', position: 81.25 };
-    if (imc < 40) return { category: 'Obesidade Grau II', position: 87.5 };
-    return { category: 'Obesidade Grau III', position: 93.75 };
+  const getImcCategory = (imc: number) => {
+    if (imc < 18.5) return "Abaixo do peso";
+    if (imc < 25) return "Normal";
+    if (imc < 30) return "Sobrepeso";
+    if (imc < 35) return "Obesidade Grau I";
+    if (imc < 40) return "Obesidade Grau II";
+    return "Obesidade Grau III";
   }
 
-  const { category: imcCategory, position: markerPosition } = getImcDetails(imc);
+  const calculateMarkerPosition = (imc: number) => {
+    if (imc <= 0) return 0;
+    if (imc < 18.5) { // Abaixo do peso: 0%-25%
+        return Math.max(0, Math.min(25, (imc / 18.5) * 25));
+    } else if (imc < 25) { // Normal: 25%-50%
+        return 25 + ((imc - 18.5) / (25 - 18.5)) * 25;
+    } else if (imc < 30) { // Sobrepeso: 50%-75%
+        return 50 + ((imc - 25) / (30 - 25)) * 25;
+    } else { // Obesidade: 75%-100%
+        const basePosition = 75;
+        // Use a logarithmic scale for values above 30 to prevent overflow
+        // This makes the marker move slower as IMC increases, but it will still move
+        const additional = Math.min(24, (Math.log(imc - 29) / Math.log(40)) * 25); // Cap at 99%
+        return Math.min(99, basePosition + additional);
+    }
+  }
+
+  const imcCategory = getImcCategory(imc);
+  const markerPosition = calculateMarkerPosition(imc);
+
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
@@ -676,7 +696,7 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
         <h2 className="text-left text-xl font-bold">{name}, aqui está a análise do seu perfil:</h2>
 
         <div className="rounded-lg bg-[#e8f5e9] p-4 text-center">
-          <p className="font-medium">Seu IMC (Índice de Massa Corporal) é: <span className="font-bold">{imc}</span></p>
+          <p className="font-medium">Seu IMC (Índice de Massa Corporal) é: <span className="font-bold">{imc}</span> - <span className="font-bold">{imcCategory}</span></p>
         </div>
 
         <div className="w-full text-left">
@@ -691,12 +711,12 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
                 <div className="w-1/4 bg-orange-400"></div>
                 <div className="w-1/4 bg-red-500"></div>
             </div>
-            <div className="relative h-4" style={{ left: `${markerPosition}%`, transform: 'translateX(-50%)' }}>
-                <div className="absolute top-0 flex flex-col items-center">
-                    <div className="h-2 w-2 rounded-full bg-black"></div>
-                    <div className="mt-1 whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white">
+             <div className="relative h-4" style={{ left: `${markerPosition}%`, transform: 'translateX(-50%)' }}>
+                <div className="absolute top-[-10px] flex flex-col items-center">
+                    <div className="whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white shadow-lg">
                         Você está aqui
                     </div>
+                    <div className="h-3 w-3 -mt-1 rotate-45 transform bg-black"></div>
                 </div>
             </div>
             <div className="mt-8 flex justify-between text-xs text-gray-500">
