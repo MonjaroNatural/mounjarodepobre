@@ -135,7 +135,7 @@ function QuizComponent() {
     setAnswers(newAnswers);
 
     setTimeout(() => {
-       if (question.id === 16) { // Last question
+       if (question.id === 16) { 
           const nameAnswer = newAnswers.find(a => a.questionId === 4)?.value as string || '';
           router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
           return;
@@ -490,9 +490,13 @@ function QuizComponent() {
               height={70}
             />
         </div>
-        {question.type !== 'loading' && (
+        {(question.type !== 'loading' && question.type !== 'results') && (
            <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" style={{backgroundColor: '#e0e0e0'}} />
         )}
+         {question.type === 'results' && quizQuestions.length > currentStep + 1 && (
+             <Progress value={progress} className="h-2 w-full max-w-xs mx-auto" style={{backgroundColor: '#e0e0e0'}} />
+         )}
+
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
@@ -517,6 +521,15 @@ function QuizComponent() {
                </Button>
              </div>
            )}
+
+            {question.type === 'results' && (
+              <div className="text-center mt-8">
+                <Button onClick={handleNext} size="lg" className="w-full max-w-xs h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90">
+                    Continuar
+                    <ChevronRight className="h-6 w-6" />
+                </Button>
+              </div>
+            )}
 
         </div>
       </div>
@@ -628,8 +641,11 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   const weightStr = (answers.find(a => a.questionId === 11)?.value as string) || '70kg';
   const heightStr = (answers.find(a => a.questionId === 12)?.value as string) || '165cm';
 
-  const parseValue = (str: string) => parseFloat(str.replace(/[a-zA-Z]/g, ''));
-
+  const parseValue = (str: string) => {
+    const match = str.match(/(\d+(\.\d+)?)/);
+    return match ? parseFloat(match[0]) : 0;
+  };
+  
   let weightInKg = parseValue(weightStr);
   if (weightStr.includes('lb')) {
     weightInKg *= 0.453592;
@@ -644,21 +660,26 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   const imc = heightInM > 0 ? parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1)) : 0;
 
   let imcCategory: 'Abaixo do peso' | 'Normal' | 'Sobrepeso' | 'Obesidade';
-  let categoryPercentage: number;
-
+  
   if (imc < 18.5) {
     imcCategory = 'Abaixo do peso';
-    categoryPercentage = 12.5;
   } else if (imc < 25) {
     imcCategory = 'Normal';
-    categoryPercentage = 37.5;
   } else if (imc < 30) {
     imcCategory = 'Sobrepeso';
-    categoryPercentage = 62.5;
   } else {
     imcCategory = 'Obesidade';
-    categoryPercentage = 87.5;
   }
+  
+  const categoryPositions: Record<typeof imcCategory, number> = {
+    'Abaixo do peso': 12.5,
+    'Normal': 37.5,
+    'Sobrepeso': 62.5,
+    'Obesidade': 87.5
+  };
+
+  const categoryPercentage = categoryPositions[imcCategory];
+
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
@@ -757,5 +778,3 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
     </div>
   );
 }
-
-    
