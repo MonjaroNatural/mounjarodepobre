@@ -8,7 +8,7 @@ export type QuizQuestion = {
   type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading';
   question: string;
   subtitle?: string;
-  options?: { label: string; sublabel?: string }[];
+  options?: { label: string; sublabel?: string; imageUrl?: string }[];
   placeholder?: string;
   buttonText?: string;
   autoAdvance?: boolean;
@@ -40,10 +40,14 @@ export const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 2,
-    type: 'single-choice',
+    type: 'single-choice-column',
     question: 'Como você descreveria seu físico?',
     subtitle: 'Escolha uma opção para continuar.',
-    options: [{ label: 'Regular' }, { label: 'Flácido' }, { label: 'Sobrepeso' }],
+    options: [
+        { label: 'Regular', imageUrl: '/regular.webp' }, 
+        { label: 'Flácido', imageUrl: '/flacido.webp' }, 
+        { label: 'Sobrepeso', imageUrl: '/sobrepeso.webp' }
+    ],
     autoAdvance: true,
   },
   {

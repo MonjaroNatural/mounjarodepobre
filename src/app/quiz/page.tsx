@@ -73,7 +73,10 @@ export default function QuizPage() {
                     htmlFor={option.label}
                     className="flex cursor-pointer items-center justify-between rounded-md border-2 border-primary/20 bg-primary/10 p-4 text-lg hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
-                    <span>{option.label}</span>
+                    <div className="flex items-center gap-4">
+                      {option.imageUrl && <Image src={option.imageUrl} alt={option.label} width={50} height={50} className="rounded-md" />}
+                      <span>{option.label}</span>
+                    </div>
                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
                       <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-white" />
                     </div>
