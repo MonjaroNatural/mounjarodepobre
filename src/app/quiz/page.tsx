@@ -670,33 +670,38 @@ function ResultsStep({ answers }: { answers: Answer[] }) {
   }
 
   const calculateMarkerPosition = (imc: number) => {
-    const belowWeightMax = 18.5;
-    const normalMax = 25;
-    const overweightMax = 30;
-    const obesity1Max = 35;
-    const obesity2Max = 40;
-    
-    if (imc >= obesity2Max) {
-        return 97; 
-    }
-    if (imc >= obesity1Max) {
-        const segment = (imc - obesity1Max) / (obesity2Max - obesity1Max);
-        return 87.5 + segment * 9.5; 
-    }
-    if (imc >= overweightMax) {
-        const segment = (imc - overweightMax) / (obesity1Max - overweightMax);
-        return 75 + segment * 12.5;
-    }
-    if (imc >= normalMax) {
-        const segment = (imc - normalMax) / (overweightMax - normalMax);
-        return 50 + segment * 25;
-    }
-    if (imc >= belowWeightMax) {
-        const segment = (imc - belowWeightMax) / (normalMax - belowWeightMax);
-        return 25 + segment * 25;
-    }
-    const segment = imc / belowWeightMax;
-    return Math.max(0, segment * 25);
+      const belowWeightMax = 18.5;
+      const normalMax = 25;
+      const overweightMax = 30;
+      const obesity1Max = 35;
+      const obesity2Max = 40;
+      
+      if (imc >= obesity2Max) {
+          return 97;
+      }
+      
+      if (imc >= obesity1Max) {
+          const segment = (imc - obesity1Max) / (obesity2Max - obesity1Max);
+          return 87.5 + segment * 9.5; 
+      }
+      
+      if (imc >= overweightMax) {
+          const segment = (imc - overweightMax) / (obesity1Max - overweightMax);
+          return 75 + segment * 12.5;
+      }
+      
+      if (imc >= normalMax) {
+          const segment = (imc - normalMax) / (overweightMax - normalMax);
+          return 50 + segment * 25;
+      }
+      
+      if (imc >= belowWeightMax) {
+          const segment = (imc - belowWeightMax) / (normalMax - belowWeightMax);
+          return 25 + segment * 25;
+      }
+      
+      const segment = imc / belowWeightMax;
+      return Math.max(0, segment * 25);
   }
 
   const imcCategory = getImcCategory(imc);
