@@ -87,27 +87,6 @@ export default function LandingPage() {
               <CarouselItem>
                 <div className="flex flex-col items-center">
                   <p className="mb-2 text-lg font-semibold text-gray-800">
-                    Andreia cazonato - São Paulo
-                  </p>
-                  <Image
-                    src="/deponovo.webp"
-                    alt="Depoimento de antes e depois"
-                    width={500}
-                    height={300}
-                    className="h-auto w-full rounded-lg shadow-md"
-                    data-ai-hint="woman before after weight loss"
-                  />
-                  <p className="mt-4 text-base italic text-gray-700">
-                    "Comecei a usar a receita do mounjaro de pobre toda noite. Em
-                    7 dias vi o ponteiro da balança baixar 5 kg, eu perdi muito
-                    inchaço, minha cintura reduziu 15 cm. Foi o empurrão que eu
-                    precisava pra manter o foco!"
-                  </p>
-                </div>
-              </CarouselItem>
-              <CarouselItem>
-                <div className="flex flex-col items-center">
-                  <p className="mb-2 text-lg font-semibold text-gray-800">
                     Ana Clara Oliveira - Salvador
                   </p>
                   <Image
@@ -123,6 +102,27 @@ export default function LandingPage() {
                     essa receita do mounjaro de pobre, perdi 7 kg em 12 dias e
                     meu apetite noturno diminuiu. Me sinto bem menos inchada, e
                     com mais disposição no dia a dia, me ajudou demais."
+                  </p>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="flex flex-col items-center">
+                  <p className="mb-2 text-lg font-semibold text-gray-800">
+                    Andreia cazonato - São Paulo
+                  </p>
+                  <Image
+                    src="/deponovo.webp"
+                    alt="Depoimento de antes e depois"
+                    width={500}
+                    height={300}
+                    className="h-auto w-full rounded-lg shadow-md"
+                    data-ai-hint="woman before after weight loss"
+                  />
+                  <p className="mt-4 text-base italic text-gray-700">
+                    "Comecei a usar a receita do mounjaro de pobre toda noite. Em
+                    7 dias vi o ponteiro da balança baixar 5 kg, eu perdi muito
+                    inchaço, minha cintura reduziu 15 cm. Foi o empurrão que eu
+                    precisava pra manter o foco!"
                   </p>
                 </div>
               </CarouselItem>
