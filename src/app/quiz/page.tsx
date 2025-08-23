@@ -409,11 +409,6 @@ function QuizComponent() {
               className="w-full"
             />
             <p className="text-sm text-gray-500">Arraste para ajustar</p>
-            {question.options?.[1]?.sublabel && (
-              <p className="text-muted-foreground">
-                {question.options[1].sublabel}
-              </p>
-            )}
           </div>
         );
       case 'height-slider':
@@ -712,40 +707,44 @@ function QuizComponent() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="fixed top-0 left-0 right-0 z-10 bg-background pt-2">
-        {currentStep > 0 && question.type !== 'loading' && (
-          <button
-            onClick={handleBack}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-primary"
-          >
-            <ChevronLeft className="h-8 w-8" />
-          </button>
-        )}
-        <div className="flex items-center justify-center">
-          <Image
-            src="/logonov1a.webp"
-            alt="Mounjaro de Pobre Logo"
-            width={70}
-            height={70}
-          />
+       <div className="fixed top-0 left-0 right-0 z-10 bg-background p-2">
+        <div className="flex items-center gap-4">
+          <div className="w-8">
+             {currentStep > 0 && question.type !== 'loading' && (
+              <button onClick={handleBack} className="text-primary">
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-1 flex-col items-center gap-2">
+            <Image
+              src="/logonov1a.webp"
+              alt="Mounjaro de Pobre Logo"
+              width={50}
+              height={50}
+            />
+             {(question.type !== 'loading' && question.type !== 'results') && (
+              <Progress
+                value={progress}
+                className="h-2 w-full max-w-xs"
+                style={{ backgroundColor: '#e0e0e0' }}
+              />
+            )}
+            {question.type === 'results' && (
+               <Progress
+                value={progress}
+                className="h-2 w-full max-w-xs"
+                style={{ backgroundColor: '#e0e0e0' }}
+              />
+            )}
+          </div>
+          
+          <div className="w-8"></div>
         </div>
-        {(question.type !== 'loading' && question.type !== 'results') && (
-          <Progress
-            value={progress}
-            className="h-2 w-full max-w-xs mx-auto"
-            style={{ backgroundColor: '#e0e0e0' }}
-          />
-        )}
-        {question.type === 'results' && (
-          <Progress
-            value={progress}
-            className="h-2 w-full max-w-xs mx-auto"
-            style={{ backgroundColor: '#e0e0e0' }}
-          />
-        )}
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center p-4 mt-20">
+      <div className="flex flex-1 flex-col items-center justify-center p-4 mt-24">
         <div
           className={`mx-auto w-full ${
             question.type === 'text'
