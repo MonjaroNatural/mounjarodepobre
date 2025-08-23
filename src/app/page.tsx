@@ -39,8 +39,8 @@ export default function LandingPage() {
         </Link>
 
         {/* Seção de Depoimento */}
-        <div className="mt-8 pt-8 border-t border-gray-200 w-full max-w-xs">
-          <p className="text-lg font-semibold text-gray-800 mb-2">Andreia cazonato - São Paulo</p>
+        <div className="mt-8 w-full max-w-[280px] border-t border-gray-200 pt-8">
+          <p className="mb-2 text-lg font-semibold text-gray-800">Andreia cazonato - São Paulo</p>
           <Image
             src="/deponovo.webp"
             alt="Depoimento de antes e depois"
