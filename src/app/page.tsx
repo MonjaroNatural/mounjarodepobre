@@ -50,7 +50,7 @@ export default function LandingPage() {
             data-ai-hint="woman before after weight loss"
           />
           <p className="mt-4 text-base italic text-gray-700">
-            &quot;Comecei a usar a receita do mounjaro de pobre toda noite. Em 7 dias vi o ponteiro da balança baixar 5 kg, eu perdi muito inchaço, minha cintura reduziu 15 cm. Foi o empurrão que eu precisava pra manter o foco!&quot;
+            "Comecei a usar a receita do mounjaro de pobre toda noite. Em 7 dias vi o ponteiro da balança baixar 5 kg, eu perdi muito inchaço, minha cintura reduziu 15 cm. Foi o empurrão que eu precisava pra manter o foco!"
           </p>
         </div>
       </main>
