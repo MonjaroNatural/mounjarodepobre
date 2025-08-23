@@ -28,6 +28,21 @@ export default function LandingPage() {
             QUERO ESSA RECEITA
           </Button>
         </Link>
+
+        {/* Seção de Depoimento */}
+        <div className="mt-8 pt-8 border-t border-gray-200 w-full max-w-md">
+          <Image
+            src="/antisydepos.png"
+            alt="Depoimento de antes e depois"
+            width={500}
+            height={300}
+            className="h-auto w-full rounded-lg shadow-md"
+            data-ai-hint="woman before after weight loss"
+          />
+          <p className="mt-4 text-base italic text-gray-700">
+            &quot;Comecei a tomar a receita do sal rosa toda noite. Em 7 dias vi o ponteiro da balança baixar 5 kg, eu perdi muito inchaço, minha cintura reduziu 15 cm. Foi o empurrão que eu precisava pra manter o foco!&quot;
+          </p>
+        </div>
       </main>
     </div>
   );
