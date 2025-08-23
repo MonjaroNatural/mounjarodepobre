@@ -8,6 +8,15 @@ export default function LandingPage() {
       <main className="container mx-auto flex max-w-2xl flex-col items-center space-y-6 px-4 py-8 text-center">
         
         <Image 
+          src="/pobrelogo.png" 
+          alt="Logo Mounjaro de Pobre"
+          width={200}
+          height={100}
+          className="h-auto"
+          data-ai-hint="logo"
+        />
+
+        <Image 
           src="/inicial.webp" 
           alt="Anúncio do Mounjaro de Pobre: Elimine até 10kg de gordura em 30 dias com essa nova receita" 
           width={500} 
