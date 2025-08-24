@@ -60,6 +60,7 @@ export const quizQuestions: QuizQuestion[] = [
       { label: 'Região do Abdômen (barriga)', imageUrl: '/regiaoabdomen.webp' },
       { label: 'Região dos Gluteos', imageUrl: '/regiaogluteos.webp' },
       { label: 'Região dos Braços', imageUrl: '/regiaodosbracos.webp' },
+      { label: 'Corpo todo' },
     ],
     buttonText: 'Continuar',
   },
