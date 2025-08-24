@@ -21,6 +21,7 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
+import { ShieldCheck, Trophy, Lock } from 'lucide-react';
 
 const faqData = [
   {
@@ -310,6 +311,40 @@ function OfferContent() {
           className="h-auto w-full"
           data-ai-hint="special offer"
         />
+        
+        <div className="w-full max-w-md space-y-4">
+          <Button
+            size="lg"
+            className="h-auto w-full bg-[#28a745] py-4 text-xl font-bold text-white hover:bg-[#28a745]/90"
+            onClick={handleCheckoutClick}
+          >
+            SIM! QUERO A RECEITA! ✅😊
+          </Button>
+          <div className="flex flex-col items-center justify-center gap-4 text-xs text-gray-600 sm:flex-row sm:gap-6">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-8 w-8 text-blue-500" />
+              <div className="text-left">
+                <p className="font-bold">Compra</p>
+                <p>Segura</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Trophy className="h-8 w-8 text-yellow-500" />
+              <div className="text-left">
+                <p className="font-bold">Satisfação</p>
+                <p>Garantida</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Lock className="h-8 w-8 text-yellow-500" />
+              <div className="text-left">
+                <p className="font-bold">Privacidade</p>
+                <p>protegida</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <Image
           src="/whatsappdepoimento.webp"
           alt="Depoimento Whatsapp"
@@ -382,14 +417,6 @@ function OfferContent() {
             ))}
           </Accordion>
         </div>
-
-        <Button
-          size="lg"
-          className="h-auto w-full max-w-md bg-[#28a745] py-4 text-xl font-bold text-white hover:bg-[#28a745]/90"
-          onClick={handleCheckoutClick}
-        >
-          SIM, QUERO MEU PLANO PERSONALIZADO!
-        </Button>
       </main>
     </div>
   );
@@ -402,6 +429,3 @@ export default function OfferPage() {
     </Suspense>
   );
 }
-
-    
-    
