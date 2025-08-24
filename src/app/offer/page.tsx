@@ -111,6 +111,9 @@ function OfferContent() {
         external_id: externalId,
         fbc: getCookie('_fbc'),
         fbp: getCookie('_fbp'),
+        ad_id: localStorage.getItem('ad_id'),
+        adset_id: localStorage.getItem('adset_id'),
+        campaign_id: localStorage.getItem('campaign_id'),
       },
       event_source_url: window.location.href,
       action_source: 'website',
@@ -118,28 +121,6 @@ function OfferContent() {
 
     router.push(checkoutUrl);
   };
-
-  useEffect(() => {
-    // Dispara o evento AddToCart quando a página de oferta é exibida
-    const eventId = generateEventId('AddToCart', externalId ?? '');
-
-    if (window.fbq) {
-      window.fbq('track', 'AddToCart', {}, { event_id: eventId });
-    }
-
-    sendN8NEvent({
-      eventName: 'AddToCart',
-      eventId: eventId,
-      eventTime: Math.floor(Date.now() / 1000),
-      userData: {
-        external_id: externalId,
-        fbc: getCookie('_fbc'),
-        fbp: getCookie('_fbp'),
-      },
-      event_source_url: window.location.href,
-      action_source: 'website',
-    });
-  }, [externalId]);
 
   return (
     <div className="bg-white text-black">

@@ -30,6 +30,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
+import { getCookie, generateEventId } from '@/lib/tracking';
+import { sendN8NEvent } from '../actions';
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
@@ -970,6 +972,35 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
   const name = (answers.find((a) => a.questionId === 4)?.value as string) || 'Olá';
   const { imc, category } = calculateImc(answers);
   const finalCategory = imcCategory || category;
+  const externalId = getCookie('my_session_id');
+
+  useEffect(() => {
+    // Dispara o evento AddToCart quando a página de resultados é exibida
+    if (!externalId) return;
+
+    const eventId = generateEventId('AddToCart', externalId);
+
+    if (window.fbq) {
+      window.fbq('track', 'AddToCart', {}, { event_id: eventId });
+    }
+
+    sendN8NEvent({
+      eventName: 'AddToCart',
+      eventId: eventId,
+      eventTime: Math.floor(Date.now() / 1000),
+      userData: {
+        external_id: externalId,
+        fbc: getCookie('_fbc'),
+        fbp: getCookie('_fbp'),
+        ad_id: localStorage.getItem('ad_id'),
+        adset_id: localStorage.getItem('adset_id'),
+        campaign_id: localStorage.getItem('campaign_id'),
+      },
+      event_source_url: window.location.href,
+      action_source: 'website',
+    });
+  }, [externalId]);
+
 
   const markerPositions: Record<ImcCategory, string> = {
     'Abaixo do peso': '12.5%',

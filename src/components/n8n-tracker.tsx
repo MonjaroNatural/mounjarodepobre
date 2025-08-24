@@ -23,6 +23,15 @@ export function N8NTracker() {
       setCookie('_fbc', fbc);
     }
 
+    const adId = searchParams.get('utm_source');
+    const adsetId = searchParams.get('utm_medium');
+    const campaignId = searchParams.get('utm_campaign');
+
+    if (adId) localStorage.setItem('ad_id', adId);
+    if (adsetId) localStorage.setItem('adset_id', adsetId);
+    if (campaignId) localStorage.setItem('campaign_id', campaignId);
+
+
     sendN8NEvent({
       eventName: 'PageView',
       eventTime: Math.floor(Date.now() / 1000),
@@ -30,6 +39,9 @@ export function N8NTracker() {
         external_id: sessionId,
         fbc: fbc,
         fbp: getCookie('_fbp'),
+        ad_id: localStorage.getItem('ad_id'),
+        adset_id: localStorage.getItem('adset_id'),
+        campaign_id: localStorage.getItem('campaign_id'),
       },
       event_source_url: window.location.href,
       action_source: 'website',

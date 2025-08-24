@@ -43,6 +43,9 @@ export interface N8NClientData {
         fbc: string | null;
         fbp: string | null;
         client_ip_address?: string;
+        ad_id?: string | null;
+        adset_id?: string | null;
+        campaign_id?: string | null;
     };
     customData?: {
         value?: number;
