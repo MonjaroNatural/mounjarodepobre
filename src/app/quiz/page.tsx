@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/carousel';
 import {
   ChevronRight,
-  ChevronLeft,
   Camera,
   HeartCrack,
   Frown,
@@ -147,12 +146,6 @@ function QuizComponent() {
       const nameAnswer =
         (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
       router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -708,14 +701,6 @@ function QuizComponent() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="fixed top-0 left-0 right-0 z-10 bg-background p-4">
-        {currentStep > 0 && question.type !== 'loading' && (
-          <button
-            onClick={handleBack}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"
-          >
-            <ChevronLeft className="h-8 w-8" />
-          </button>
-        )}
         <div className="flex flex-col items-center justify-center">
           <Image
             src="/logonov1a.webp"
@@ -961,7 +946,7 @@ function ResultsStep({ answers, onNext }: { answers: Answer[]; onNext: () => voi
       
       if (imc >= normalMax) {
           const segment = (imc - normalMax) / (overweightMax - normalMax);
-          return 50 + segment * 25;
+          return 25 + segment * 25;
       }
       
       if (imc >= belowWeightMax) {
@@ -1126,5 +1111,3 @@ function ResultsStep({ answers, onNext }: { answers: Answer[]; onNext: () => voi
     </div>
   );
 }
-
-    
