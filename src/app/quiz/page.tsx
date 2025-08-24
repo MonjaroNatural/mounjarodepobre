@@ -1084,22 +1084,28 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
       </div>
 
       <div className="space-y-6 mt-10">
-        <h1 className="text-2xl font-bold">Veja a transformação da Silvia!</h1>
-        <Image
-          src="/silvia.webp"
-          alt="Transformação da Silvia"
-          width={580}
-          height={400}
-          className="mx-auto rounded-lg"
-          data-ai-hint="woman before after weight loss"
-        />
-        <p className="text-gray-600">
-          Oiii comprei porque uma amiga me indicou... O resultado é incrível 😅
-          Recomendo muito. estou a 1 mês e estou com muito menos vontade de comer
-          besteiras, perdi peso e desinchei bastante! Meu maior medo era ficar com
-          flacidez, morria de medo disso, mas graças a Deus isso não aconteceu e
-          to emagrecendo com muita saude, obrigada, recuperei minha autoestima,
-          me sinto jovem de novo!
+        <div className="space-y-4 rounded-lg border bg-gray-50 p-4">
+            <h1 className="text-2xl font-bold">Veja a transformação da Silvia!</h1>
+            <Image
+            src="/silvia.webp"
+            alt="Transformação da Silvia"
+            width={580}
+            height={400}
+            className="mx-auto rounded-lg"
+            data-ai-hint="woman before after weight loss"
+            />
+            <p className="text-gray-600 text-left italic">
+            "Oiii comprei porque uma amiga me indicou... O resultado é incrível 😅
+            Recomendo muito. estou a 1 mês e estou com muito menos vontade de comer
+            besteiras, perdi peso e desinchei bastante! Meu maior medo era ficar com
+            flacidez, morria de medo disso, mas graças a Deus isso não aconteceu e
+            to emagrecendo com muita saude, obrigada, recuperei minha autoestima,
+            me sinto jovem de novo!"
+            </p>
+        </div>
+
+        <p className="text-gray-800 text-left">
+            A partir dos dados coletados e do resultado do seu IMC, nós elaboramos um programa de acompanhamento individual para que você alcance seus resultados no menor tempo possível, com a melhor qualidade de vida projetada de acordo com seus objetivos — em apenas 4 semanas.
         </p>
 
         <div className="rounded-lg border bg-gray-50 p-4 text-left">
