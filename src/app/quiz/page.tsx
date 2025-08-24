@@ -29,6 +29,7 @@ import {
   Siren,
   Lightbulb,
   XCircle,
+  Check,
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
 import { getClientData, generateEventId } from '@/lib/tracking';
@@ -386,32 +387,32 @@ function QuizComponent() {
               const isChecked = Array.isArray(currentAnswer) && currentAnswer.includes(option.label);
               return (
                 <div key={option.label}>
-                  <Checkbox
-                    id={option.label}
-                    checked={isChecked}
-                    onCheckedChange={() => handleMultipleChoice(option.label)}
-                    className="peer sr-only"
-                  />
                   <Label
                     htmlFor={option.label}
                     data-state={isChecked ? 'checked' : 'unchecked'}
                     className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg transition-all hover:bg-primary/20 data-[state=checked]:border-green-800 data-[state=checked]:bg-green-800 data-[state=checked]:text-white active:scale-[0.98] active:bg-green-800 active:text-white"
                   >
-                    <div className="flex items-center gap-4">
-                      {option.emoji && (
-                        <span className="text-2xl">{option.emoji}</span>
-                      )}
-                      {option.imageUrl && (
-                        <Image
-                          src={option.imageUrl}
-                          alt={option.label}
-                          width={60}
-                          height={60}
-                          className="h-auto w-16 rounded-md object-contain"
+                     <div className="flex items-center gap-4">
+                        <Checkbox
+                          id={option.label}
+                          checked={isChecked}
+                          onCheckedChange={() => handleMultipleChoice(option.label)}
+                          className="sr-only peer"
                         />
-                      )}
-                      <span className={`flex-1 text-left ${isChecked ? 'text-white' : 'text-black'}`}>{option.label}</span>
-                    </div>
+                        {option.emoji && (
+                          <span className="text-2xl">{option.emoji}</span>
+                        )}
+                        {option.imageUrl && (
+                          <Image
+                            src={option.imageUrl}
+                            alt={option.label}
+                            width={60}
+                            height={60}
+                            className="h-auto w-16 rounded-md object-contain"
+                          />
+                        )}
+                        <span className={`flex-1 text-left ${isChecked ? 'text-white' : 'text-black'}`}>{option.label}</span>
+                     </div>
                      <div className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-primary bg-white peer-data-[state=checked]:bg-white data-[state=checked]:bg-white data-[state=checked]:text-green-800">
                         <Check className={`h-4 w-4 ${isChecked ? 'text-green-800' : 'text-transparent'}`} />
                       </div>
@@ -1176,5 +1177,3 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     </div>
   );
 }
-
-    
