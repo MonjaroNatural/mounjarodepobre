@@ -1114,10 +1114,12 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
           data-ai-hint="woman before after weight loss"
         />
         <p className="text-gray-600">
-          A partir dos dados coletados e do resultado do seu IMC, nós elaboramos
-          um programa de acompanhamento individual para que você alcance seus
-          resultados no menor tempo possível, com a melhor qualidade de vida
-          projetada de acordo com seus objetivos — em apenas 4 semanas.
+          Oiii comprei porque uma amiga me indicou... O resultado é incrível 😅
+          Recomendo muito. estou a 1 mês e estou com muito menos vontade de comer
+          besteiras, perdi peso e desinchei bastante! Meu maior medo era ficar com
+          flacidez, morria de medo disso, mas graças a Deus isso não aconteceu e
+          to emagrecendo com muita saude, obrigada, recuperei minha autoestima,
+          me sinto jovem de novo!
         </p>
 
         <div className="rounded-lg border bg-gray-50 p-4 text-left">
