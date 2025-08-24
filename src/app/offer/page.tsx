@@ -76,11 +76,11 @@ const faqData = [
 ];
 
 const testimonials = [
-    { name: 'Ana Paula', image: '/dep33.webp', text: 'Sou muito ansiosa e já tentei de tudo pra emagrecer. Já fiz treino em casa, tomei pílulas mas nunca adiantava, o pouco que perdia voltava muito rápido. Vi esse mounjaro dos pobres Instagram e comecei a tomar todos os dias do jeito certo, só ai que comecei a emagrecer de verdade. Perdi 15 kg em menos de 3 meses, sem passar fome e sem ter que ficar fazendo exercício igual uma louca. E ainda melhorou minha ansiedade, parei de descontar na comida e hoje consigo me controlar totalmente. Super recomendo!!😘😘' },
-    { name: 'Maria Silva', image: '/dep5.webp', text: 'perdi 16kg em 2 meses! 😍 😍 feliz demais, pra mim valeu a pena KKKKK' },
-    { name: 'Joana Santos', image: '/dep6.webp', text: 'A maior motivação é ver aquela roupa que não cabia mais em você voltar a caber, sério, sua autoestima vai pra lua, recomendo demais meninas.' },
-    { name: 'Fernanda Costa', image: '/dep7.webp', text: 'Eu achava quase impossível eu perder peso depois dos 30. Mas ai eu conheci essa receita do mounjaro de pobre, resultado depois de 5 meses? perdi 37 kilos! Fiquei parecendo uma menininha😊❤' },
-    { name: 'Beatriz Almeida', image: '/dep8.webp', text: 'perdi 16 kilos usando o mounjaro de pobre, fiquei assustada com o tanto que emagreci em 1 mês' },
+  { name: 'Ana Paula', image: '/dep33.webp', text: 'Sou muito ansiosa e já tentei de tudo pra emagrecer. Já fiz treino em casa, tomei pílulas mas nunca adiantava, o pouco que perdia voltava muito rápido. Vi esse mounjaro dos pobres Instagram e comecei a tomar todos os dias do jeito certo, só ai que comecei a emagrecer de verdade. Perdi 15 kg em menos de 3 meses, sem passar fome e sem ter que ficar fazendo exercício igual uma louca. E ainda melhorou minha ansiedade, parei de descontar na comida e hoje consigo me controlar totalmente. Super recomendo!!😘😘' },
+  { name: 'Maria Silva', image: '/dep5.webp', text: 'perdi 16kg em 2 meses! 😍 😍 feliz demais, pra mim valeu a pena KKKKK' },
+  { name: 'Joana Santos', image: '/dep6.webp', text: 'A maior motivação é ver aquela roupa que não cabia mais em você voltar a caber, sério, sua autoestima vai pra lua, recomendo demais meninas.' },
+  { name: 'Fernanda Costa', image: '/dep7.webp', text: 'Eu achava quase impossível eu perder peso depois dos 30. Mas ai eu conheci essa receita do mounjaro de pobre, resultado depois de 5 meses? perdi 37 kilos! Fiquei parecendo uma menininha😊❤' },
+  { name: 'Beatriz Almeida', image: '/dep8.webp', text: 'perdi 16 kilos usando o mounjaro de pobre, fiquei assustada com o tanto que emagreci em 1 mês' },
 ];
 
 function OfferContent() {
@@ -294,6 +294,31 @@ function OfferContent() {
           </span>
         </p>
 
+        <Image
+          src="/1bonus.webp"
+          alt="Bônus"
+          width={600}
+          height={400}
+          className="h-auto w-full"
+          data-ai-hint="bonus gift"
+        />
+        <Image
+          src="/oferta.webp"
+          alt="Oferta"
+          width={600}
+          height={400}
+          className="h-auto w-full"
+          data-ai-hint="special offer"
+        />
+        <Image
+          src="/whatsappdepoimento.webp"
+          alt="Depoimento Whatsapp"
+          width={600}
+          height={400}
+          className="h-auto w-full"
+          data-ai-hint="testimonial chat"
+        />
+
         <div className="w-full space-y-4 rounded-lg bg-gray-50 p-6">
           <h2 className="text-2xl font-bold">
             Elas usaram e aprovaram o Mounjaro dos Pobres
@@ -378,4 +403,5 @@ export default function OfferPage() {
   );
 }
 
+    
     
