@@ -94,27 +94,29 @@ function OfferContent() {
 
   const handleCheckoutClick = () => {
     if (typeof window === 'undefined') return;
-
-    const { userData } = getClientData();
-    const checkoutUrl = `https://pay.hotmart.com/G93148123M?sck=${userData.external_id}`;
-
-    // Dispara o evento InitiateCheckout
-    const eventId = generateEventId('InitiateCheckout', userData.external_id ?? '');
-
-    if (window.fbq) {
-      window.fbq('track', 'InitiateCheckout', {}, { event_id: eventId });
-    }
-
-    sendN8NEvent({
-      eventName: 'InitiateCheckout',
-      eventId: eventId,
-      eventTime: Math.floor(Date.now() / 1000),
-      userData: userData,
-      event_source_url: window.location.href,
-      action_source: 'website',
-    });
-
-    router.push(checkoutUrl);
+  
+    setTimeout(() => {
+      const { userData } = getClientData();
+      const checkoutUrl = `https://pay.hotmart.com/G93148123M?sck=${userData.external_id}`;
+  
+      // Dispara o evento InitiateCheckout
+      const eventId = generateEventId('InitiateCheckout', userData.external_id ?? '');
+  
+      if (window.fbq) {
+        window.fbq('track', 'InitiateCheckout', {}, { event_id: eventId });
+      }
+  
+      sendN8NEvent({
+        eventName: 'InitiateCheckout',
+        eventId: eventId,
+        eventTime: Math.floor(Date.now() / 1000),
+        userData: userData,
+        event_source_url: window.location.href,
+        action_source: 'website',
+      });
+  
+      router.push(checkoutUrl);
+    }, 4000);
   };
 
   return (

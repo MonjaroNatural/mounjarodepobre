@@ -977,24 +977,26 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    const { userData } = getClientData();
-    if (!userData.external_id) return;
-
-    const eventId = generateEventId('AddToCart', userData.external_id);
-
-    if (window.fbq) {
-      window.fbq('track', 'AddToCart', {}, { event_id: eventId });
-    }
-
-    sendN8NEvent({
-      eventName: 'AddToCart',
-      eventId: eventId,
-      eventTime: Math.floor(Date.now() / 1000),
-      userData: userData,
-      event_source_url: window.location.href,
-      action_source: 'website',
-    });
+  
+    setTimeout(() => {
+      const { userData } = getClientData();
+      if (!userData.external_id) return;
+  
+      const eventId = generateEventId('AddToCart', userData.external_id);
+  
+      if (window.fbq) {
+        window.fbq('track', 'AddToCart', {}, { event_id: eventId });
+      }
+  
+      sendN8NEvent({
+        eventName: 'AddToCart',
+        eventId: eventId,
+        eventTime: Math.floor(Date.now() / 1000),
+        userData: userData,
+        event_source_url: window.location.href,
+        action_source: 'website',
+      });
+    }, 4000);
   }, []);
 
 
