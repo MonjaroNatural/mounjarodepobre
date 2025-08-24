@@ -31,7 +31,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
-import { getCookie, generateEventId, getClientData } from '@/lib/tracking';
+import { getClientData, generateEventId } from '@/lib/tracking';
 import { sendN8NEvent } from '../actions';
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -983,9 +983,13 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
       if (!userData.external_id) return;
   
       const eventId = generateEventId('AddToCart', userData.external_id);
+      const eventData = {
+        value: 5,
+        currency: 'USD',
+      };
   
       if (window.fbq) {
-        window.fbq('track', 'AddToCart', {}, { event_id: eventId });
+        window.fbq('track', 'AddToCart', eventData, { event_id: eventId });
       }
   
       sendN8NEvent({
@@ -993,6 +997,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
         eventId: eventId,
         eventTime: Math.floor(Date.now() / 1000),
         userData: userData,
+        customData: eventData,
         event_source_url: window.location.href,
         action_source: 'website',
       });

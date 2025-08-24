@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Meter } from '@/components/ui/meter';
-import { getCookie, generateEventId, getClientData } from '@/lib/tracking';
+import { getClientData, generateEventId } from '@/lib/tracking';
 import { sendN8NEvent } from '@/app/actions';
 import {
   Accordion,
@@ -99,11 +99,14 @@ function OfferContent() {
       const { userData } = getClientData();
       const checkoutUrl = `https://pay.hotmart.com/G93148123M?sck=${userData.external_id}`;
   
-      // Dispara o evento InitiateCheckout
       const eventId = generateEventId('InitiateCheckout', userData.external_id ?? '');
+      const eventData = {
+        value: 5,
+        currency: 'USD',
+      };
   
       if (window.fbq) {
-        window.fbq('track', 'InitiateCheckout', {}, { event_id: eventId });
+        window.fbq('track', 'InitiateCheckout', eventData, { event_id: eventId });
       }
   
       sendN8NEvent({
@@ -111,6 +114,7 @@ function OfferContent() {
         eventId: eventId,
         eventTime: Math.floor(Date.now() / 1000),
         userData: userData,
+        customData: eventData,
         event_source_url: window.location.href,
         action_source: 'website',
       });
