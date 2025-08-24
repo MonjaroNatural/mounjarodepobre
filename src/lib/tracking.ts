@@ -38,18 +38,6 @@ export const generateEventId = (
   return `${eventName}.${externalId}.${Date.now()}`;
 };
 
-async function getClientIp(): Promise<string> {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json');
-    if (!response.ok) return '';
-    const data = await response.json();
-    return data.ip;
-  } catch (error) {
-    console.error('Error fetching client IP:', error);
-    return '';
-  }
-}
-
 export const initializeTracking = async (
   searchParams: ReadonlyURLSearchParams,
 ) => {
@@ -89,6 +77,19 @@ export const initializeTracking = async (
   if (navigator.userAgent) {
     sessionStorage.setItem('user_agent', navigator.userAgent);
   }
+
+  async function getClientIp(): Promise<string> {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      if (!response.ok) return '';
+      const data = await response.json();
+      return data.ip;
+    } catch (error) {
+      console.error('Error fetching client IP:', error);
+      return '';
+    }
+  }
+
   const clientIpAddress = await getClientIp();
   if (clientIpAddress) {
     sessionStorage.setItem('client_ip', clientIpAddress);
