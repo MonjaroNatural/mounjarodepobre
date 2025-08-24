@@ -313,7 +313,7 @@ function QuizComponent() {
                     />
                     <Label
                       htmlFor={option.label}
-                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg transition-transform active:scale-[0.98] active:brightness-90 hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
+                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg transition-all active:scale-[0.98] active:bg-primary/30 hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
                     >
                       <div className="flex items-center gap-4">
                         {IconComponent && (
@@ -369,7 +369,7 @@ function QuizComponent() {
                   />
                   <Label
                     htmlFor={option.label}
-                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-transform active:scale-[0.98] active:brightness-90 hover:bg-primary/10 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
+                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-transform active:scale-[0.98] active:bg-primary/30 hover:bg-primary/10 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
                     {option.imageUrl && (
                       <Image
@@ -396,7 +396,7 @@ function QuizComponent() {
               <Label
                 key={option.label}
                 htmlFor={option.label}
-                className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg transition-transform active:scale-[0.98] active:brightness-90 hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
+                className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg transition-all active:scale-[0.98] active:bg-primary/30 hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
               >
                 <div className="flex items-center gap-4">
                   {option.emoji && (
