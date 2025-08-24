@@ -360,7 +360,7 @@ function QuizComponent() {
               className="flex flex-wrap justify-center gap-4"
             >
               {question.options?.map((option) => (
-                <div key={option.label} className="w-full max-w-[150px]">
+                <div key={option.label} className="w-full max-w-[180px]">
                   <RadioGroupItem
                     value={option.label}
                     id={option.label}
