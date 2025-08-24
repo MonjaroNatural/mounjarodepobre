@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -313,33 +314,29 @@ function OfferContent() {
           >
             <CarouselContent className="-ml-4">
               {testimonials.map((testimonial, index) => (
-                <CarouselItem key={index} className="pl-4 md:basis-1/2">
-                  <div className="flex h-full flex-col justify-between rounded-lg border bg-white p-6 shadow-md">
-                    <div>
-                      <div className="flex items-center gap-4">
-                        <Image
-                          src={testimonial.image}
-                          alt={`Foto de ${testimonial.name}`}
-                          width={56}
-                          height={56}
-                          className="h-14 w-14 rounded-full object-cover"
-                          data-ai-hint="woman smiling portrait"
-                        />
-                        <div>
-                          <p className="font-bold">{testimonial.name}</p>
-                          <div className="flex text-yellow-400">
-                            {'★★★★★'.split('').map((s, i) => (
-                              <span key={i}>{s}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <p className="mt-4 text-left text-sm italic text-gray-700">
-                        "{testimonial.text}"
-                      </p>
-                    </div>
-                  </div>
-                </CarouselItem>
+                 <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                 <div className="flex h-full flex-col items-center gap-4 rounded-lg border bg-white p-4 text-center shadow-md">
+                   <Image
+                     src={testimonial.image}
+                     alt={`Depoimento de ${testimonial.name}`}
+                     width={400}
+                     height={200}
+                     className="h-auto w-full rounded-lg"
+                     data-ai-hint="woman happy"
+                   />
+                   <div className="flex-1">
+                     <p className="font-bold">{testimonial.name}</p>
+                     <div className="mb-2 flex justify-center text-yellow-400">
+                       {'★★★★★'.split('').map((s, i) => (
+                         <span key={i}>{s}</span>
+                       ))}
+                     </div>
+                     <p className="text-sm italic text-gray-700">
+                       "{testimonial.text}"
+                     </p>
+                   </div>
+                 </div>
+               </CarouselItem>
               ))}
             </CarouselContent>
           </Carousel>
@@ -380,3 +377,5 @@ export default function OfferPage() {
     </Suspense>
   );
 }
+
+    
