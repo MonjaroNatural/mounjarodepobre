@@ -97,7 +97,7 @@ function OfferContent() {
   
     setTimeout(() => {
       const { userData } = getClientData();
-      const checkoutUrl = `https://pay.hotmart.com/G93148123M?sck=${userData.external_id}`;
+      const checkoutUrl = `https://pay.cakto.com.br/4hq9554_540351?src=${userData.external_id}`;
   
       const eventId = generateEventId('InitiateCheckout', userData.external_id ?? '');
       const eventData = {
