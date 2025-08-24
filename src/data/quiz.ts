@@ -175,6 +175,17 @@ export const quizQuestions: QuizQuestion[] = [
     buttonText: 'Continuar',
   },
   {
+    id: 16,
+    type: 'single-choice-image',
+    question: 'Qual é o corpo dos seus sonhos?',
+    subtitle: 'Escolha uma opção abaixo:',
+    options: [
+      { label: 'Em forma', imageUrl: '/enforma.webp' },
+      { label: 'Natural', imageUrl: '/natural.webp' },
+    ],
+    autoAdvance: true,
+  },
+  {
     id: 17,
     type: 'single-choice-column',
     question: 'Como é o seu dia a dia?',
@@ -223,16 +234,5 @@ export const quizQuestions: QuizQuestion[] = [
     type: 'results',
     question: 'Seus Resultados',
     buttonText: 'Continuar para a oferta',
-  },
-  {
-    id: 16,
-    type: 'single-choice-image',
-    question: 'Qual é o corpo dos seus sonhos?',
-    subtitle: 'Escolha uma opção abaixo:',
-    options: [
-      { label: 'Em forma', imageUrl: '/enforma.webp' },
-      { label: 'Natural', imageUrl: '/natural.webp' },
-    ],
-    autoAdvance: true,
   }
 ];
