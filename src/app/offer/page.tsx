@@ -12,6 +12,8 @@ function OfferContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const name = searchParams.get('name') || 'Seu Plano';
+  const currentWeight = searchParams.get('currentWeight') || '';
+  const desiredWeight = searchParams.get('desiredWeight') || '';
   const externalId = getCookie('my_session_id');
 
   const handleCheckoutClick = () => {
@@ -77,6 +79,12 @@ function OfferContent() {
             <div className="rounded-md bg-[#ffebee] p-2 text-center font-bold text-red-800">
               Antes do Mounjaro dos Pobres
             </div>
+            {currentWeight && (
+                 <div className="text-center">
+                    <p className="font-bold">Seu peso atual:</p>
+                    <p className="text-2xl font-bold text-red-600">{currentWeight}</p>
+                 </div>
+            )}
             <Image
               src="/antes11.webp"
               alt="Mulher antes de usar o produto"
@@ -108,6 +116,12 @@ function OfferContent() {
             <div className="rounded-md bg-[#e3f2fd] p-2 text-center font-bold text-blue-800">
               Depois do Mounjaro dos Pobres
             </div>
+            {desiredWeight && (
+                <div className="text-center">
+                    <p className="font-bold">Seu peso desejado:</p>
+                    <p className="text-2xl font-bold text-green-600">{desiredWeight}</p>
+                </div>
+            )}
              <Image
               src="/depois.webp"
               alt="Mulher depois de usar o produto"

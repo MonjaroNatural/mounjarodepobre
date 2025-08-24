@@ -212,7 +212,18 @@ function QuizComponent() {
       // Last step, navigate to offer
       const nameAnswer =
         (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
-      router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
+      const currentWeightAnswer =
+        (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
+      const desiredWeightAnswer =
+        (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
+      
+      const queryParams = new URLSearchParams({
+          name: nameAnswer,
+          currentWeight: currentWeightAnswer,
+          desiredWeight: desiredWeightAnswer
+      });
+      
+      router.push(`/offer?${queryParams.toString()}`);
     }
   };
 
@@ -226,18 +237,34 @@ function QuizComponent() {
 
     setTimeout(() => {
       if (question.id === 16) {
-        const nameAnswer =
-          (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
-        router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
-        return;
+         const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
+         const currentWeightAnswer = (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
+         const desiredWeightAnswer = (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
+
+         const queryParams = new URLSearchParams({
+             name: nameAnswer,
+             currentWeight: currentWeightAnswer,
+             desiredWeight: desiredWeightAnswer
+         });
+         
+         router.push(`/offer?${queryParams.toString()}`);
+         return;
       }
 
       if (currentStep < quizQuestions.length - 1) {
         setCurrentStep(currentStep + 1);
       } else {
-        const nameAnswer =
-          (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
-        router.push(`/offer?name=${encodeURIComponent(nameAnswer)}`);
+        const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
+        const currentWeightAnswer = (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
+        const desiredWeightAnswer = (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
+
+        const queryParams = new URLSearchParams({
+            name: nameAnswer,
+            currentWeight: currentWeightAnswer,
+            desiredWeight: desiredWeightAnswer
+        });
+
+        router.push(`/offer?${queryParams.toString()}`);
       }
     }, 500);
   };
