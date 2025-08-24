@@ -311,7 +311,7 @@ function OfferContent() {
           className="h-auto w-full"
           data-ai-hint="special offer"
         />
-        
+
         <div className="w-full max-w-md space-y-4">
           <Button
             size="lg"
@@ -320,7 +320,7 @@ function OfferContent() {
           >
             SIM! QUERO A RECEITA! ✅😊
           </Button>
-          <div className="flex flex-col items-center justify-center gap-4 text-xs text-gray-600 sm:flex-row sm:gap-6">
+          <div className="flex flex-row items-center justify-center gap-4 text-xs text-gray-600 sm:gap-6">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-8 w-8 text-blue-500" />
               <div className="text-left">
@@ -374,29 +374,32 @@ function OfferContent() {
           >
             <CarouselContent className="-ml-4">
               {testimonials.map((testimonial, index) => (
-                 <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                 <div className="flex h-full flex-col items-center gap-4 rounded-lg border bg-white p-4 text-center shadow-md">
-                   <Image
-                     src={testimonial.image}
-                     alt={`Depoimento de ${testimonial.name}`}
-                     width={400}
-                     height={200}
-                     className="h-auto w-full rounded-lg"
-                     data-ai-hint="woman happy"
-                   />
-                   <div className="flex-1">
-                     <p className="font-bold">{testimonial.name}</p>
-                     <div className="mb-2 flex justify-center text-yellow-400">
-                       {'★★★★★'.split('').map((s, i) => (
-                         <span key={i}>{s}</span>
-                       ))}
-                     </div>
-                     <p className="text-sm italic text-gray-700">
-                       "{testimonial.text}"
-                     </p>
-                   </div>
-                 </div>
-               </CarouselItem>
+                <CarouselItem
+                  key={index}
+                  className="pl-4 md:basis-1/2 lg:basis-1/3"
+                >
+                  <div className="flex h-full flex-col items-center gap-4 rounded-lg border bg-white p-4 text-center shadow-md">
+                    <Image
+                      src={testimonial.image}
+                      alt={`Depoimento de ${testimonial.name}`}
+                      width={400}
+                      height={200}
+                      className="h-auto w-full rounded-lg"
+                      data-ai-hint="woman happy"
+                    />
+                    <div className="flex-1">
+                      <p className="font-bold">{testimonial.name}</p>
+                      <div className="mb-2 flex justify-center text-yellow-400">
+                        {'★★★★★'.split('').map((s, i) => (
+                          <span key={i}>{s}</span>
+                        ))}
+                      </div>
+                      <p className="text-sm italic text-gray-700">
+                        "{testimonial.text}"
+                      </p>
+                    </div>
+                  </div>
+                </CarouselItem>
               ))}
             </CarouselContent>
           </Carousel>
