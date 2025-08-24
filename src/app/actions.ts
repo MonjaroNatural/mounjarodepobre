@@ -9,43 +9,15 @@ const webhookUrls = {
   InitiateCheckout: 'https://redis-n8n.rzilkp.easypanel.host/webhook-test/checkoutfb',
 };
 
-async function getClientIp(): Promise<string> {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json', {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-        },
-        cache: 'no-store',
-    });
-    if (!response.ok) {
-        console.error('Error fetching client IP:', response.statusText);
-        return '';
-    }
-    const data = await response.json();
-    return data.ip;
-  } catch (error) {
-    console.error('Error fetching client IP:', error);
-    return '';
-  }
-}
-
-
-export const sendN8NEvent = async (clientData: Omit<N8NClientData, 'userData'> & { userData: Omit<N8NClientData['userData'], 'client_ip_address'>}) => {
+export const sendN8NEvent = async (clientData: N8NClientData) => {
   try {
     const webhookUrl = webhookUrls[clientData.eventName];
     if (!webhookUrl) {
       throw new Error(`No webhook URL configured for event: ${clientData.eventName}`);
     }
 
-    const clientIpAddress = await getClientIp();
-
     const finalPayload = {
-      ...clientData,
-      userData: {
-        ...clientData.userData,
-        client_ip_address: clientIpAddress,
-      }
+        ...clientData,
     };
 
     const response = await fetch(webhookUrl, {
