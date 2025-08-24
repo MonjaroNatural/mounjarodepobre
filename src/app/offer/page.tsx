@@ -111,6 +111,7 @@ function OfferContent() {
         external_id: externalId,
         fbc: getCookie('_fbc'),
         fbp: getCookie('_fbp'),
+        client_user_agent: sessionStorage.getItem('user_agent'),
         ad_id: localStorage.getItem('ad_id'),
         adset_id: localStorage.getItem('adset_id'),
         campaign_id: localStorage.getItem('campaign_id'),

@@ -617,7 +617,7 @@ function QuizComponent() {
 
   const showButton =
     question.buttonText &&
-    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading', 'results'].includes(
+    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading'].includes(
       question.type,
     );
 
@@ -993,6 +993,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
         external_id: externalId,
         fbc: getCookie('_fbc'),
         fbp: getCookie('_fbp'),
+        client_user_agent: sessionStorage.getItem('user_agent'),
         ad_id: localStorage.getItem('ad_id'),
         adset_id: localStorage.getItem('adset_id'),
         campaign_id: localStorage.getItem('campaign_id'),
@@ -1156,16 +1157,6 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
             <span className="font-bold text-green-700">93%</span>
           </div>
         </div>
-      </div>
-       <div className="text-center mt-8">
-        <Button
-          onClick={onNext}
-          size="lg"
-          className="w-full max-w-xs h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
-        >
-          {quizQuestions.find(q => q.type === 'results')?.buttonText || 'Continuar'}
-          <ChevronRight className="h-6 w-6" />
-        </Button>
       </div>
     </div>
   );

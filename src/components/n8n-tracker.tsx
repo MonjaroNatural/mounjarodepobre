@@ -30,6 +30,7 @@ export function N8NTracker() {
     if (adId) localStorage.setItem('ad_id', adId);
     if (adsetId) localStorage.setItem('adset_id', adsetId);
     if (campaignId) localStorage.setItem('campaign_id', campaignId);
+    if (navigator.userAgent) sessionStorage.setItem('user_agent', navigator.userAgent);
 
 
     sendN8NEvent({
@@ -39,6 +40,7 @@ export function N8NTracker() {
         external_id: sessionId,
         fbc: fbc,
         fbp: getCookie('_fbp'),
+        client_user_agent: sessionStorage.getItem('user_agent'),
         ad_id: localStorage.getItem('ad_id'),
         adset_id: localStorage.getItem('adset_id'),
         campaign_id: localStorage.getItem('campaign_id'),
