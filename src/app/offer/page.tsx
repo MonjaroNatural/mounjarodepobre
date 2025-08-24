@@ -345,18 +345,9 @@ function OfferContent() {
           </div>
         </div>
 
-        <Image
-          src="/whatsappdepoimento.webp"
-          alt="Depoimento Whatsapp"
-          width={600}
-          height={400}
-          className="h-auto w-full"
-          data-ai-hint="testimonial chat"
-        />
-
         <div className="w-full space-y-4 rounded-lg bg-gray-50 p-6">
           <h2 className="text-2xl font-bold">
-            Elas usaram e aprovaram o Mounjaro dos Pobres
+            Quem Usa <span className="text-green-600">Tem Resultado</span> 😉👇
           </h2>
           <Carousel
             setApi={setApi}
@@ -404,6 +395,15 @@ function OfferContent() {
             </CarouselContent>
           </Carousel>
         </div>
+
+        <Image
+          src="/whatsappdepoimento.webp"
+          alt="Depoimento Whatsapp"
+          width={600}
+          height={400}
+          className="h-auto w-full"
+          data-ai-hint="testimonial chat"
+        />
 
         <div className="w-full space-y-4 rounded-lg border p-6">
           <h2 className="text-2xl font-bold">Perguntas Frequentes</h2>
