@@ -313,11 +313,11 @@ function QuizComponent() {
                     <Label
                       onClick={() => handleSingleChoice(option.label)}
                       htmlFor={option.label}
-                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg transition-all active:scale-[0.98] active:bg-green-800 active:text-white hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
+                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg text-primary-foreground transition-all hover:bg-primary/20 peer-data-[state=checked]:border-green-800 peer-data-[state=checked]:bg-green-800 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-primary"
                     >
                       <div className="flex items-center gap-4">
                         {IconComponent && (
-                          <IconComponent className="h-6 w-6 text-primary" />
+                          <IconComponent className="h-6 w-6 text-primary peer-data-[state=checked]:text-white" />
                         )}
                         {option.emoji && (
                           <span className="text-2xl">{option.emoji}</span>
@@ -331,7 +331,7 @@ function QuizComponent() {
                             className="h-auto w-16 rounded-md object-contain"
                           />
                         )}
-                        <div className="flex-1 text-left">
+                        <div className="flex-1 text-left text-black peer-data-[state=checked]:text-white">
                           <span className={option.sublabel ? 'font-bold' : ''}>
                             {option.label}
                           </span>
@@ -342,8 +342,8 @@ function QuizComponent() {
                           )}
                         </div>
                       </div>
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-primary">
-                        <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-white" />
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white peer-data-[state=checked]:bg-white">
+                        <ChevronRight className="h-4 w-4 text-primary peer-data-[state=checked]:text-green-800" />
                       </div>
                     </Label>
                   </div>
@@ -369,7 +369,7 @@ function QuizComponent() {
                   <Label
                     onClick={() => handleSingleChoice(option.label)}
                     htmlFor={option.label}
-                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-all active:scale-[0.98] active:bg-green-800 active:text-white hover:bg-primary/10 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
+                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-all hover:bg-primary/10 peer-data-[state=checked]:border-green-800 peer-data-[state=checked]:bg-green-800 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-primary"
                   >
                     {option.imageUrl && (
                       <Image
@@ -380,7 +380,7 @@ function QuizComponent() {
                         className="h-auto w-full rounded-md object-contain"
                       />
                     )}
-                    <span className="mt-2 text-center text-base font-medium">
+                    <span className="mt-2 text-center text-base font-medium text-black peer-data-[state=checked]:text-white">
                       {option.label}
                     </span>
                   </Label>
@@ -396,7 +396,7 @@ function QuizComponent() {
               <Label
                 key={option.label}
                 htmlFor={option.label}
-                className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg transition-all active:scale-[0.98] active:bg-green-800 active:text-white hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
+                className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg transition-all hover:bg-primary/20 data-[state=checked]:border-green-800 data-[state=checked]:bg-green-800 data-[state=checked]:text-white [&:has([data-state=checked])]:border-primary"
               >
                 <div className="flex items-center gap-4">
                   {option.emoji && (
@@ -411,7 +411,7 @@ function QuizComponent() {
                       className="h-auto w-16 rounded-md object-contain"
                     />
                   )}
-                  <span className="flex-1 text-left">{option.label}</span>
+                  <span className="flex-1 text-left text-black peer-data-[state=checked]:text-white">{option.label}</span>
                 </div>
                 <Checkbox
                   id={option.label}
@@ -420,7 +420,7 @@ function QuizComponent() {
                     Array.isArray(currentAnswer) &&
                     currentAnswer.includes(option.label)
                   }
-                  className="h-6 w-6 shrink-0 rounded-md border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                  className="h-6 w-6 shrink-0 rounded-md border-2 border-primary bg-white data-[state=checked]:bg-white data-[state=checked]:text-green-800"
                 />
               </Label>
             ))}
@@ -1147,3 +1147,5 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     </div>
   );
 }
+
+    
