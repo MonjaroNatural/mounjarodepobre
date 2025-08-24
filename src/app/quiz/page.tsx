@@ -614,7 +614,7 @@ function QuizComponent() {
 
   const showButton =
     question.buttonText &&
-    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading'].includes(
+    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading', 'results'].includes(
       question.type,
     );
 
