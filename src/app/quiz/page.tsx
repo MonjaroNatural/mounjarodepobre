@@ -31,7 +31,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
-import { getCookie, generateEventId } from '@/lib/tracking';
+import { getCookie, generateEventId, getClientData } from '@/lib/tracking';
 import { sendN8NEvent } from '../actions';
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -974,13 +974,14 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
   const name = (answers.find((a) => a.questionId === 4)?.value as string) || 'Olá';
   const { imc, category } = calculateImc(answers);
   const finalCategory = imcCategory || category;
-  const externalId = getCookie('my_session_id');
 
   useEffect(() => {
-    // Dispara o evento AddToCart quando a página de resultados é exibida
-    if (!externalId) return;
+    if (typeof window === 'undefined') return;
 
-    const eventId = generateEventId('AddToCart', externalId);
+    const { userData } = getClientData();
+    if (!userData.external_id) return;
+
+    const eventId = generateEventId('AddToCart', userData.external_id);
 
     if (window.fbq) {
       window.fbq('track', 'AddToCart', {}, { event_id: eventId });
@@ -990,20 +991,11 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
       eventName: 'AddToCart',
       eventId: eventId,
       eventTime: Math.floor(Date.now() / 1000),
-      userData: {
-        external_id: externalId,
-        fbc: getCookie('_fbc'),
-        fbp: getCookie('_fbp'),
-        client_ip_address: sessionStorage.getItem('client_ip'),
-        client_user_agent: sessionStorage.getItem('user_agent'),
-        ad_id: localStorage.getItem('ad_id'),
-        adset_id: localStorage.getItem('adset_id'),
-        campaign_id: localStorage.getItem('campaign_id'),
-      },
+      userData: userData,
       event_source_url: window.location.href,
       action_source: 'website',
     });
-  }, [externalId]);
+  }, []);
 
 
   const markerPositions: Record<ImcCategory, string> = {
