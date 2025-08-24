@@ -291,7 +291,6 @@ function QuizComponent() {
         return (
           <div className="w-full">
             <RadioGroup
-              onValueChange={handleSingleChoice}
               value={typeof currentAnswer === 'string' ? currentAnswer : ''}
               className={`flex ${
                 question.type === 'single-choice-column'
@@ -312,6 +311,7 @@ function QuizComponent() {
                       className="peer sr-only"
                     />
                     <Label
+                      onClick={() => handleSingleChoice(option.label)}
                       htmlFor={option.label}
                       className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-[#6c9a42] bg-[#e8f5e9] p-4 text-lg transition-all active:scale-[0.98] active:bg-green-800 active:text-white hover:bg-primary/20 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/20 [&:has([data-state=checked])]:border-primary"
                     >
@@ -356,7 +356,6 @@ function QuizComponent() {
         return (
           <div className="w-full">
             <RadioGroup
-              onValueChange={handleSingleChoice}
               value={typeof currentAnswer === 'string' ? currentAnswer : ''}
               className="flex flex-wrap justify-center gap-4"
             >
@@ -368,6 +367,7 @@ function QuizComponent() {
                     className="peer sr-only"
                   />
                   <Label
+                    onClick={() => handleSingleChoice(option.label)}
                     htmlFor={option.label}
                     className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-transform active:scale-[0.98] active:bg-green-800 active:text-white hover:bg-primary/10 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
