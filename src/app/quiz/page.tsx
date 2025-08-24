@@ -357,10 +357,10 @@ function QuizComponent() {
           <div className="w-full">
             <RadioGroup
               value={typeof currentAnswer === 'string' ? currentAnswer : ''}
-              className="flex flex-wrap justify-center gap-4"
+              className="flex justify-center gap-4"
             >
               {question.options?.map((option) => (
-                <div key={option.label} className="w-full max-w-[180px]">
+                <div key={option.label} className="flex-1">
                   <RadioGroupItem
                     value={option.label}
                     id={option.label}
@@ -375,8 +375,8 @@ function QuizComponent() {
                       <Image
                         src={option.imageUrl}
                         alt={option.label}
-                        width={120}
-                        height={120}
+                        width={200}
+                        height={200}
                         className="h-auto w-full rounded-md object-contain"
                       />
                     )}
