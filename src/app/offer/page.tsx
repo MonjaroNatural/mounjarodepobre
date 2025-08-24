@@ -71,28 +71,20 @@ function OfferContent() {
           está pronto.
         </h1>
 
-        <div className="space-y-4">
-          <div className="flex justify-center gap-4 text-sm">
-            <div className="rounded-md bg-[#ffebee] p-2 font-bold text-red-800">
-              Antes do Mounjaro dos Pobres
-            </div>
-            <div className="rounded-md bg-[#e3f2fd] p-2 font-bold text-blue-800">
-              Depois do Mounjaro dos Pobres
-            </div>
-          </div>
-          <Image
-            src="/anteedepoischeckoutic.gif"
-            alt="Antes e depois de usar Mounjaro dos Pobres"
-            width={400}
-            height={300}
-            className="mx-auto rounded-lg"
-            unoptimized
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-6 rounded-lg border p-4 text-left text-sm">
+        <div className="grid grid-cols-2 gap-4 rounded-lg border p-4 text-left text-sm">
           {/* Coluna Antes */}
           <div className="space-y-3">
+            <div className="rounded-md bg-[#ffebee] p-2 text-center font-bold text-red-800">
+              Antes do Mounjaro dos Pobres
+            </div>
+            <Image
+              src="/antes11.webp"
+              alt="Mulher antes de usar o produto"
+              width={250}
+              height={300}
+              className="mx-auto rounded-lg"
+              data-ai-hint="woman overweight sad"
+            />
             <div className="space-y-1">
               <p>Metabolismo lento</p>
               <Meter value={1} max={5} variant="destructive" />
@@ -110,8 +102,20 @@ function OfferContent() {
               <Meter value={3} max={5} variant="destructive" />
             </div>
           </div>
+
           {/* Coluna Depois */}
           <div className="space-y-3">
+            <div className="rounded-md bg-[#e3f2fd] p-2 text-center font-bold text-blue-800">
+              Depois do Mounjaro dos Pobres
+            </div>
+             <Image
+              src="/depois.webp"
+              alt="Mulher depois de usar o produto"
+              width={250}
+              height={300}
+              className="mx-auto rounded-lg"
+              data-ai-hint="woman fit happy"
+            />
             <div className="space-y-1">
               <p>Metabolismo acelerado</p>
               <Meter value={4} max={5} variant="constructive" />
