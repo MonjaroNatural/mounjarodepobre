@@ -75,26 +75,11 @@ const faqData = [
 ];
 
 const testimonials = [
-  {
-    name: 'Juliana Paes',
-    text: 'Eu não acreditava mais que podia emagrecer. Com o protocolo, perdi 8kg em 3 semanas sem sofrimento. Minha autoestima voltou com tudo!',
-    image: '/depoimento1.webp',
-  },
-  {
-    name: 'Márcia Oliveira',
-    text: 'Finalmente algo que funciona! Perdi medidas, ganhei disposição e o melhor: sem passar fome ou tomar remédios caros. Recomendo demais!',
-    image: '/depoimento2.webp',
-  },
-  {
-    name: 'Carla Souza',
-    text: 'Em 1 mês, perdi 12kg. Parece mágica, mas é só o método certo. O "Mounjaro de Pobre" mudou a minha vida e a forma como eu me vejo no espelho.',
-    image: '/depoimento3.webp',
-  },
-  {
-    name: 'Fernanda Lima',
-    text: 'O resultado foi muito além do peso. Me sinto mais leve, desinchada e com uma energia que não tinha há anos. Foi o melhor investimento que fiz em mim.',
-    image: '/depoimento4.webp',
-  },
+    { name: 'Ana Paula', image: '/dep33.webp', text: 'Sou muito ansiosa e já tentei de tudo pra emagrecer. Já fiz treino em casa, tomei pílulas mas nunca adiantava, o pouco que perdia voltava muito rápido. Vi esse mounjaro dos pobres Instagram e comecei a tomar todos os dias do jeito certo, só ai que comecei a emagrecer de verdade. Perdi 15 kg em menos de 3 meses, sem passar fome e sem ter que ficar fazendo exercício igual uma louca. E ainda melhorou minha ansiedade, parei de descontar na comida e hoje consigo me controlar totalmente. Super recomendo!!😘😘' },
+    { name: 'Maria Silva', image: '/dep5.webp', text: 'perdi 16kg em 2 meses! 😍 😍 feliz demais, pra mim valeu a pena KKKKK' },
+    { name: 'Joana Santos', image: '/dep6.webp', text: 'A maior motivação é ver aquela roupa que não cabia mais em você voltar a caber, sério, sua autoestima vai pra lua, recomendo demais meninas.' },
+    { name: 'Fernanda Costa', image: '/dep7.webp', text: 'Eu achava quase impossível eu perder peso depois dos 30. Mas ai eu conheci essa receita do mounjaro de pobre, resultado depois de 5 meses? perdi 37 kilos! Fiquei parecendo uma menininha😊❤' },
+    { name: 'Beatriz Almeida', image: '/dep8.webp', text: 'perdi 16 kilos usando o mounjaro de pobre, fiquei assustada com o tanto que emagreci em 1 mês' },
 ];
 
 function OfferContent() {
