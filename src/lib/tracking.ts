@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import type { ReadonlyURLSearchParams } from 'next/navigation';
 
@@ -38,9 +39,7 @@ export const generateEventId = (
   return `${eventName}.${externalId}.${Date.now()}`;
 };
 
-export const initializeTracking = async (
-  searchParams: ReadonlyURLSearchParams,
-) => {
+export const initializeTracking = (searchParams: ReadonlyURLSearchParams) => {
   if (typeof window === 'undefined') return;
 
   // Session ID
@@ -73,26 +72,9 @@ export const initializeTracking = async (
   if (adsetId) localStorage.setItem('adset_id', adsetId);
   if (campaignId) localStorage.setItem('campaign_id', campaignId);
 
-  // User Agent and IP
+  // User Agent
   if (navigator.userAgent) {
     sessionStorage.setItem('user_agent', navigator.userAgent);
-  }
-
-  async function getClientIp(): Promise<string> {
-    try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      if (!response.ok) return '';
-      const data = await response.json();
-      return data.ip;
-    } catch (error) {
-      console.error('Error fetching client IP:', error);
-      return '';
-    }
-  }
-
-  const clientIpAddress = await getClientIp();
-  if (clientIpAddress) {
-    sessionStorage.setItem('client_ip', clientIpAddress);
   }
 };
 
@@ -104,7 +86,7 @@ export interface N8NClientData {
     external_id: string | null;
     fbc: string | null;
     fbp: string | null;
-    client_ip_address?: string | null;
+    client_ip_address?: string | null; // This will now be added by the server
     client_user_agent?: string | null;
     ad_id?: string | null;
     adset_id?: string | null;
@@ -120,7 +102,11 @@ export interface N8NClientData {
 
 export const getClientData = (): Omit<
   N8NClientData,
-  'eventName' | 'eventId' | 'eventTime' | 'event_source_url' | 'action_source'
+  | 'eventName'
+  | 'eventId'
+  | 'eventTime'
+  | 'event_source_url'
+  | 'action_source'
 > => {
   if (typeof window === 'undefined') {
     return {
@@ -128,7 +114,6 @@ export const getClientData = (): Omit<
         external_id: null,
         fbc: null,
         fbp: null,
-        client_ip_address: null,
         client_user_agent: null,
         ad_id: null,
         adset_id: null,
@@ -142,7 +127,6 @@ export const getClientData = (): Omit<
       external_id: getCookie('my_session_id'),
       fbc: getCookie('_fbc'),
       fbp: getCookie('_fbp'),
-      client_ip_address: sessionStorage.getItem('client_ip'),
       client_user_agent: sessionStorage.getItem('user_agent'),
       ad_id: localStorage.getItem('ad_id'),
       adset_id: localStorage.getItem('adset_id'),
