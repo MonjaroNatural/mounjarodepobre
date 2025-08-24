@@ -392,38 +392,39 @@ function QuizComponent() {
       case 'multiple-choice':
         return (
           <div className="w-full space-y-4">
-            {question.options?.map((option) => (
-              <Label
-                key={option.label}
-                htmlFor={option.label}
-                className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg transition-all hover:bg-primary/20 data-[state=checked]:border-green-800 data-[state=checked]:bg-green-800 data-[state=checked]:text-white [&:has([data-state=checked])]:border-primary"
-              >
-                <div className="flex items-center gap-4">
-                  {option.emoji && (
-                    <span className="text-2xl">{option.emoji}</span>
-                  )}
-                  {option.imageUrl && (
-                    <Image
-                      src={option.imageUrl}
-                      alt={option.label}
-                      width={60}
-                      height={60}
-                      className="h-auto w-16 rounded-md object-contain"
-                    />
-                  )}
-                  <span className="flex-1 text-left text-black peer-data-[state=checked]:text-white">{option.label}</span>
-                </div>
-                <Checkbox
-                  id={option.label}
-                  onCheckedChange={() => handleMultipleChoice(option.label)}
-                  checked={
-                    Array.isArray(currentAnswer) &&
-                    currentAnswer.includes(option.label)
-                  }
-                  className="h-6 w-6 shrink-0 rounded-md border-2 border-primary bg-white data-[state=checked]:bg-white data-[state=checked]:text-green-800"
-                />
-              </Label>
-            ))}
+            {question.options?.map((option) => {
+              const isChecked = Array.isArray(currentAnswer) && currentAnswer.includes(option.label);
+              return (
+                <Label
+                  key={option.label}
+                  htmlFor={option.label}
+                  data-state={isChecked ? 'checked' : 'unchecked'}
+                  className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg transition-all hover:bg-primary/20 data-[state=checked]:border-green-800 data-[state=checked]:bg-green-800 data-[state=checked]:text-white"
+                >
+                  <div className="flex items-center gap-4">
+                    {option.emoji && (
+                      <span className="text-2xl">{option.emoji}</span>
+                    )}
+                    {option.imageUrl && (
+                      <Image
+                        src={option.imageUrl}
+                        alt={option.label}
+                        width={60}
+                        height={60}
+                        className="h-auto w-16 rounded-md object-contain"
+                      />
+                    )}
+                    <span className="flex-1 text-left text-black data-[state=checked]:text-white">{option.label}</span>
+                  </div>
+                  <Checkbox
+                    id={option.label}
+                    onCheckedChange={() => handleMultipleChoice(option.label)}
+                    checked={isChecked}
+                    className="h-6 w-6 shrink-0 rounded-md border-2 border-primary bg-white data-[state=checked]:bg-white data-[state=checked]:text-green-800"
+                  />
+                </Label>
+              )
+            })}
           </div>
         );
       case 'text':
@@ -1147,5 +1148,3 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     </div>
   );
 }
-
-    
