@@ -707,39 +707,37 @@ function QuizComponent() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-       <div className="fixed top-0 left-0 right-0 z-10 grid grid-cols-[auto_1fr_auto] items-center bg-background p-2">
-        <div className="flex w-10 justify-start">
-           {currentStep > 0 && question.type !== 'loading' && (
-            <button onClick={handleBack} className="text-primary">
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-col items-center gap-2">
+      <div className="fixed top-0 left-0 right-0 z-10 bg-background p-4">
+        {currentStep > 0 && question.type !== 'loading' && (
+          <button
+            onClick={handleBack}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"
+          >
+            <ChevronLeft className="h-8 w-8" />
+          </button>
+        )}
+        <div className="flex flex-col items-center justify-center">
           <Image
             src="/logonov1a.webp"
             alt="Mounjaro de Pobre Logo"
             width={50}
             height={50}
           />
-           {(question.type !== 'loading' && question.type !== 'results') && (
+          {(question.type !== 'loading' && question.type !== 'results') && (
             <Progress
               value={progress}
-              className="h-2 w-full max-w-xs"
+              className="h-2 w-full max-w-xs mt-2"
               style={{ backgroundColor: '#e0e0e0' }}
             />
           )}
           {question.type === 'results' && (
              <Progress
               value={progress}
-              className="h-2 w-full max-w-xs"
+              className="h-2 w-full max-w-xs mt-2"
               style={{ backgroundColor: '#e0e0e0' }}
             />
           )}
         </div>
-        
-        <div className="w-10"></div>
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center p-4 mt-24">
