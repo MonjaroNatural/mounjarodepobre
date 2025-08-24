@@ -39,17 +39,84 @@ const iconMap: { [key: string]: React.ElementType } = {
   GlassWater: GlassWater,
 };
 
+type ImcCategory = 'Abaixo do peso' | 'Normal' | 'Sobrepeso' | 'Obesidade';
+
+const getImcCategory = (imc: number): ImcCategory => {
+  if (imc < 18.5) return 'Abaixo do peso';
+  if (imc < 25) return 'Normal';
+  if (imc < 30) return 'Sobrepeso';
+  return 'Obesidade';
+};
+
+const calculateImc = (answers: Answer[]): { imc: number; category: ImcCategory } => {
+    const weightStr = (answers.find((a) => a.questionId === 11)?.value as string) || '70kg';
+    const heightStr = (answers.find((a) => a.questionId === 12)?.value as string) || '165cm';
+
+    const parseValue = (str: string) => {
+        const match = str.match(/(\d+(\.\d+)?)/);
+        return match ? parseFloat(match[0]) : 0;
+    };
+
+    let weightInKg = parseValue(weightStr);
+    if (weightStr.includes('lb')) {
+        weightInKg *= 0.453592;
+    }
+
+    let heightInCm = parseValue(heightStr);
+    if (heightStr.includes('pol')) {
+        heightInCm *= 2.54;
+    }
+
+    const heightInM = heightInCm / 100;
+    const imc = heightInM > 0 ? parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1)) : 0;
+    const category = getImcCategory(imc);
+    
+    return { imc, category };
+}
+
+
 function QuizComponent() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [currentAnswer, setCurrentAnswer] = useState<
-    string | string[] | number | null
-  >(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize state from URL or to default
+  const initialStep = searchParams.has('step') ? parseInt(searchParams.get('step') as string, 10) : 0;
+  const [currentStep, setCurrentStep] = useState(initialStep);
+  
+  const [answers, setAnswers] = useState<Answer[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedAnswers = localStorage.getItem('quizAnswers');
+      return savedAnswers ? JSON.parse(savedAnswers) : [];
+    }
+    return [];
+  });
+  
+  const [currentAnswer, setCurrentAnswer] = useState< string | string[] | number | null >(null);
   const [weight, setWeight] = useState(70);
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lb'>('kg');
   const [height, setHeight] = useState(165);
   const [heightUnit, setHeightUnit] = useState<'cm' | 'pol'>('cm');
-  const router = useRouter();
+
+  useEffect(() => {
+    // Save answers to localStorage whenever they change
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quizAnswers', JSON.stringify(answers));
+    }
+  }, [answers]);
+  
+  // Effect to update URL when step changes
+  useEffect(() => {
+    const question = quizQuestions[currentStep];
+    if (!question) return;
+
+    let url = `/quiz?step=${currentStep}`;
+    if (question.type === 'results') {
+        const { category } = calculateImc(answers);
+        url += `&imcCategory=${encodeURIComponent(category)}`;
+    }
+    router.replace(url, { scroll: false });
+    
+  }, [currentStep, answers, router]);
 
   useEffect(() => {
     const question = quizQuestions[currentStep];
@@ -505,7 +572,8 @@ function QuizComponent() {
       case 'loading':
         return <LoadingStep onComplete={handleNext} />;
       case 'results':
-        return <ResultsStep answers={answers} onNext={handleNext} />;
+        const imcCategory = searchParams.get('imcCategory') as ImcCategory | null;
+        return <ResultsStep answers={answers} onNext={handleNext} imcCategory={imcCategory} />;
       default:
         return null;
     }
@@ -700,7 +768,7 @@ function QuizComponent() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="fixed top-0 left-0 right-0 z-10 bg-background p-4">
+       <div className="fixed top-0 left-0 right-0 z-10 bg-background p-4">
         <div className="flex flex-col items-center justify-center">
           <Image
             src="/logonov1a.webp"
@@ -888,78 +956,19 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-function ResultsStep({ answers, onNext }: { answers: Answer[]; onNext: () => void }) {
+function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNext: () => void; imcCategory: ImcCategory | null }) {
   const name = (answers.find((a) => a.questionId === 4)?.value as string) || 'Olá';
-  const weightStr =
-    (answers.find((a) => a.questionId === 11)?.value as string) || '70kg';
-  const heightStr =
-    (answers.find((a) => a.questionId === 12)?.value as string) || '165cm';
+  const { imc, category } = calculateImc(answers);
+  const finalCategory = imcCategory || category;
 
-  const parseValue = (str: string) => {
-    const match = str.match(/(\d+(\.\d+)?)/);
-    return match ? parseFloat(match[0]) : 0;
+  const markerPositions: Record<ImcCategory, string> = {
+    'Abaixo do peso': '12.5%',
+    'Normal': '37.5%',
+    'Sobrepeso': '62.5%',
+    'Obesidade': '87.5%',
   };
 
-  let weightInKg = parseValue(weightStr);
-  if (weightStr.includes('lb')) {
-    weightInKg *= 0.453592;
-  }
-
-  let heightInCm = parseValue(heightStr);
-  if (heightStr.includes('pol')) {
-    heightInCm *= 2.54;
-  }
-
-  const heightInM = heightInCm / 100;
-  const imc =
-    heightInM > 0 ? parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1)) : 0;
-
-  const getImcCategory = (imc: number) => {
-    if (imc < 18.5) return 'Abaixo do peso';
-    if (imc < 25) return 'Normal';
-    if (imc < 30) return 'Sobrepeso';
-    if (imc < 35) return 'Obesidade Grau I';
-    if (imc < 40) return 'Obesidade Grau II';
-    return 'Obesidade Grau III';
-  };
-
-  const calculateMarkerPosition = (imc: number) => {
-      const belowWeightMax = 18.5;
-      const normalMax = 25;
-      const overweightMax = 30;
-      const obesity1Max = 35;
-      const obesity2Max = 40;
-      
-      if (imc >= obesity2Max) {
-          return 97;
-      }
-      
-      if (imc >= obesity1Max) {
-          const segment = (imc - obesity1Max) / (obesity2Max - obesity1Max);
-          return 87 + segment * 10;
-      }
-      
-      if (imc >= overweightMax) {
-          const segment = (imc - overweightMax) / (obesity1Max - overweightMax);
-          return 75 + segment * 12;
-      }
-      
-      if (imc >= normalMax) {
-          const segment = (imc - normalMax) / (overweightMax - normalMax);
-          return 25 + segment * 25;
-      }
-      
-      if (imc >= belowWeightMax) {
-          const segment = (imc - belowWeightMax) / (normalMax - belowWeightMax);
-          return 25 + segment * 25;
-      }
-      
-      const segment = imc / belowWeightMax;
-      return Math.max(0, segment * 25);
-  }
-
-  const imcCategory = getImcCategory(imc);
-  const markerPosition = calculateMarkerPosition(imc);
+  const markerPosition = markerPositions[finalCategory];
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
@@ -972,7 +981,7 @@ function ResultsStep({ answers, onNext }: { answers: Answer[]; onNext: () => voi
           <p className="font-medium">
             Seu IMC (Índice de Massa Corporal) é:{' '}
             <span className="font-bold">{imc}</span> -{' '}
-            <span className="font-bold">{imcCategory}</span>
+            <span className="font-bold">{finalCategory}</span>
           </p>
         </div>
 
@@ -985,9 +994,9 @@ function ResultsStep({ answers, onNext }: { answers: Answer[]; onNext: () => voi
               <div className="w-1/4 bg-red-500"></div>
             </div>
             <div
-              className="absolute top-0 h-full"
+              className="absolute top-0 h-full transition-all duration-500"
               style={{
-                left: `${markerPosition}%`,
+                left: markerPosition,
                 transform: 'translateX(-50%)',
               }}
             >
