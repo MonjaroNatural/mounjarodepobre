@@ -313,7 +313,7 @@ function QuizComponent() {
                     <Label
                       onClick={() => handleSingleChoice(option.label)}
                       htmlFor={option.label}
-                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg text-primary-foreground transition-all peer-data-[state=checked]:border-green-800 peer-data-[state=checked]:bg-green-800 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-primary"
+                      className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg text-primary-foreground transition-all peer-data-[state=checked]:border-green-800 peer-data-[state=checked]:bg-green-800 peer-data-[state=checked]:text-white active:scale-[0.98] active:bg-green-800 active:text-white [&:has([data-state=checked])]:border-primary"
                     >
                       <div className="flex items-center gap-4">
                         {IconComponent && (
@@ -369,7 +369,7 @@ function QuizComponent() {
                   <Label
                     onClick={() => handleSingleChoice(option.label)}
                     htmlFor={option.label}
-                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-all hover:bg-primary/10 peer-data-[state=checked]:border-green-800 peer-data-[state=checked]:bg-green-800 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-primary"
+                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-all hover:bg-primary/10 peer-data-[state=checked]:border-green-800 peer-data-[state=checked]:bg-green-800 peer-data-[state=checked]:text-white active:scale-[0.98] active:bg-green-800 active:text-white [&:has([data-state=checked])]:border-primary"
                   >
                     {option.imageUrl && (
                       <Image
@@ -399,7 +399,7 @@ function QuizComponent() {
                   key={option.label}
                   htmlFor={option.label}
                   data-state={isChecked ? 'checked' : 'unchecked'}
-                  className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg transition-all hover:bg-primary/20 data-[state=checked]:border-green-800 data-[state=checked]:bg-green-800 data-[state=checked]:text-white"
+                  className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg transition-all hover:bg-primary/20 data-[state=checked]:border-green-800 data-[state=checked]:bg-green-800 data-[state=checked]:text-white active:scale-[0.98] active:bg-green-800 active:text-white"
                   onClick={() => handleMultipleChoice(option.label)}
                 >
                   <div className="flex items-center gap-4">
@@ -894,6 +894,8 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
     '/dep4.webp',
     '/dep5.webp',
     '/dep6.webp',
+    '/dep7.webp',
+    '/dep8.webp',
   ];
 
   useEffect(() => {
