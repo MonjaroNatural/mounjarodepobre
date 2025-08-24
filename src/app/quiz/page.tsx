@@ -598,7 +598,8 @@ function QuizComponent() {
   const isButtonDisabled = () => {
     if (
       question.type === 'promise' ||
-      question.type === 'testimonial'
+      question.type === 'testimonial' ||
+      question.type === 'results'
     ) {
       return false;
     }
@@ -617,7 +618,7 @@ function QuizComponent() {
 
   const showButton =
     question.buttonText &&
-    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading'].includes(
+    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading', 'results'].includes(
       question.type,
     );
 
@@ -993,6 +994,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
         external_id: externalId,
         fbc: getCookie('_fbc'),
         fbp: getCookie('_fbp'),
+        client_ip_address: sessionStorage.getItem('client_ip'),
         client_user_agent: sessionStorage.getItem('user_agent'),
         ad_id: localStorage.getItem('ad_id'),
         adset_id: localStorage.getItem('adset_id'),
@@ -1157,9 +1159,15 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
             <span className="font-bold text-green-700">93%</span>
           </div>
         </div>
+        <Button
+            onClick={onNext}
+            size="lg"
+            className="w-full max-w-md h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
+        >
+            Continuar para a oferta
+            <ChevronRight className="h-6 w-6" />
+        </Button>
       </div>
     </div>
   );
 }
-
-    

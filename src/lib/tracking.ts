@@ -42,7 +42,7 @@ export interface N8NClientData {
         external_id: string | null;
         fbc: string | null;
         fbp: string | null;
-        client_ip_address?: string;
+        client_ip_address?: string | null;
         client_user_agent?: string | null;
         ad_id?: string | null;
         adset_id?: string | null;
