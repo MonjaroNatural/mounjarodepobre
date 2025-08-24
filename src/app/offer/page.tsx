@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 
 const faqData = [
   {
@@ -67,6 +74,28 @@ const faqData = [
   },
 ];
 
+const testimonials = [
+  {
+    name: 'Juliana Paes',
+    text: 'Eu não acreditava mais que podia emagrecer. Com o protocolo, perdi 8kg em 3 semanas sem sofrimento. Minha autoestima voltou com tudo!',
+    image: '/depoimento1.webp',
+  },
+  {
+    name: 'Márcia Oliveira',
+    text: 'Finalmente algo que funciona! Perdi medidas, ganhei disposição e o melhor: sem passar fome ou tomar remédios caros. Recomendo demais!',
+    image: '/depoimento2.webp',
+  },
+  {
+    name: 'Carla Souza',
+    text: 'Em 1 mês, perdi 12kg. Parece mágica, mas é só o método certo. O "Mounjaro de Pobre" mudou a minha vida e a forma como eu me vejo no espelho.',
+    image: '/depoimento3.webp',
+  },
+  {
+    name: 'Fernanda Lima',
+    text: 'O resultado foi muito além do peso. Me sinto mais leve, desinchada e com uma energia que não tinha há anos. Foi o melhor investimento que fiz em mim.',
+    image: '/depoimento4.webp',
+  },
+];
 
 function OfferContent() {
   const router = useRouter();
@@ -75,55 +104,55 @@ function OfferContent() {
   const currentWeight = searchParams.get('currentWeight') || '';
   const desiredWeight = searchParams.get('desiredWeight') || '';
   const externalId = getCookie('my_session_id');
+  const [api, setApi] = useState<CarouselApi>();
 
   const handleCheckoutClick = () => {
     const checkoutUrl = `https://pay.hotmart.com/G93148123M?sck=${externalId}`;
-    
+
     // Dispara o evento InitiateCheckout
     const eventId = generateEventId('InitiateCheckout', externalId ?? '');
-    
+
     if (window.fbq) {
-        window.fbq('track', 'InitiateCheckout', {}, { event_id: eventId });
+      window.fbq('track', 'InitiateCheckout', {}, { event_id: eventId });
     }
 
     sendN8NEvent({
-        eventName: 'InitiateCheckout',
-        eventId: eventId,
-        eventTime: Math.floor(Date.now() / 1000),
-        userData: {
-            external_id: externalId,
-            fbc: getCookie('_fbc'),
-            fbp: getCookie('_fbp'),
-        },
-        event_source_url: window.location.href,
-        action_source: 'website',
+      eventName: 'InitiateCheckout',
+      eventId: eventId,
+      eventTime: Math.floor(Date.now() / 1000),
+      userData: {
+        external_id: externalId,
+        fbc: getCookie('_fbc'),
+        fbp: getCookie('_fbp'),
+      },
+      event_source_url: window.location.href,
+      action_source: 'website',
     });
 
     router.push(checkoutUrl);
   };
 
-   useEffect(() => {
+  useEffect(() => {
     // Dispara o evento AddToCart quando a página de oferta é exibida
     const eventId = generateEventId('AddToCart', externalId ?? '');
-    
+
     if (window.fbq) {
-        window.fbq('track', 'AddToCart', {}, { event_id: eventId });
+      window.fbq('track', 'AddToCart', {}, { event_id: eventId });
     }
-    
+
     sendN8NEvent({
-        eventName: 'AddToCart',
-        eventId: eventId,
-        eventTime: Math.floor(Date.now() / 1000),
-        userData: {
-            external_id: externalId,
-            fbc: getCookie('_fbc'),
-            fbp: getCookie('_fbp'),
-        },
-        event_source_url: window.location.href,
-        action_source: 'website',
+      eventName: 'AddToCart',
+      eventId: eventId,
+      eventTime: Math.floor(Date.now() / 1000),
+      userData: {
+        external_id: externalId,
+        fbc: getCookie('_fbc'),
+        fbp: getCookie('_fbp'),
+      },
+      event_source_url: window.location.href,
+      action_source: 'website',
     });
   }, [externalId]);
-
 
   return (
     <div className="bg-white text-black">
@@ -140,10 +169,12 @@ function OfferContent() {
               Antes do Mounjaro dos Pobres
             </div>
             {currentWeight && (
-                 <div className="text-center">
-                    <p className="font-bold">Seu peso atual:</p>
-                    <p className="text-2xl font-bold text-red-600">{currentWeight}</p>
-                 </div>
+              <div className="text-center">
+                <p className="font-bold">Seu peso atual:</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {currentWeight}
+                </p>
+              </div>
             )}
             <Image
               src="/antes11.webp"
@@ -177,12 +208,14 @@ function OfferContent() {
               Depois do Mounjaro dos Pobres
             </div>
             {desiredWeight && (
-                <div className="text-center">
-                    <p className="font-bold">Seu peso desejado:</p>
-                    <p className="text-2xl font-bold text-green-600">{desiredWeight}</p>
-                </div>
+              <div className="text-center">
+                <p className="font-bold">Seu peso desejado:</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {desiredWeight}
+                </p>
+              </div>
             )}
-             <Image
+            <Image
               src="/depois.webp"
               alt="Mulher depois de usar o produto"
               width={250}
@@ -275,12 +308,66 @@ function OfferContent() {
           </span>
         </p>
 
+        <div className="w-full space-y-4 rounded-lg bg-gray-50 p-6">
+          <h2 className="text-2xl font-bold">
+            Elas usaram e aprovaram o Mounjaro dos Pobres
+          </h2>
+          <Carousel
+            setApi={setApi}
+            opts={{
+              loop: true,
+              align: 'start',
+            }}
+            plugins={[
+              Autoplay({
+                delay: 5000,
+                stopOnInteraction: false,
+              }),
+            ]}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem key={index} className="pl-4 md:basis-1/2">
+                  <div className="flex h-full flex-col justify-between rounded-lg border bg-white p-6 shadow-md">
+                    <div>
+                      <div className="flex items-center gap-4">
+                        <Image
+                          src={testimonial.image}
+                          alt={`Foto de ${testimonial.name}`}
+                          width={56}
+                          height={56}
+                          className="h-14 w-14 rounded-full object-cover"
+                          data-ai-hint="woman smiling portrait"
+                        />
+                        <div>
+                          <p className="font-bold">{testimonial.name}</p>
+                          <div className="flex text-yellow-400">
+                            {'★★★★★'.split('').map((s, i) => (
+                              <span key={i}>{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-left text-sm italic text-gray-700">
+                        "{testimonial.text}"
+                      </p>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </div>
+
         <div className="w-full space-y-4 rounded-lg border p-6">
           <h2 className="text-2xl font-bold">Perguntas Frequentes</h2>
           <Accordion type="single" collapsible className="w-full text-left">
             {faqData.map((faq, index) => (
               <AccordionItem value={`item-${index}`} key={index}>
-                <AccordionTrigger className="font-semibold">{faq.question}</AccordionTrigger>
+                <AccordionTrigger className="text-left font-semibold">
+                  {faq.question}
+                </AccordionTrigger>
                 <AccordionContent className="text-base text-gray-700">
                   {faq.answer}
                 </AccordionContent>
