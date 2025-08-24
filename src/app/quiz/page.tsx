@@ -258,12 +258,14 @@ function QuizComponent() {
   };
 
   const handleMultipleChoice = (value: string) => {
-    const newAnswers = Array.isArray(currentAnswer) ? [...currentAnswer] : [];
-    if (newAnswers.includes(value)) {
-      setCurrentAnswer(newAnswers.filter((v) => v !== value));
-    } else {
-      setCurrentAnswer([...newAnswers, value]);
-    }
+    setCurrentAnswer((prev) => {
+      const newAnswers = Array.isArray(prev) ? [...prev] : [];
+      if (newAnswers.includes(value)) {
+        return newAnswers.filter((v) => v !== value);
+      } else {
+        return [...newAnswers, value];
+      }
+    });
   };
 
   const question = quizQuestions[currentStep];
@@ -388,7 +390,6 @@ function QuizComponent() {
                   htmlFor={option.label}
                   data-state={isChecked ? 'checked' : 'unchecked'}
                   className="flex h-full cursor-pointer items-center justify-between rounded-md border-2 border-primary bg-[#e8f5e9] p-4 text-lg transition-all hover:bg-primary/20 data-[state=checked]:border-green-800 data-[state=checked]:bg-green-800 data-[state=checked]:text-white active:scale-[0.98] active:bg-green-800 active:text-white"
-                  onClick={() => handleMultipleChoice(option.label)}
                 >
                   <div className="flex items-center gap-4">
                     {option.emoji && (
@@ -408,6 +409,7 @@ function QuizComponent() {
                   <Checkbox
                     id={option.label}
                     checked={isChecked}
+                    onCheckedChange={() => handleMultipleChoice(option.label)}
                     className="h-6 w-6 shrink-0 rounded-md border-2 border-primary bg-white data-[state=checked]:bg-white data-[state=checked]:text-green-800"
                   />
                 </Label>
@@ -1170,3 +1172,5 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     </div>
   );
 }
+
+    
