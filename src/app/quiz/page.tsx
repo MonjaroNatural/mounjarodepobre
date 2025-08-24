@@ -595,8 +595,7 @@ function QuizComponent() {
   const isButtonDisabled = () => {
     if (
       question.type === 'promise' ||
-      question.type === 'testimonial' ||
-      question.type === 'results'
+      question.type === 'testimonial'
     ) {
       return false;
     }
@@ -1132,7 +1131,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
           size="lg"
           className="w-full max-w-xs h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
         >
-          Continuar
+          {quizQuestions.find(q => q.type === 'results')?.buttonText || 'Continuar'}
           <ChevronRight className="h-6 w-6" />
         </Button>
       </div>
