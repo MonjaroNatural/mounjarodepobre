@@ -369,7 +369,7 @@ function QuizComponent() {
                   <Label
                     onClick={() => handleSingleChoice(option.label)}
                     htmlFor={option.label}
-                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-transform active:scale-[0.98] active:bg-green-800 active:text-white hover:bg-primary/10 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
+                    className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-[#e0eede] bg-white p-4 text-lg transition-all active:scale-[0.98] active:bg-green-800 active:text-white hover:bg-primary/10 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary"
                   >
                     {option.imageUrl && (
                       <Image
@@ -1147,5 +1147,3 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     </div>
   );
 }
-
-    
