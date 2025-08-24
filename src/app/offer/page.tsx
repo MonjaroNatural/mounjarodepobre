@@ -7,6 +7,66 @@ import { Button } from '@/components/ui/button';
 import { Meter } from '@/components/ui/meter';
 import { getCookie, generateEventId } from '@/lib/tracking';
 import { sendN8NEvent } from '@/app/actions';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+
+const faqData = [
+  {
+    question: '❓Isso realmente funciona ou é só mais uma promessa falsa?',
+    answer:
+      'Sim, funciona — e não é mais uma promessa vazia. O protocolo que a gente desenvolveu foi feito pra quem já tentou de tudo e nunca teve resultado. É direto, simples e baseado nas estratégias mais eficazes que realmente ativam a queima de gordura sem você precisar viver de dieta ou remédio caro.',
+  },
+  {
+    question: '🕒Em quanto tempo eu começo a ver resultado?',
+    answer:
+      'Muita gente começa a ver diferença nas primeiras 2 semanas — seja no peso, nas roupas ou no espelho. Mas o protocolo completo é pensado pra 4 semanas de transformação, com metas realistas e atingíveis. Você vai se surpreender com o que é possível quando faz do jeito certo.',
+  },
+  {
+    question: '🙋‍♀️Mesmo comigo que já tentei de tudo?',
+    answer:
+      'Principalmente você. Esse plano foi feito justamente pra quem já cansou de tentar mil dietas, remédios e treinos que não funcionam. A maioria das mulheres que tiveram resultado com o protocolo já estavam desacreditadas antes. O diferencial é a forma como a gente aplica o método, respeitando sua realidade.',
+  },
+  {
+    question: '❤️Isso faz mal pra saúde?',
+    answer:
+      'De forma nenhuma. O protocolo foi pensado pra ser o mais seguro possível. Nada de remédio agressivo, efeito colateral ou restrição maluca. Tudo é feito respeitando o seu corpo, sua rotina e seu bem-estar. A ideia aqui é emagrecer de forma saudável, sem perder massa muscular e sem acabar com sua energia.',
+  },
+  {
+    question: '⚠️Tem efeito colateral?',
+    answer:
+      'Não. Como o protocolo não envolve uso de remédios perigosos, você não precisa se preocupar com efeitos colaterais. É um método que você pode aplicar com tranquilidade e que se adapta à sua rotina — sem te deixar mal, sem te dar dor de cabeça e sem prejudicar sua saúde.',
+  },
+  {
+    question: '🌿É natural ou tem algum remédio envolvido?',
+    answer:
+      'É 100% natural. O “Mounjaro de Pobre” é um nome simbólico pra um protocolo inteligente que simula os efeitos positivos dos remédios caríssimos — só que com alimentos acessíveis, estratégias comprovadas e uma abordagem totalmente segura. Nada de remédio.',
+  },
+  {
+    question: '📚Tem base científica ou é só “achismo”?',
+    answer:
+      'Tem base sim. O protocolo foi montado com base em descobertas recentes de universidades como Harvard, que revelaram os verdadeiros mecanismos que ativam a perda de gordura. O que a gente fez foi traduzir tudo isso pra uma linguagem simples e prática — sem enrolação e com essa coisa difícil de seguir.',
+  },
+  {
+    question: '🧩Esse plano serve pra mim? É adaptado pro meu caso?',
+    answer:
+      'Sim. Quando você compra, a gente monta o plano com base nas suas informações, objetivos e rotina. Ou seja: não é algo genérico. Ele é adaptado pra funcionar no seu dia a dia, com o que você gosta de comer e com o tempo que você tem.',
+  },
+  {
+    question: '🛡️Tem garantia? E se eu não gostar?',
+    answer:
+      'Tem garantia total. Se você aplicar o que tá no plano e não tiver resultado, é só mandar um e-mail que devolvemos seu dinheiro. Simples assim. A ideia é te entregar algo que realmente funcione — e se não funcionar pra você, você não paga por isso.',
+  },
+  {
+    question: '📦Como funciona a entrega do plano?',
+    answer:
+      'Assim que a compra for aprovada, o plano chega automaticamente no seu e-mail. Tudo é digital e entregue na hora, então você já pode começar no mesmo dia. É só abrir, seguir as instruções e começar sua transformação.',
+  },
+];
+
 
 function OfferContent() {
   const router = useRouter();
@@ -214,6 +274,20 @@ function OfferContent() {
             você recebe todos os bônus de presente!
           </span>
         </p>
+
+        <div className="w-full space-y-4 rounded-lg border p-6">
+          <h2 className="text-2xl font-bold">Perguntas Frequentes</h2>
+          <Accordion type="single" collapsible className="w-full text-left">
+            {faqData.map((faq, index) => (
+              <AccordionItem value={`item-${index}`} key={index}>
+                <AccordionTrigger className="font-semibold">{faq.question}</AccordionTrigger>
+                <AccordionContent className="text-base text-gray-700">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
 
         <Button
           size="lg"
