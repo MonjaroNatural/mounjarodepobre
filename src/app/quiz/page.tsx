@@ -888,14 +888,14 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
   const [api, setApi] = useState<CarouselApi>();
 
   const testimonials = [
-    '/dep1.webp',
-    '/dep2.webp',
-    '/dep3.webp',
-    '/dep4.webp',
-    '/dep5.webp',
-    '/dep6.webp',
-    '/dep7.webp',
-    '/dep8.webp',
+    { src: '/dep1.webp', text: 'Muito bom! Recomendo, meu apetite diminui muito e já perdi 7kg nos últimos 11 dias.' },
+    { src: '/dep2.webp', text: 'Pra mim valeu a pena, pq eu tinha muito inchaço na barriga, usei por 1 mês e a pochete foi embora! O produto maravilhoso meu Deus 🥺' },
+    { src: '/dep3.webp', text: 'Sou muito ansiosa e já tentei de tudo pra emagrecer. Já fiz treino em casa, tomei pílulas mas nunca adiantava, o pouco que perdia voltava muito rápido. Vi esse mounjaro dos pobres Instagram e comecei a tomar todos os dias do jeito certo, só ai que comecei a emagrecer de verdade. Perdi 15 kg em menos de 3 meses, sem passar fome e sem ter que ficar fazendo exercício igual uma louca. E ainda melhorou minha ansiedade, parei de descontar na comida e hoje consigo me controlar totalmente. Super recomendo!!😘😘' },
+    { src: '/dep4.webp', text: 'depois do mounjaro dos pobres, parece até que eu rejuvenesci 20 anos kkkk me sinto ótima, valeu super a pena, vcs tão de parabéns!' },
+    { src: '/dep5.webp', text: 'perdi 16kg em 2 meses! 😍 😍 feliz demais, pra mim valeu a pena KKKKK' },
+    { src: '/dep6.webp', text: 'A maior motivação é ver aquela roupa que não cabia mais em você voltar a caber, sério, sua autoestima vai pra lua, recomendo demais meninas.' },
+    { src: '/dep7.webp', text: 'Eu achava quase impossível eu perder peso depois dos 30. Mas ai eu conheci essa receita do mounjaro de pobre, resultado depois de 5 meses? perdi 37 kilos! Fiquei parecendo uma menininha😊❤' },
+    { src: '/dep8.webp', text: 'perdi 16 kilos usando o mounjaro de pobre, fiquei assustada com o tanto que emagreci em 1 mês' },
   ];
 
   useEffect(() => {
@@ -956,16 +956,17 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
 
       <Carousel setApi={setApi} className="w-full max-w-xs">
         <CarouselContent>
-          {testimonials.map((src, index) => (
+          {testimonials.map((testimonial, index) => (
             <CarouselItem key={index}>
-              <div className="p-1">
+              <div className="p-1 flex flex-col items-center gap-4">
                 <Image
-                  src={src}
+                  src={testimonial.src}
                   alt={`Depoimento ${index + 1}`}
                   width={400}
                   height={200}
                   className="w-full h-auto rounded-lg"
                 />
+                <p className="text-sm text-gray-700 italic">"{testimonial.text}"</p>
               </div>
             </CarouselItem>
           ))}
