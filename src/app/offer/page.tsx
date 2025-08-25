@@ -6,8 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Meter } from '@/components/ui/meter';
-import { getClientData, generateEventId } from '@/lib/tracking';
 import { sendN8NEvent } from '@/app/actions';
+import { getCookie } from '@/lib/tracking';
 import {
   Accordion,
   AccordionContent,
@@ -94,33 +94,38 @@ function OfferContent() {
 
   const handleCheckoutClick = () => {
     if (typeof window === 'undefined') return;
-  
-    setTimeout(() => {
-      const { userData } = getClientData();
-      const checkoutUrl = `https://pay.cakto.com.br/4hq9554_540351?src=${userData.external_id}`;
-  
-      const eventId = generateEventId('InitiateCheckout', userData.external_id ?? '');
-      const eventData = {
-        value: 5,
-        currency: 'USD',
-      };
-  
-      if (window.fbq) {
-        window.fbq('track', 'InitiateCheckout', eventData, { event_id: eventId });
-      }
-  
-      sendN8NEvent({
-        eventName: 'InitiateCheckout',
-        eventId: eventId,
+
+    const external_id = getCookie('my_session_id');
+    const checkoutUrl = `https://pay.cakto.com.br/4hq9554_540351?src=${external_id}`;
+
+    const payload = {
+        eventName: 'InitiateCheckout' as const,
         eventTime: Math.floor(Date.now() / 1000),
-        userData: userData,
-        customData: eventData,
+        userData: {
+            external_id: external_id,
+            fbc: getCookie('_fbc'),
+            fbp: getCookie('_fbp'),
+            client_user_agent: navigator.userAgent,
+            client_ip_address: null,
+        },
+        customData: {
+            value: 5,
+            currency: 'USD',
+        },
         event_source_url: window.location.href,
-        action_source: 'website',
-      });
-  
-      router.push(checkoutUrl);
-    }, 4000);
+        action_source: 'website' as const,
+    };
+
+    // Send to N8N
+    sendN8NEvent(payload);
+
+    // Send to Facebook Pixel
+    if (window.fbq) {
+        window.fbq('track', 'InitiateCheckout', { value: 5, currency: 'USD' });
+    }
+
+    // Redirect user
+    router.push(checkoutUrl);
   };
 
   return (

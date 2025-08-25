@@ -32,8 +32,9 @@ import {
   Check,
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
-import { getClientData, generateEventId } from '@/lib/tracking';
 import { sendN8NEvent } from '../actions';
+import { getCookie } from '@/lib/tracking';
+
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
@@ -983,32 +984,32 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
   const finalCategory = imcCategory || category;
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-  
-    setTimeout(() => {
-      const { userData } = getClientData();
-      if (!userData.external_id) return;
-  
-      const eventId = generateEventId('AddToCart', userData.external_id);
-      const eventData = {
-        value: 5,
-        currency: 'USD',
-      };
-  
-      if (window.fbq) {
-        window.fbq('track', 'AddToCart', eventData, { event_id: eventId });
-      }
-  
-      sendN8NEvent({
-        eventName: 'AddToCart',
-        eventId: eventId,
-        eventTime: Math.floor(Date.now() / 1000),
-        userData: userData,
-        customData: eventData,
-        event_source_url: window.location.href,
-        action_source: 'website',
-      });
+    const timer = setTimeout(() => {
+        const payload = {
+            eventName: 'AddToCart' as const,
+            eventTime: Math.floor(Date.now() / 1000),
+            userData: {
+                external_id: getCookie('my_session_id'),
+                fbc: getCookie('_fbc'),
+                fbp: getCookie('_fbp'),
+                client_user_agent: navigator.userAgent,
+                client_ip_address: null, // IP will be captured by the server/webhook
+            },
+            customData: {
+                value: 5,
+                currency: 'USD',
+            },
+            event_source_url: window.location.href,
+            action_source: 'website' as const,
+        };
+        sendN8NEvent(payload);
+
+        if (window.fbq) {
+            window.fbq('track', 'AddToCart', { value: 5, currency: 'USD' });
+        }
     }, 4000);
+
+    return () => clearTimeout(timer);
   }, []);
 
 
