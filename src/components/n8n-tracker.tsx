@@ -19,17 +19,19 @@ export function N8NTracker() {
       const { userData } = getClientData();
       if (!userData.external_id) return;
 
-      // 3. Prepare and send the PageView event
+      // 3. Prepare and send the PageView event after a delay
       const eventId = generateEventId('PageView', userData.external_id);
       
-      sendN8NEvent({
-        eventName: 'PageView',
-        eventId: eventId,
-        eventTime: Math.floor(Date.now() / 1000),
-        userData: userData,
-        event_source_url: window.location.href,
-        action_source: 'website',
-      });
+      setTimeout(() => {
+        sendN8NEvent({
+          eventName: 'PageView',
+          eventId: eventId,
+          eventTime: Math.floor(Date.now() / 1000),
+          userData: userData,
+          event_source_url: window.location.href,
+          action_source: 'website',
+        });
+      }, 4000);
     };
 
     trackPageView();
