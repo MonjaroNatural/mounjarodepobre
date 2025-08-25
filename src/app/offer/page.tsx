@@ -98,7 +98,7 @@ function OfferContent() {
   const desiredWeight = searchParams.get('desiredWeight') || '';
   const [api, setApi] = useState<CarouselApi>();
 
-  const handleCheckoutClick = async () => {
+  const handleCheckoutClick = () => {
     if (typeof window === 'undefined') return;
 
     const external_id = getCookie('my_session_id');
@@ -125,11 +125,11 @@ function OfferContent() {
     
     // Send to N8N
     try {
-        await fetch(N8N_WEBHOOK_URL_CHECKOUT, {
+        fetch(N8N_WEBHOOK_URL_CHECKOUT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(checkoutPayload),
-            mode: 'no-cors'
+            keepalive: true
         });
     } catch (error) {
         console.error('Error sending InitiateCheckout event to N8N:', error);

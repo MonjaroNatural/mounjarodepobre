@@ -1014,7 +1014,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
-                mode: 'no-cors'
+                keepalive: true,
             });
         } catch(error) {
             console.error("Failed to send AddToCart event to N8N", error);
