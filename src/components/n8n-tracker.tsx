@@ -37,13 +37,15 @@ export function N8NTracker() {
         
         async function sendPageViewEvent() {
             const sessionId = getCookie('my_session_id') || generateUUID();
-            setCookie('my_session_id', sessionId, 30);
+            if (!getCookie('my_session_id')) {
+                setCookie('my_session_id', sessionId, 30); // 30 dias de expiração
+            }
             
             const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb";
 
             const currentParams = new URLSearchParams(window.location.search);
 
-            console.log("[DEBUG] 2. Verificando cookies após 500ms de espera...");
+            console.log("[DEBUG] 2. Verificando cookies após 4 segundos de espera...");
             console.log("[DEBUG] Todos os cookies:", document.cookie);
             const fbcCookie = getCookie('_fbc');
             const fbpCookie = getCookie('_fbp');
@@ -86,7 +88,7 @@ export function N8NTracker() {
         
         const timer = setTimeout(() => {
             sendPageViewEvent();
-        }, 500);
+        }, 4000);
 
         return () => clearTimeout(timer);
 
