@@ -9,7 +9,6 @@ export function N8NTracker() {
 
     useEffect(() => {
         // --- FUNÇÕES AUXILIARES ---
-        // 1. getCookie: Lê um cookie específico do navegador.
         function getCookie(name: string): string | null {
             if (typeof document === 'undefined') return null;
             const value = `; ${document.cookie}`;
@@ -18,7 +17,6 @@ export function N8NTracker() {
             return null;
         }
 
-        // 2. setCookie: Cria ou atualiza um cookie.
         function setCookie(name: string, value: string, days: number): void {
             if (typeof document === 'undefined') return;
             let expires = "";
@@ -30,7 +28,6 @@ export function N8NTracker() {
             document.cookie = name + "=" + (value || "")  + expires + "; path=/";
         }
 
-        // 3. generateUUID: Cria um ID único para a sessão do usuário.
         function generateUUID(): string {
           return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -39,22 +36,27 @@ export function N8NTracker() {
         }
         
         async function sendPageViewEvent() {
-            // 1. Garante um ID de sessão para o visitante.
             const sessionId = getCookie('my_session_id') || generateUUID();
             setCookie('my_session_id', sessionId, 30);
             
-            // 2. URL do webhook N8N para PageView.
             const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb";
 
-            // 3. Monta o payload com os dados.
             const currentParams = new URLSearchParams(window.location.search);
+
+            console.log("[DEBUG] 2. Verificando cookies após 500ms de espera...");
+            console.log("[DEBUG] Todos os cookies:", document.cookie);
+            const fbcCookie = getCookie('_fbc');
+            const fbpCookie = getCookie('_fbp');
+            console.log("[DEBUG] Cookie _fbc lido:", fbcCookie);
+            console.log("[DEBUG] Cookie _fbp lido:", fbpCookie);
+
             const payload = {
                 eventName: 'PageView',
                 eventTime: Math.floor(Date.now() / 1000),
                 userData: {
                     external_id: sessionId,
-                    fbc: getCookie('_fbc'),
-                    fbp: getCookie('_fbp'),
+                    fbc: fbcCookie,
+                    fbp: fbpCookie,
                     client_user_agent: navigator.userAgent,
                 },
                 customData: {
@@ -63,22 +65,25 @@ export function N8NTracker() {
                     campaign_id: currentParams.get('utm_campaign') || null,
                 },
                 event_source_url: window.location.href,
-                action_source: 'website'
+                action_source: 'website' as const,
             };
+
+            console.log("[DEBUG] 3. Payload final que será enviado:", payload);
             
-            // 4. Envia os dados para o webhook.
             try {
                 await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                console.log("[DEBUG] 4. Evento PageView enviado com sucesso para N8N.");
             } catch (error) {
-                console.error('Erro de rede ao enviar evento PageView para o N8N:', error);
+                console.error('[DEBUG] 4. Erro ao enviar evento PageView para N8N:', error);
             }
         }
         
-        // Atraso de 500ms para dar tempo ao Pixel do FB para criar o cookie _fbc.
+        console.log("[DEBUG] 1. N8N Tracker iniciado. URL atual:", window.location.href);
+        
         const timer = setTimeout(() => {
             sendPageViewEvent();
         }, 500);
