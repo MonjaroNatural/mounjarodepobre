@@ -26,10 +26,11 @@ export const setCookie = (name: string, value: string, days: number = 365) => {
   }
 
   const hostname = window.location.hostname;
-  // Don't set domain for localhost or special dev environments
-  const domain_string = (hostname === 'localhost' || hostname.endsWith('.cloudworkstations.dev')) 
+  const isDevEnvironment = hostname === 'localhost' || hostname.endsWith('.cloudworkstations.dev');
+  
+  const domain_string = isDevEnvironment 
     ? '' 
-    : `; domain=.${hostname.replace('www.', '')}`;
+    : `; domain=${hostname.replace('www.', '')}`;
 
   document.cookie = `${name}=${value || ''}${expires}; path=/` + domain_string;
 };
