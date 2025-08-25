@@ -40,6 +40,7 @@ export const generateEventId = (
 };
 
 async function getClientIp(): Promise<string> {
+    if (typeof window === 'undefined') return '';
     try {
         const response = await fetch('https://api.ipify.org?format=json', {
             method: 'GET',
@@ -60,7 +61,7 @@ async function getClientIp(): Promise<string> {
     }
 }
 
-export const initializeTracking = (searchParams: ReadonlyURLSearchParams) => {
+export const initializeTracking = async (searchParams: ReadonlyURLSearchParams) => {
   if (typeof window === 'undefined') return;
 
   // Session ID
@@ -98,9 +99,8 @@ export const initializeTracking = (searchParams: ReadonlyURLSearchParams) => {
     sessionStorage.setItem('user_agent', navigator.userAgent);
   }
   
-  getClientIp().then(ip => {
-      if(ip) sessionStorage.setItem('client_ip_address', ip);
-  });
+  const ip = await getClientIp();
+  if(ip) sessionStorage.setItem('client_ip_address', ip);
 };
 
 export interface N8NClientData {
