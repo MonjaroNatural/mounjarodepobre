@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -8,7 +9,6 @@ export function N8NTracker() {
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        // --- FUNÇÕES AUXILIARES ---
         function getCookie(name: string): string | null {
             if (typeof document === 'undefined') return null;
             const value = `; ${document.cookie}`;
@@ -38,7 +38,7 @@ export function N8NTracker() {
         async function sendPageViewEvent() {
             const sessionId = getCookie('my_session_id') || generateUUID();
             if (!getCookie('my_session_id')) {
-                setCookie('my_session_id', sessionId, 30); // 30 dias de expiração
+                setCookie('my_session_id', sessionId, 30); 
             }
             
             const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb";
@@ -70,7 +70,8 @@ export function N8NTracker() {
                 await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    mode: 'no-cors'
                 });
             } catch (error) {
                 console.error('Erro ao enviar evento PageView para N8N:', error);
