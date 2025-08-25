@@ -128,8 +128,7 @@ function OfferContent() {
         await fetch(N8N_WEBHOOK_URL_CHECKOUT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(checkoutPayload),
-            mode: 'no-cors'
+            body: JSON.stringify(checkoutPayload)
         });
     } catch (error) {
         console.error('Error sending InitiateCheckout event to N8N:', error);

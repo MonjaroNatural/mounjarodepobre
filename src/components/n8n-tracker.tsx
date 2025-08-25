@@ -70,8 +70,7 @@ export function N8NTracker() {
                 await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    mode: 'no-cors'
+                    body: JSON.stringify(payload)
                 });
             } catch (error) {
                 console.error('Erro ao enviar evento PageView para N8N:', error);
