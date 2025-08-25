@@ -6,8 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Meter } from '@/components/ui/meter';
-import { sendN8NEvent } from '@/app/actions';
-import { getCookie } from '@/lib/tracking';
 import {
   Accordion,
   AccordionContent,
@@ -84,6 +82,14 @@ const testimonials = [
   { name: 'Beatriz Almeida', image: '/dep8.webp', text: 'perdi 16 kilos usando o mounjaro de pobre, fiquei assustada com o tanto que emagreci em 1 mês' },
 ];
 
+function getCookie(name: string): string | null {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+}
+
 function OfferContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -92,13 +98,15 @@ function OfferContent() {
   const desiredWeight = searchParams.get('desiredWeight') || '';
   const [api, setApi] = useState<CarouselApi>();
 
-  const handleCheckoutClick = () => {
+  const handleCheckoutClick = async () => {
     if (typeof window === 'undefined') return;
 
     const external_id = getCookie('my_session_id');
     const checkoutUrl = `https://pay.cakto.com.br/4hq9554_540351?src=${external_id}`;
+    
+    const N8N_WEBHOOK_URL_CHECKOUT = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/checkoutfb";
 
-    const payload = {
+    const checkoutPayload = {
         eventName: 'InitiateCheckout' as const,
         eventTime: Math.floor(Date.now() / 1000),
         userData: {
@@ -115,9 +123,18 @@ function OfferContent() {
         event_source_url: window.location.href,
         action_source: 'website' as const,
     };
-
+    
     // Send to N8N
-    sendN8NEvent(payload);
+    try {
+        await fetch(N8N_WEBHOOK_URL_CHECKOUT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(checkoutPayload),
+            mode: 'no-cors'
+        });
+    } catch (error) {
+        console.error('Error sending InitiateCheckout event to N8N:', error);
+    }
 
     // Send to Facebook Pixel
     if (window.fbq) {

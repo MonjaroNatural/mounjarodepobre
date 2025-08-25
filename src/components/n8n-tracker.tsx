@@ -1,38 +1,57 @@
-
 'use client';
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { getCookie, setCookie, generateUUID } from '@/lib/tracking';
 
 export function N8NTracker() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        // Aguarda um momento para garantir que o pixel do Facebook tenha tempo de processar a URL
-        // e criar o cookie _fbc se o parâmetro fbclid estiver presente.
-        const timer = setTimeout(async () => {
-            const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb";
+        // --- FUNÇÕES AUXILIARES ---
+        function getCookie(name: string): string | null {
+            if (typeof document === 'undefined') return null;
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+            return null;
+        }
 
-            // 1. Garante que temos um ID de sessão.
+        function setCookie(name: string, value: string, days: number): void {
+            if (typeof document === 'undefined') return;
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+        }
+
+        function generateUUID(): string {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+        }
+        
+        async function sendPageViewEvent() {
             const sessionId = getCookie('my_session_id') || generateUUID();
-            setCookie('my_session_id', sessionId, 30); // Cookie de sessão válido por 30 dias.
-
-            // 2. Lê os parâmetros da URL atual
+            setCookie('my_session_id', sessionId, 30);
+            
+            const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb";
+            
             const currentParams = new URLSearchParams(window.location.search);
 
-            // 3. Coleta todos os dados para o payload.
-            // O getCookie('_fbc') agora deve funcionar porque demos tempo ao script do FB.
             const payload = {
                 eventName: 'PageView',
                 eventTime: Math.floor(Date.now() / 1000),
                 userData: {
                     external_id: sessionId,
-                    fbc: getCookie('_fbc') || null,
-                    fbp: getCookie('_fbp') || null,
+                    fbc: getCookie('_fbc'),
+                    fbp: getCookie('_fbp'),
                     client_user_agent: navigator.userAgent,
-                    client_ip_address: null, // O IP será adicionado pelo N8N/servidor
+                    client_ip_address: null, 
                 },
                 customData: {
                     ad_id: currentParams.get('utm_source') || null,
@@ -42,23 +61,28 @@ export function N8NTracker() {
                 event_source_url: window.location.href,
                 action_source: 'website'
             };
-
+            
             // 4. Envia os dados para o webhook.
             try {
                 await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    mode: 'no-cors'
                 });
             } catch (error) {
                 console.error('Erro de rede ao enviar evento PageView para o N8N:', error);
             }
-
-        }, 500); // Atraso de 500ms é a chave.
+        }
+        
+        // Aguarda 500ms para dar tempo ao Pixel do FB para criar o cookie _fbc.
+        const timer = setTimeout(() => {
+            sendPageViewEvent();
+        }, 500);
 
         return () => clearTimeout(timer);
 
     }, [pathname, searchParams]);
 
-    return null; // O componente não renderiza nada visível.
+    return null;
 }
