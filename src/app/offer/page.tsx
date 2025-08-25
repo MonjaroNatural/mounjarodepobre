@@ -90,6 +90,16 @@ function getCookie(name: string): string | null {
     return null;
 }
 
+function getCampaignParams() {
+    if (typeof window === 'undefined') return {};
+    try {
+        const storedParams = localStorage.getItem('campaign_params');
+        return storedParams ? JSON.parse(storedParams) : {};
+    } catch (e) {
+        return {};
+    }
+}
+
 function OfferContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -106,7 +116,7 @@ function OfferContent() {
     
     const N8N_WEBHOOK_URL_CHECKOUT = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/checkoutfb";
 
-    const currentParams = new URLSearchParams(window.location.search);
+    const campaignParams = getCampaignParams();
 
     const checkoutPayload = {
         eventName: 'InitiateCheckout' as const,
@@ -120,9 +130,9 @@ function OfferContent() {
         customData: {
             value: 5,
             currency: 'USD',
-            ad_id: currentParams.get('utm_source') || null,
-            adset_id: currentParams.get('utm_medium') || null,
-            campaign_id: currentParams.get('utm_campaign') || null,
+            ad_id: campaignParams.ad_id || null,
+            adset_id: campaignParams.adset_id || null,
+            campaign_id: campaignParams.campaign_id || null,
         },
         event_source_url: window.location.href,
         action_source: 'website' as const,

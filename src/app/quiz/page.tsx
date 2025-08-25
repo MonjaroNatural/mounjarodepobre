@@ -41,6 +41,16 @@ function getCookie(name: string): string | null {
     return null;
 }
 
+function getCampaignParams() {
+    if (typeof window === 'undefined') return {};
+    try {
+        const storedParams = localStorage.getItem('campaign_params');
+        return storedParams ? JSON.parse(storedParams) : {};
+    } catch (e) {
+        return {};
+    }
+}
+
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
@@ -992,7 +1002,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
   useEffect(() => {
     const timer = setTimeout(() => {
         const N8N_WEBHOOK_URL_ADD_TO_CART = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/addtocartfb";
-        const currentParams = new URLSearchParams(window.location.search);
+        const campaignParams = getCampaignParams();
         
         const payload = {
             eventName: 'AddToCart' as const,
@@ -1006,9 +1016,9 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
             customData: {
                 value: 5,
                 currency: 'USD',
-                ad_id: currentParams.get('utm_source') || null,
-                adset_id: currentParams.get('utm_medium') || null,
-                campaign_id: currentParams.get('utm_campaign') || null,
+                ad_id: campaignParams.ad_id || null,
+                adset_id: campaignParams.adset_id || null,
+                campaign_id: campaignParams.campaign_id || null,
             },
             event_source_url: window.location.href,
             action_source: 'website' as const,

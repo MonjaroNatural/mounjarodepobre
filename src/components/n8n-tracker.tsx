@@ -4,6 +4,16 @@
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
+function getCampaignParams() {
+    if (typeof window === 'undefined') return {};
+    try {
+        const storedParams = localStorage.getItem('campaign_params');
+        return storedParams ? JSON.parse(storedParams) : {};
+    } catch (e) {
+        return {};
+    }
+}
+
 export function N8NTracker() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -35,6 +45,21 @@ export function N8NTracker() {
           });
         }
         
+        // Capture and store campaign params
+        const currentParams = new URLSearchParams(window.location.search);
+        const ad_id = currentParams.get('utm_source');
+        const adset_id = currentParams.get('utm_medium');
+        const campaign_id = currentParams.get('utm_campaign');
+
+        if (ad_id || adset_id || campaign_id) {
+            const campaignParams = {
+                ad_id: ad_id || undefined,
+                adset_id: adset_id || undefined,
+                campaign_id: campaign_id || undefined,
+            };
+            localStorage.setItem('campaign_params', JSON.stringify(campaignParams));
+        }
+
         async function sendPageViewEvent() {
             const sessionId = getCookie('my_session_id') || generateUUID();
             if (!getCookie('my_session_id')) {
@@ -43,10 +68,9 @@ export function N8NTracker() {
             
             const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb";
 
-            const currentParams = new URLSearchParams(window.location.search);
-
             const fbcCookie = getCookie('_fbc');
             const fbpCookie = getCookie('_fbp');
+            const campaignParams = getCampaignParams();
 
             const payload = {
                 eventName: 'PageView',
@@ -58,9 +82,9 @@ export function N8NTracker() {
                     client_user_agent: navigator.userAgent,
                 },
                 customData: {
-                    ad_id: currentParams.get('utm_source') || null,
-                    adset_id: currentParams.get('utm_medium') || null,
-                    campaign_id: currentParams.get('utm_campaign') || null,
+                    ad_id: campaignParams.ad_id || null,
+                    adset_id: campaignParams.adset_id || null,
+                    campaign_id: campaignParams.campaign_id || null,
                 },
                 event_source_url: window.location.href,
                 action_source: 'website' as const,
