@@ -45,12 +45,8 @@ export function N8NTracker() {
 
             const currentParams = new URLSearchParams(window.location.search);
 
-            console.log("[DEBUG] 2. Verificando cookies após 4 segundos de espera...");
-            console.log("[DEBUG] Todos os cookies:", document.cookie);
             const fbcCookie = getCookie('_fbc');
             const fbpCookie = getCookie('_fbp');
-            console.log("[DEBUG] Cookie _fbc lido:", fbcCookie);
-            console.log("[DEBUG] Cookie _fbp lido:", fbpCookie);
 
             const payload = {
                 eventName: 'PageView',
@@ -69,8 +65,6 @@ export function N8NTracker() {
                 event_source_url: window.location.href,
                 action_source: 'website' as const,
             };
-
-            console.log("[DEBUG] 3. Payload final que será enviado:", payload);
             
             try {
                 await fetch(N8N_WEBHOOK_URL, {
@@ -78,13 +72,10 @@ export function N8NTracker() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                console.log("[DEBUG] 4. Evento PageView enviado com sucesso para N8N.");
             } catch (error) {
-                console.error('[DEBUG] 4. Erro ao enviar evento PageView para N8N:', error);
+                console.error('Erro ao enviar evento PageView para N8N:', error);
             }
         }
-        
-        console.log("[DEBUG] 1. N8N Tracker iniciado. URL atual:", window.location.href);
         
         const timer = setTimeout(() => {
             sendPageViewEvent();
