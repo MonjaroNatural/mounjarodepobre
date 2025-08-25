@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { initializeTracking, getClientData, generateEventId } from '@/lib/tracking';
+import { initializeTracking } from '@/lib/tracking';
 import { sendN8NEvent } from '@/app/actions';
 
 export function N8NTracker() {
@@ -12,27 +12,19 @@ export function N8NTracker() {
 
   useEffect(() => {
     const trackPageView = async () => {
-      // 1. Initialize cookies, localStorage, etc.
-      // This now correctly waits for the async operations inside to complete.
-      await initializeTracking(searchParams);
-
-      // 2. Get all the client data that was just stored
-      const { userData } = getClientData();
+      // 1. Initialize cookies and get all client data, including the newly set fbc.
+      // This now correctly waits for async operations and returns the complete data.
+      const { userData, eventId } = await initializeTracking(searchParams);
       if (!userData.external_id) return;
 
-      // 3. Prepare and send the PageView event after a delay
-      const eventId = generateEventId('PageView', userData.external_id);
-      
+      // 2. Prepare and send the PageView event after a delay,
+      // using the data returned directly from the initialization.
       setTimeout(() => {
-        // We get client data again here to ensure we have the latest values
-        // set by initializeTracking, especially fbc.
-        const latestClientData = getClientData();
-
         sendN8NEvent({
           eventName: 'PageView',
           eventId: eventId,
           eventTime: Math.floor(Date.now() / 1000),
-          userData: latestClientData.userData,
+          userData: userData,
           event_source_url: window.location.href,
           action_source: 'website',
         });

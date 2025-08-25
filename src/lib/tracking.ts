@@ -26,10 +26,11 @@ export const setCookie = (name: string, value: string, days: number = 365) => {
   }
 
   const hostname = window.location.hostname;
-  const isDevEnvironment = hostname === 'localhost' || hostname.endsWith('.cloudworkstations.dev');
-  
-  const domain_string = isDevEnvironment 
-    ? '' 
+  const isDevEnvironment =
+    hostname === 'localhost' || hostname.endsWith('.cloudworkstations.dev');
+
+  const domain_string = isDevEnvironment
+    ? ''
     : `; domain=${hostname.replace('www.', '')}`;
 
   document.cookie = `${name}=${value || ''}${expires}; path=/` + domain_string;
@@ -47,29 +48,46 @@ export const generateEventId = (
 };
 
 async function getClientIp(): Promise<string> {
-    if (typeof window === 'undefined') return '';
-    try {
-        const response = await fetch('https://api.ipify.org?format=json', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            },
-            cache: 'no-store',
-        });
-        if (!response.ok) {
-            console.error('Error fetching client IP:', response.statusText);
-            return '';
-        }
-        const data = await response.json();
-        return data.ip;
-    } catch (error) {
-        console.error('Error fetching client IP:', error);
-        return '';
+  if (typeof window === 'undefined') return '';
+  try {
+    const response = await fetch('https://api.ipify.org?format=json', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      console.error('Error fetching client IP:', response.statusText);
+      return '';
     }
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error('Error fetching client IP:', error);
+    return '';
+  }
 }
 
-export const initializeTracking = async (searchParams: ReadonlyURLSearchParams) => {
-  if (typeof window === 'undefined') return;
+export const initializeTracking = async (searchParams: ReadonlyURLSearchParams): Promise<{ 
+    userData: N8NClientData['userData'],
+    eventId: string,
+}> => {
+  if (typeof window === 'undefined') {
+      return {
+          userData: {
+            external_id: null,
+            fbc: null,
+            fbp: null,
+            client_ip_address: null,
+            client_user_agent: null,
+            ad_id: null,
+            adset_id: null,
+            campaign_id: null,
+        },
+        eventId: ''
+      };
+  }
 
   // Session ID
   let sessionId = getCookie('my_session_id');
@@ -84,12 +102,16 @@ export const initializeTracking = async (searchParams: ReadonlyURLSearchParams) 
     fbp = `fb.1.${Date.now()}.${Math.floor(Math.random() * 1e10)}`;
     setCookie('_fbp', fbp);
   }
-
+  
   // FBC Cookie from fbclid
   const fbclid = searchParams.get('fbclid');
+  let fbc = getCookie('_fbc');
   if (fbclid) {
-    const fbc = `fb.1.${Date.now()}.${fbclid}`;
+    fbc = `fb.1.${Date.now()}.${fbclid}`;
     setCookie('_fbc', fbc);
+  } else {
+    // Ensure we send the existing cookie if fbclid isn't in the URL
+    fbc = getCookie('_fbc');
   }
 
   // UTM parameters
@@ -102,12 +124,31 @@ export const initializeTracking = async (searchParams: ReadonlyURLSearchParams) 
   if (campaignId) localStorage.setItem('campaign_id', campaignId);
 
   // User Agent and IP
-  if (navigator.userAgent) {
-    sessionStorage.setItem('user_agent', navigator.userAgent);
+  const userAgent = navigator.userAgent;
+  if (userAgent) {
+    sessionStorage.setItem('user_agent', userAgent);
   }
   
   const ip = await getClientIp();
-  if(ip) sessionStorage.setItem('client_ip_address', ip);
+  if (ip) sessionStorage.setItem('client_ip_address', ip);
+
+  // Generate event ID here to pass back
+  const eventId = generateEventId('PageView', sessionId);
+
+  // Return all data directly
+  return {
+    userData: {
+      external_id: sessionId,
+      fbc: fbc,
+      fbp: fbp,
+      client_ip_address: ip,
+      client_user_agent: userAgent,
+      ad_id: localStorage.getItem('ad_id'),
+      adset_id: localStorage.getItem('adset_id'),
+      campaign_id: localStorage.getItem('campaign_id'),
+    },
+    eventId,
+  };
 };
 
 export interface N8NClientData {
