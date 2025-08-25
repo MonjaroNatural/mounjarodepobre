@@ -106,6 +106,8 @@ function OfferContent() {
     
     const N8N_WEBHOOK_URL_CHECKOUT = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/checkoutfb";
 
+    const currentParams = new URLSearchParams(window.location.search);
+
     const checkoutPayload = {
         eventName: 'InitiateCheckout' as const,
         eventTime: Math.floor(Date.now() / 1000),
@@ -118,6 +120,9 @@ function OfferContent() {
         customData: {
             value: 5,
             currency: 'USD',
+            ad_id: currentParams.get('utm_source') || null,
+            adset_id: currentParams.get('utm_medium') || null,
+            campaign_id: currentParams.get('utm_campaign') || null,
         },
         event_source_url: window.location.href,
         action_source: 'website' as const,
