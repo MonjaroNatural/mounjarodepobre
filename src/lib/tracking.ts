@@ -21,11 +21,17 @@ export const setCookie = (name: string, value: string, days: number = 365) => {
   let expires = '';
   if (days) {
     const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     expires = `; expires=${date.toUTCString()}`;
   }
-  const domain = `.${window.location.hostname.replace('www.', '')}`;
-  document.cookie = `${name}=${value || ''}${expires}; domain=${domain}; path=/`;
+
+  const hostname = window.location.hostname;
+  // Don't set domain for localhost or special dev environments
+  const domain_string = (hostname === 'localhost' || hostname.endsWith('.cloudworkstations.dev')) 
+    ? '' 
+    : `; domain=.${hostname.replace('www.', '')}`;
+
+  document.cookie = `${name}=${value || ''}${expires}; path=/` + domain_string;
 };
 
 export const generateUUID = (): string => {
