@@ -114,7 +114,6 @@ function OfferContent() {
             fbc: getCookie('_fbc'),
             fbp: getCookie('_fbp'),
             client_user_agent: navigator.userAgent,
-            client_ip_address: null,
         },
         customData: {
             value: 5,
@@ -129,8 +128,7 @@ function OfferContent() {
         await fetch(N8N_WEBHOOK_URL_CHECKOUT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(checkoutPayload),
-            mode: 'no-cors'
+            body: JSON.stringify(checkoutPayload)
         });
     } catch (error) {
         console.error('Error sending InitiateCheckout event to N8N:', error);

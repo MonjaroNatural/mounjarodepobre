@@ -32,8 +32,14 @@ import {
   Check,
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
-import { sendN8NEvent } from '../actions';
-import { getCookie } from '@/lib/tracking';
+
+function getCookie(name: string): string | null {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+}
 
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -985,6 +991,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
 
   useEffect(() => {
     const timer = setTimeout(() => {
+        const N8N_WEBHOOK_URL_ADD_TO_CART = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/addtocartfb";
         const payload = {
             eventName: 'AddToCart' as const,
             eventTime: Math.floor(Date.now() / 1000),
@@ -993,7 +1000,6 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
                 fbc: getCookie('_fbc'),
                 fbp: getCookie('_fbp'),
                 client_user_agent: navigator.userAgent,
-                client_ip_address: null, // IP will be captured by the server/webhook
             },
             customData: {
                 value: 5,
@@ -1002,7 +1008,16 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
             event_source_url: window.location.href,
             action_source: 'website' as const,
         };
-        sendN8NEvent(payload);
+        
+        try {
+            fetch(N8N_WEBHOOK_URL_ADD_TO_CART, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch(error) {
+            console.error("Failed to send AddToCart event to N8N", error);
+        }
 
         if (window.fbq) {
             window.fbq('track', 'AddToCart', { value: 5, currency: 'USD' });

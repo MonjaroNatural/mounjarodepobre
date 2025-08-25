@@ -8,7 +8,6 @@ export function N8NTracker() {
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        // --- FUNÇÕES AUXILIARES ---
         function getCookie(name: string): string | null {
             if (typeof document === 'undefined') return null;
             const value = `; ${document.cookie}`;
@@ -51,7 +50,6 @@ export function N8NTracker() {
                     fbc: getCookie('_fbc'),
                     fbp: getCookie('_fbp'),
                     client_user_agent: navigator.userAgent,
-                    client_ip_address: null, 
                 },
                 customData: {
                     ad_id: currentParams.get('utm_source') || null,
@@ -62,20 +60,17 @@ export function N8NTracker() {
                 action_source: 'website'
             };
             
-            // 4. Envia os dados para o webhook.
             try {
                 await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    mode: 'no-cors'
+                    body: JSON.stringify(payload)
                 });
             } catch (error) {
                 console.error('Erro de rede ao enviar evento PageView para o N8N:', error);
             }
         }
         
-        // Aguarda 500ms para dar tempo ao Pixel do FB para criar o cookie _fbc.
         const timer = setTimeout(() => {
             sendPageViewEvent();
         }, 500);
