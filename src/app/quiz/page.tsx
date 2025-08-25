@@ -1013,7 +1013,8 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
             fetch(N8N_WEBHOOK_URL_ADD_TO_CART, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                mode: 'no-cors'
             });
         } catch(error) {
             console.error("Failed to send AddToCart event to N8N", error);
