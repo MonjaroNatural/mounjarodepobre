@@ -31,9 +31,9 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <Suspense fallback={null}>
           <N8NTracker />
+          <MetaPixel />
         </Suspense>
         {children}
-        <MetaPixel />
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-W3V9W2R"
