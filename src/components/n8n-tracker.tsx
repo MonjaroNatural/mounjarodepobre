@@ -66,7 +66,7 @@ export function N8NTracker() {
                 setCookie('my_session_id', sessionId, 30); 
             }
             
-            const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb";
+            const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook/pageviewfb";
 
             const fbcCookie = getCookie('_fbc');
             const fbpCookie = getCookie('_fbp');

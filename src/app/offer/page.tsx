@@ -114,7 +114,7 @@ function OfferContent() {
     const external_id = getCookie('my_session_id');
     const checkoutUrl = `https://pay.cakto.com.br/woxorku_541445?src=${external_id}`;
     
-    const N8N_WEBHOOK_URL_CHECKOUT = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/checkoutfb";
+    const N8N_WEBHOOK_URL_CHECKOUT = "https://redis-n8n.rzilkp.easypanel.host/webhook/checkoutfb";
 
     const campaignParams = getCampaignParams();
 

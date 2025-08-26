@@ -1001,7 +1001,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
 
   useEffect(() => {
     const timer = setTimeout(() => {
-        const N8N_WEBHOOK_URL_ADD_TO_CART = "https://redis-n8n.rzilkp.easypanel.host/webhook-test/addtocartfb";
+        const N8N_WEBHOOK_URL_ADD_TO_CART = "https://redis-n8n.rzilkp.easypanel.host/webhook/addtocartfb";
         const campaignParams = getCampaignParams();
         
         const payload = {
