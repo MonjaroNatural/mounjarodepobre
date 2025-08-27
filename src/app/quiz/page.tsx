@@ -95,6 +95,31 @@ const calculateImc = (answers: Answer[]): { imc: number; category: ImcCategory }
     return { imc, category };
 }
 
+// Função para enviar o evento do passo do quiz para o N8N
+function sendQuizStepEvent(step: number, questionText: string, answer: string | string[] | number) {
+  const externalId = getCookie('my_session_id');
+
+  // Só envia se o external_id existir
+  if (!externalId) {
+    console.warn('External ID not found, skipping webhook.');
+    return;
+  }
+
+  const N8N_WEBHOOK_URL_QUIZ_STEP = 'https://redis-n8n.rzilkp.easypanel.host/webhook-test/quizn8n';
+
+  const payload = {
+    external_id: externalId,
+    quiz_step: step,
+    quiz_question: questionText,
+    quiz_answer: answer, // Adicionando a resposta ao payload
+  };
+  
+  // Usa navigator.sendBeacon para não bloquear a UI.
+  // O payload precisa ser enviado como Blob.
+  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json; charset=UTF-8' });
+  navigator.sendBeacon(N8N_WEBHOOK_URL_QUIZ_STEP, blob);
+}
+
 
 function QuizComponent() {
   const router = useRouter();
@@ -252,6 +277,12 @@ function QuizComponent() {
     const question = quizQuestions[currentStep];
     setCurrentAnswer(value);
     const questionId = question.id;
+    
+    // ** TESTE PARA A PRIMEIRA ETAPA **
+    if (questionId === 1) {
+      sendQuizStepEvent(currentStep + 1, question.question, value);
+    }
+
     const otherAnswers = answers.filter((a) => a.questionId !== questionId);
     const newAnswers = [...otherAnswers, { questionId: questionId, value: value }];
     setAnswers(newAnswers);
