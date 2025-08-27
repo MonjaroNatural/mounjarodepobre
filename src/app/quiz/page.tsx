@@ -95,7 +95,9 @@ const calculateImc = (answers: Answer[]): { imc: number; category: ImcCategory }
     return { imc, category };
 }
 
-function sendQuizStepEvent(step: number, questionText: string, answer: string | string[] | number) {
+function sendQuizStepEvent(step: number, questionText: string, answer: string | string[] | number | null) {
+  if (!answer) return;
+
   const externalId = getCookie('my_session_id');
   if (!externalId) {
     console.warn('External ID not found, skipping webhook.');
@@ -116,7 +118,7 @@ function sendQuizStepEvent(step: number, questionText: string, answer: string | 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        keepalive: true // Permite que a requisição continue mesmo se a página mudar
+        keepalive: true, // Permite que a requisição continue mesmo se a página mudar
     });
   } catch (error) {
       console.error("Failed to send quiz step event", error)
@@ -160,7 +162,7 @@ function QuizComponent() {
 
     let url = `/quiz?step=${currentStep}`;
     if (question.type === 'results') {
-        const { imc, category } = calculateImc(answers);
+        const { category } = calculateImc(answers);
         url += `&imcCategory=${encodeURIComponent(category)}`;
     }
     router.replace(url, { scroll: false });
@@ -224,19 +226,23 @@ function QuizComponent() {
   const handleNext = () => {
     const question = quizQuestions[currentStep];
     let answerToStore: Answer | null = null;
+    let answerValueForWebhook: string | string[] | number | null = null;
 
     if (question.type === 'weight-slider') {
       const value = `${weight}${weightUnit}`;
       answerToStore = { questionId: question.id, value };
+      answerValueForWebhook = value;
     } else if (question.type === 'height-slider') {
       const value = `${height}${heightUnit}`;
       answerToStore = { questionId: question.id, value };
+      answerValueForWebhook = value;
     } else if (
       currentAnswer !== null &&
       currentAnswer !== '' &&
       (!Array.isArray(currentAnswer) || currentAnswer.length > 0)
     ) {
       answerToStore = { questionId: question.id, value: currentAnswer };
+      answerValueForWebhook = currentAnswer;
     } else {
       if (
         question.type === 'text' ||
@@ -246,6 +252,11 @@ function QuizComponent() {
         console.warn('Answer is required');
         return;
       }
+    }
+
+    // Send event for questions that use the "Continue" button
+    if (answerValueForWebhook) {
+      sendQuizStepEvent(currentStep + 1, question.question, answerValueForWebhook);
     }
 
     let newAnswers = answers;
@@ -281,9 +292,7 @@ function QuizComponent() {
     setCurrentAnswer(value);
     const questionId = question.id;
     
-    if (questionId === 1) {
-      sendQuizStepEvent(currentStep + 1, question.question, value);
-    }
+    sendQuizStepEvent(currentStep + 1, question.question, value);
 
     const otherAnswers = answers.filter((a) => a.questionId !== questionId);
     const newAnswers = [...otherAnswers, { questionId: questionId, value: value }];
@@ -1242,3 +1251,5 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     </div>
   );
 }
+
+    
