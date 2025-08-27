@@ -111,8 +111,16 @@ function sendQuizStepEvent(step: number, questionText: string, answer: string | 
     quiz_answer: answer,
   };
   
-  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json; charset=UTF-8' });
-  navigator.sendBeacon(N8N_WEBHOOK_URL_QUIZ_STEP, blob);
+  try {
+    fetch(N8N_WEBHOOK_URL_QUIZ_STEP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true // Permite que a requisição continue mesmo se a página mudar
+    });
+  } catch (error) {
+      console.error("Failed to send quiz step event", error)
+  }
 }
 
 
