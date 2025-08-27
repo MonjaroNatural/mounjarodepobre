@@ -95,11 +95,8 @@ const calculateImc = (answers: Answer[]): { imc: number; category: ImcCategory }
     return { imc, category };
 }
 
-// Função para enviar o evento do passo do quiz para o N8N
 function sendQuizStepEvent(step: number, questionText: string, answer: string | string[] | number) {
   const externalId = getCookie('my_session_id');
-
-  // Só envia se o external_id existir
   if (!externalId) {
     console.warn('External ID not found, skipping webhook.');
     return;
@@ -111,11 +108,9 @@ function sendQuizStepEvent(step: number, questionText: string, answer: string | 
     external_id: externalId,
     quiz_step: step,
     quiz_question: questionText,
-    quiz_answer: answer, // Adicionando a resposta ao payload
+    quiz_answer: answer,
   };
   
-  // Usa navigator.sendBeacon para não bloquear a UI.
-  // O payload precisa ser enviado como Blob.
   const blob = new Blob([JSON.stringify(payload)], { type: 'application/json; charset=UTF-8' });
   navigator.sendBeacon(N8N_WEBHOOK_URL_QUIZ_STEP, blob);
 }
@@ -157,7 +152,7 @@ function QuizComponent() {
 
     let url = `/quiz?step=${currentStep}`;
     if (question.type === 'results') {
-        const { category } = calculateImc(answers);
+        const { imc, category } = calculateImc(answers);
         url += `&imcCategory=${encodeURIComponent(category)}`;
     }
     router.replace(url, { scroll: false });
@@ -278,7 +273,6 @@ function QuizComponent() {
     setCurrentAnswer(value);
     const questionId = question.id;
     
-    // ** TESTE PARA A PRIMEIRA ETAPA **
     if (questionId === 1) {
       sendQuizStepEvent(currentStep + 1, question.question, value);
     }
