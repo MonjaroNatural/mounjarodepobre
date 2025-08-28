@@ -96,7 +96,7 @@ const calculateImc = (answers: Answer[]): { imc: number; category: ImcCategory }
 }
 
 function sendQuizStepEvent(step: number, questionText: string, answer: string | string[] | number | null) {
-  if (!answer) return;
+  if (typeof window === 'undefined' || !answer) return;
 
   const externalId = getCookie('my_session_id');
   if (!externalId) {
@@ -1251,5 +1251,3 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     </div>
   );
 }
-
-    
