@@ -1,3 +1,4 @@
+
 'use client';
 
 import Script from 'next/script';
@@ -15,8 +16,11 @@ export function MetaPixel() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (window.fbq) {
-      window.fbq('track', 'PageView');
+    // Only track PageView on the root path ('/')
+    if (pathname === '/') {
+      if (window.fbq) {
+        window.fbq('track', 'PageView');
+      }
     }
   }, [pathname, searchParams]);
 
