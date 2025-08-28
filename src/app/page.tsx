@@ -40,7 +40,7 @@ export default function LandingPage() {
           alt="Logo Mounjaro de Pobre"
           width={200}
           height={100}
-          className="h-auto"
+          className="h-auto w-auto"
           data-ai-hint="logo"
         />
 

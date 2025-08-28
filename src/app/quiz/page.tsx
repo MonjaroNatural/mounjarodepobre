@@ -104,7 +104,7 @@ function sendQuizStepEvent(step: number, questionText: string, answer: string | 
     return;
   }
 
-  const N8N_WEBHOOK_URL_QUIZ_STEP = 'https://redis-n8n.rzilkp.easypanel.host/webhook-test/quizn8n';
+  const N8N_WEBHOOK_URL_QUIZ_STEP = 'https://redis-n8n.rzilkp.easypanel.host/webhook/quizn8n';
 
   const payload = {
     external_id: externalId,
@@ -857,6 +857,7 @@ function QuizComponent() {
             alt="Mounjaro de Pobre Logo"
             width={50}
             height={50}
+            className="h-auto w-auto"
           />
           {(question.type !== 'loading' && question.type !== 'results') && (
             <Progress

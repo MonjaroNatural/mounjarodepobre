@@ -4,7 +4,7 @@
 import { headers } from 'next/headers';
 
 const N8N_WEBHOOK_URL_HOMEPAGE =
-  'https://redis-n8n.rzilkp.easypanel.host/webhook-test/paginainicial';
+  'https://redis-n8n.rzilkp.easypanel.host/webhook/paginainicial';
 
 interface HomePageViewPayload {
   external_id: string | null;
