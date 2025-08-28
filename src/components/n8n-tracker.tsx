@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { trackHomePageView } from '@/app/actions';
 
 function getCampaignParams() {
     if (typeof window === 'undefined') return {};
@@ -60,53 +61,39 @@ export function N8NTracker() {
             localStorage.setItem('campaign_params', JSON.stringify(campaignParams));
         }
 
-        async function sendPageViewEvent() {
+        async function sendHomePageViewEvent() {
             const sessionId = getCookie('my_session_id') || generateUUID();
             if (!getCookie('my_session_id')) {
                 setCookie('my_session_id', sessionId, 30); 
             }
             
-            const N8N_WEBHOOK_URL = "https://redis-n8n.rzilkp.easypanel.host/webhook/pageviewfb";
-
             const fbcCookie = getCookie('_fbc');
             const fbpCookie = getCookie('_fbp');
             const campaignParams = getCampaignParams();
 
             const payload = {
-                eventName: 'PageView',
-                eventTime: Math.floor(Date.now() / 1000),
-                userData: {
-                    external_id: sessionId,
-                    fbc: fbcCookie,
-                    fbp: fbpCookie,
-                    client_user_agent: navigator.userAgent,
-                },
-                customData: {
-                    ad_id: campaignParams.ad_id || null,
-                    adset_id: campaignParams.adset_id || null,
-                    campaign_id: campaignParams.campaign_id || null,
-                },
+                external_id: sessionId,
+                fbc: fbcCookie,
+                fbp: fbpCookie,
+                client_user_agent: navigator.userAgent,
+                ad_id: campaignParams.ad_id || null,
+                adset_id: campaignParams.adset_id || null,
+                campaign_id: campaignParams.campaign_id || null,
                 event_source_url: window.location.href,
-                action_source: 'website' as const,
             };
             
-            try {
-                fetch(N8N_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    keepalive: true
-                });
-            } catch (error) {
-                console.error('Erro ao enviar evento PageView para N8N:', error);
-            }
+            // Call the server action
+            await trackHomePageView(payload);
         }
         
-        const timer = setTimeout(() => {
-            sendPageViewEvent();
-        }, 4000);
+        // Only run on the initial page ('/')
+        if (pathname === '/') {
+            const timer = setTimeout(() => {
+                sendHomePageViewEvent();
+            }, 1500); // Reduced delay for faster tracking on the homepage
 
-        return () => clearTimeout(timer);
+            return () => clearTimeout(timer);
+        }
 
     }, [pathname, searchParams]);
 
