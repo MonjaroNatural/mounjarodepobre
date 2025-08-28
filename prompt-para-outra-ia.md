@@ -1,5 +1,5 @@
 
-Olá! Preciso que você implemente um sistema de rastreamento de funil de marketing ponta a ponta em um projeto Next.js. O objetivo é enviar webhooks para o N8N em cada etapa crucial da jornada do usuário, desde a primeira visita até o clique no botão de checkout.
+Olá! Preciso que você implemente um sistema de rastreamento de funil de marketing em um projeto Next.js. O objetivo é enviar webhooks para o N8N em etapas cruciais da jornada do usuário: a primeira visita e cada passo de um quiz.
 
 A implementação deve ser robusta, organizada e seguir as melhores práticas, separando a lógica do cliente e do servidor adequadamente.
 
@@ -26,7 +26,7 @@ Aqui está o detalhamento completo do que precisa ser feito:
 **Implementação Técnica:**
 1.  No mesmo componente `N8NTracker.tsx`, quando a página carregar, verifique a URL em busca dos seguintes parâmetros: `utm_source`, `utm_medium`, e `utm_campaign`.
 2.  Se algum desses parâmetros existir, salve-os como um objeto JSON no `localStorage` do navegador, sob a chave `campaign_params`.
-3.  Este objeto salvo deve ser recuperado e incluído nos webhooks de `HomePageView`, `AddToCart`, e `InitiateCheckout`.
+3.  Este objeto salvo deve ser recuperado e incluído no webhook de `HomePageView`.
 
 ---
 
@@ -62,29 +62,6 @@ Aqui está o detalhamento completo do que precisa ser feito:
     *   `quiz_question`: O texto da pergunta.
     *   `quiz_answer`: A resposta fornecida pelo usuário.
 5.  **URL do Webhook:** `[SUA_URL_QUIZ_AQUI]`
-
----
-
-### **Requisito 5: Webhook de Adição ao Carrinho (AddToCart)**
-
-**Objetivo:** Rastrear quando um usuário completa o quiz e chega à página de resultados/oferta. Este evento é um proxy para "Adicionar ao Carrinho" para o Pixel da Meta.
-
-**Implementação Técnica:**
-1.  Na página do quiz (`src/app/quiz/page.tsx`), no componente que renderiza a tela de resultados (`ResultsStep`), use um `useEffect` para disparar este webhook.
-2.  O payload deve ser semelhante ao `HomePageView`, mas com `eventName: 'AddToCart'` e `customData` incluindo `value` e `currency`.
-3.  **URL do Webhook:** `[SUA_URL_ADDTOCART_AQUI]`
-
----
-
-### **Requisito 6: Webhook de Início de Checkout (InitiateCheckout)**
-
-**Objetivo:** Rastrear o clique final no botão que leva o usuário para a página de pagamento.
-
-**Implementação Técnica:**
-1.  Na página da oferta (`src/app/offer/page.tsx`), na função `onClick` do botão de checkout:
-2.  Antes de redirecionar o usuário, envie um webhook com `eventName: 'InitiateCheckout'`.
-3.  O payload deve ser semelhante ao `AddToCart`.
-4.  **URL do Webhook:** `[SUA_URL_CHECKOUT_AQUI]`
 
 ---
 
