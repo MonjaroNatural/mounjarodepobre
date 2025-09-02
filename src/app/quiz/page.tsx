@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { quizQuestions, QuizQuestion, Answer } from '@/data/quiz';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -128,16 +128,24 @@ function sendQuizStepEvent(step: number, questionText: string, answer: string | 
 
 function QuizComponent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // Initialize state from URL or to default
-  const initialStep = searchParams.has('step') ? parseInt(searchParams.get('step') as string, 10) : 0;
-  const [currentStep, setCurrentStep] = useState(initialStep);
+  const [currentStep, setCurrentStep] = useState(0);
   
   const [answers, setAnswers] = useState<Answer[]>(() => {
     if (typeof window !== 'undefined') {
       const savedAnswers = localStorage.getItem('quizAnswers');
-      return savedAnswers ? JSON.parse(savedAnswers) : [];
+      if (savedAnswers) {
+        try {
+          // A simple check to see if it's a valid array.
+          const parsed = JSON.parse(savedAnswers);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        } catch (e) {
+          // Not a valid JSON, clear it.
+          localStorage.removeItem('quizAnswers');
+        }
+      }
     }
     return [];
   });
@@ -147,6 +155,7 @@ function QuizComponent() {
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lb'>('kg');
   const [height, setHeight] = useState(165);
   const [heightUnit, setHeightUnit] = useState<'cm' | 'pol'>('cm');
+  const [imcCategory, setImcCategory] = useState<ImcCategory | null>(null);
 
   useEffect(() => {
     // Save answers to localStorage whenever they change
@@ -155,20 +164,6 @@ function QuizComponent() {
     }
   }, [answers]);
   
-  // Effect to update URL when step changes
-  useEffect(() => {
-    const question = quizQuestions[currentStep];
-    if (!question) return;
-
-    let url = `/quiz?step=${currentStep}`;
-    if (question.type === 'results') {
-        const { category } = calculateImc(answers);
-        url += `&imcCategory=${encodeURIComponent(category)}`;
-    }
-    router.replace(url, { scroll: false });
-    
-  }, [currentStep, answers, router]);
-
   useEffect(() => {
     const question = quizQuestions[currentStep];
     if (!question) return;
@@ -267,6 +262,10 @@ function QuizComponent() {
     }
 
     if (currentStep < quizQuestions.length - 1) {
+      if (quizQuestions[currentStep + 1].type === 'results') {
+        const { category } = calculateImc(newAnswers);
+        setImcCategory(category);
+      }
       setCurrentStep(currentStep + 1);
     } else {
       // Last step, navigate to offer
@@ -300,6 +299,10 @@ function QuizComponent() {
 
     setTimeout(() => {
       if (currentStep < quizQuestions.length - 1) {
+        if (quizQuestions[currentStep + 1].type === 'results') {
+          const { category } = calculateImc(newAnswers);
+          setImcCategory(category);
+        }
         setCurrentStep(currentStep + 1);
       } else {
         const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
@@ -610,7 +613,7 @@ function QuizComponent() {
                 alt="Promise Image"
                 width={502}
                 height={497}
-                className="mx-auto"
+                className="mx-auto h-auto w-auto"
                 data-ai-hint="woman celebrating"
               />
             )}
@@ -631,7 +634,7 @@ function QuizComponent() {
                 alt="Testimonial Image"
                 width={580}
                 height={476}
-                className="mx-auto rounded-lg"
+                className="mx-auto rounded-lg h-auto w-auto"
                 data-ai-hint="woman smiling"
               />
             )}
@@ -654,7 +657,6 @@ function QuizComponent() {
       case 'loading':
         return <LoadingStep onComplete={handleNext} />;
       case 'results':
-        const imcCategory = searchParams.get('imcCategory') as ImcCategory | null;
         return <ResultsStep answers={answers} onNext={handleNext} imcCategory={imcCategory} />;
       default:
         return null;
@@ -931,9 +933,8 @@ function QuizComponent() {
 
 export default function QuizPage() {
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
-      <QuizComponent />
-    </Suspense>
+    // No need for Suspense here anymore as we don't rely on URL params
+    <QuizComponent />
   );
 }
 
@@ -1094,7 +1095,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
     'Obesidade': '87.5%',
   };
 
-  const markerPosition = markerPositions[finalCategory];
+  const markerPosition = markerPositions[finalCategory] || '37.5%';
 
   return (
     <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
@@ -1206,7 +1207,7 @@ function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNe
             alt="Transformação da Silvia"
             width={580}
             height={400}
-            className="mx-auto rounded-lg"
+            className="mx-auto rounded-lg h-auto w-auto"
             data-ai-hint="woman before after weight loss"
             />
             <p className="text-gray-600 text-left italic">
