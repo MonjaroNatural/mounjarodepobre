@@ -82,7 +82,7 @@ function ResultsComponent() {
           currentWeight: currentWeight,
           desiredWeight: desiredWeight
       });
-      router.push(`/offer?${queryParams.toString()}`);
+      router.push(`/vsl?${queryParams.toString()}`);
   }
 
   const markerPositions: Record<ImcCategory, string> = {
@@ -261,7 +261,7 @@ function ResultsComponent() {
                     size="lg"
                     className="w-full max-w-md h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
                 >
-                    Continuar para a oferta
+                    Gerar meu plano personalizado
                     <ChevronRight className="h-6 w-6" />
                 </Button>
             </div>
