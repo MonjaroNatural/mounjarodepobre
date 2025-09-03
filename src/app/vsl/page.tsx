@@ -33,12 +33,11 @@ function VslContent() {
         <p className="text-lg text-gray-600">
           Assista ao vídeo abaixo com as instruções completas sobre seu plano
         </p>
-        <div className="aspect-video w-full overflow-hidden rounded-lg bg-black shadow-2xl">
-           <div 
-            id="vid_68b7c566d95b2222fd24bec2"
-            style={{display: 'block', margin: '0 auto', width: '100%'}}
-           ></div>
-        </div>
+        <div 
+          id="vid_68b7c566d95b2222fd24bec2"
+          style={{display: 'block', margin: '0 auto', width: '100%', aspectRatio: '16/9'}}
+          className="rounded-lg bg-black shadow-2xl"
+        ></div>
 
         <div className="flex animate-pulse justify-center pt-4">
           <Button
