@@ -71,7 +71,7 @@ function ResultsComponent() {
 
   const name = searchParams.get('name') || 'Olá';
   const currentWeight = searchParams.get('currentWeight') || '70kg';
-  const desiredWeight = search_params.get('desiredWeight') || '65kg';
+  const desiredWeight = searchParams.get('desiredWeight') || '65kg';
   const height = searchParams.get('height') || '165cm';
 
   const { imc, category } = calculateImc(currentWeight, height);
@@ -84,51 +84,6 @@ function ResultsComponent() {
       });
       router.push(`/offer?${queryParams.toString()}`);
   }
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-        const N8N_WEBHOOK_URL_ADD_TO_CART = "https://redis-n8n.rzilkp.easypanel.host/webhook/addtocartfb";
-        const campaignParams = getCampaignParams();
-        
-        const payload = {
-            eventName: 'AddToCart' as const,
-            eventTime: Math.floor(Date.now() / 1000),
-            userData: {
-                external_id: getCookie('my_session_id'),
-                fbc: getCookie('_fbc'),
-                fbp: getCookie('_fbp'),
-                client_user_agent: navigator.userAgent,
-            },
-            customData: {
-                value: 5,
-                currency: 'USD',
-                ad_id: campaignParams.ad_id || null,
-                adset_id: campaignParams.adset_id || null,
-                campaign_id: campaignParams.campaign_id || null,
-            },
-            event_source_url: window.location.href,
-            action_source: 'website' as const,
-        };
-        
-        try {
-            fetch(N8N_WEBHOOK_URL_ADD_TO_CART, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-                keepalive: true,
-            });
-        } catch(error) {
-            console.error("Failed to send AddToCart event to N8N", error);
-        }
-
-        if (window.fbq) {
-            window.fbq('track', 'AddToCart', { value: 5, currency: 'USD' });
-        }
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
 
   const markerPositions: Record<ImcCategory, string> = {
     'Abaixo do peso': '12.5%',
