@@ -14,6 +14,17 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
+function setCookie(name: string, value: string, days: number): void {
+    if (typeof document === 'undefined') return;
+    let expires = "";
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+
 function getCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
     const value = `; ${document.cookie}`;
@@ -73,6 +84,16 @@ function ResultsComponent() {
   const currentWeight = searchParams.get('currentWeight') || '70kg';
   const desiredWeight = searchParams.get('desiredWeight') || '65kg';
   const height = searchParams.get('height') || '165cm';
+
+  useEffect(() => {
+    const quizData = {
+      name: name,
+      currentWeight: currentWeight,
+      desiredWeight: desiredWeight,
+    };
+    setCookie('quiz_data', JSON.stringify(quizData), 1); // Salva o cookie por 1 dia
+  }, [name, currentWeight, desiredWeight]);
+
 
   const { imc, category } = calculateImc(currentWeight, height);
 

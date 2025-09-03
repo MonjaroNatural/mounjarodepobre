@@ -104,16 +104,45 @@ function getCampaignParams() {
 function OfferContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const name = searchParams.get('name') || 'Seu Plano';
-  const currentWeight = searchParams.get('currentWeight') || '';
-  const desiredWeight = searchParams.get('desiredWeight') || '';
   const [api, setApi] = useState<CarouselApi>();
+
+  let name = searchParams.get('name');
+  let currentWeight = searchParams.get('currentWeight');
+  let desiredWeight = searchParams.get('desiredWeight');
+
+  // Fallback to reading from cookie if URL params are not present
+  if (!name || !currentWeight || !desiredWeight) {
+    const cookieData = getCookie('quiz_data');
+    if (cookieData) {
+      try {
+        const parsedData = JSON.parse(cookieData);
+        name = name || parsedData.name || 'Seu Plano';
+        currentWeight = currentWeight || parsedData.currentWeight || '';
+        desiredWeight = desiredWeight || parsedData.desiredWeight || '';
+      } catch (e) {
+        console.error("Failed to parse quiz_data cookie", e);
+      }
+    }
+  }
+
+  name = name || 'Seu Plano';
+
 
   const handleCheckoutClick = () => {
     if (typeof window === 'undefined') return;
 
     const external_id = getCookie('my_session_id');
-    const checkoutUrl = `https://pay.cakto.com.br/woxorku_541445?src=${external_id}`;
+    const baseCheckoutUrl = 'https://pay.cakto.com.br/woxorku_541445';
+    
+    const checkoutParams = new URLSearchParams();
+    if(external_id) checkoutParams.set('src', external_id);
+
+    // Add quiz data to checkout URL
+    if (name) checkoutParams.set('name', name);
+    if (currentWeight) checkoutParams.set('currentWeight', currentWeight);
+    if (desiredWeight) checkoutParams.set('desiredWeight', desiredWeight);
+    
+    const checkoutUrl = `${baseCheckoutUrl}?${checkoutParams.toString()}`;
     
     const N8N_WEBHOOK_URL_CHECKOUT = "https://redis-n8n.rzilkp.easypanel.host/webhook/checkoutfb";
 
