@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useEffect, Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 function VslContent() {
@@ -10,7 +9,7 @@ function VslContent() {
 
   useEffect(() => {
     const scriptId = 'vturb-player-script';
-    // Evita adicionar o script múltiplas vezes se o componente re-renderizar
+    // Evita adicionar o script múltiplas vezes
     if (document.getElementById(scriptId)) {
       return;
     }
@@ -32,30 +31,42 @@ function VslContent() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 text-center">
-       <div className="w-full max-w-4xl space-y-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 text-center">
+      <div className="w-full max-w-4xl space-y-6">
         <h1 className="text-2xl font-bold md:text-4xl">
-            {name ? `${name}, seu` : 'Seu'} plano personalizado foi feito com sucesso!
+          {name ? `${name}, seu` : 'Seu'} plano personalizado foi feito com
+          sucesso!
         </h1>
-        <p className="text-lg text-gray-700">
-            Assista ao vídeo abaixo com as instruções completas sobre seu plano
+        <p className="text-lg text-gray-600">
+          Assista ao vídeo abaixo com as instruções completas sobre seu plano
         </p>
 
-        {/* O player da Vturb será inserido aqui pelo script */}
+        {/* Container do vídeo Vturb */}
         <div
-            dangerouslySetInnerHTML={{
-            __html: `<vturb-smartplayer id="vid-68b7c566d95b2222fd24bec2" style="display: block; margin: 0 auto; width: 100%; aspect-ratio: 16/9;"></vturb-smartplayer>`,
-            }}
+          dangerouslySetInnerHTML={{
+            __html: `
+              <vturb-smartplayer 
+                id="vid-68b7c566d95b2222fd24bec2" 
+                style="display: block; margin: 0 auto; width: 100%; aspect-ratio: 16/9;">
+              </vturb-smartplayer>
+            `,
+          }}
         />
-       </div>
+
+        <p className="text-sm text-gray-500 mt-4">
+          Não feche essa página pois sua vaga será perdida e você não poderá
+          receber outro plano especial
+        </p>
+
+      </div>
     </div>
   );
 }
 
 export default function VslPage() {
-    return (
-        <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Carregando seu plano...</div>}>
-            <VslContent />
-        </Suspense>
-    )
+  return (
+    <Suspense fallback={<div>Carregando seu plano...</div>}>
+      <VslContent />
+    </Suspense>
+  );
 }
