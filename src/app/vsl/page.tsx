@@ -43,7 +43,6 @@ function VslContent() {
         {/* 
           Container limpo para o vídeo da Vturb. 
           O script da Vturb vai procurar por este 'id' e injetar o vídeo aqui.
-          Não há classes de estilo que possam causar o fundo preto.
         */}
         <div 
           id="vid_68b7c566d95b2222fd24bec2" 
