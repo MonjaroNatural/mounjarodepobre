@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { ShieldCheck, Trophy, Lock } from 'lucide-react';
+import { useState } from 'react';
 
 const faqData = [
   {
@@ -138,7 +139,6 @@ function OfferContent() {
         action_source: 'website' as const,
     };
     
-    // Send to N8N
     try {
         fetch(N8N_WEBHOOK_URL_CHECKOUT, {
             method: 'POST',
@@ -150,12 +150,10 @@ function OfferContent() {
         console.error('Error sending InitiateCheckout event to N8N:', error);
     }
 
-    // Send to Facebook Pixel
     if (window.fbq) {
         window.fbq('track', 'InitiateCheckout', { value: 5, currency: 'USD' });
     }
 
-    // Redirect user
     router.push(checkoutUrl);
   };
 

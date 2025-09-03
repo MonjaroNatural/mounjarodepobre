@@ -1,3 +1,4 @@
+
 export type Answer = {
   questionId: number;
   value: string | string[] | number;
@@ -5,7 +6,7 @@ export type Answer = {
 
 export type QuizQuestion = {
   id: number;
-  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading' | 'weight-slider' | 'height-slider' | 'results' | 'single-choice-image';
+  type: 'single-choice' | 'single-choice-column'| 'multiple-choice' | 'text'| 'number' | 'promise' | 'testimonial' | 'loading' | 'weight-slider' | 'height-slider' | 'single-choice-image';
   question: string;
   subtitle?: string;
   options?: { label: string; sublabel?: string; imageUrl?: string, icon?: string, emoji?: string }[];
@@ -229,11 +230,5 @@ export const quizQuestions: QuizQuestion[] = [
     type: 'loading',
     question: 'Aguarde enquanto preparamos o seu Mounjaro dos Pobres…',
     subtitle: 'Analisando as suas respostas...',
-  },
-  {
-    id: 15,
-    type: 'results',
-    question: 'Seus Resultados',
-    buttonText: 'Continuar para a oferta',
   }
 ];

@@ -41,60 +41,6 @@ function getCookie(name: string): string | null {
     return null;
 }
 
-function getCampaignParams() {
-    if (typeof window === 'undefined') return {};
-    try {
-        const storedParams = localStorage.getItem('campaign_params');
-        return storedParams ? JSON.parse(storedParams) : {};
-    } catch (e) {
-        return {};
-    }
-}
-
-
-const iconMap: { [key: string]: React.ElementType } = {
-  Camera: Camera,
-  HeartCrack: HeartCrack,
-  Frown: Frown,
-  Hand: Hand,
-  GlassWater: GlassWater,
-};
-
-type ImcCategory = 'Abaixo do peso' | 'Normal' | 'Sobrepeso' | 'Obesidade';
-
-const getImcCategory = (imc: number): ImcCategory => {
-  if (imc < 18.5) return 'Abaixo do peso';
-  if (imc < 25) return 'Normal';
-  if (imc < 30) return 'Sobrepeso';
-  return 'Obesidade';
-};
-
-const calculateImc = (answers: Answer[]): { imc: number; category: ImcCategory } => {
-    const weightStr = (answers.find((a) => a.questionId === 11)?.value as string) || '70kg';
-    const heightStr = (answers.find((a) => a.questionId === 12)?.value as string) || '165cm';
-
-    const parseValue = (str: string) => {
-        const match = str.match(/(\d+(\.\d+)?)/);
-        return match ? parseFloat(match[0]) : 0;
-    };
-
-    let weightInKg = parseValue(weightStr);
-    if (weightStr.includes('lb')) {
-        weightInKg *= 0.453592;
-    }
-
-    let heightInCm = parseValue(heightStr);
-    if (heightStr.includes('pol')) {
-        heightInCm *= 2.54;
-    }
-
-    const heightInM = heightInCm / 100;
-    const imc = heightInM > 0 ? parseFloat((weightInKg / (heightInM * heightInM)).toFixed(1)) : 0;
-    const category = getImcCategory(imc);
-    
-    return { imc, category };
-}
-
 function sendQuizStepEvent(step: number, questionText: string, answer: string | string[] | number | null) {
   if (typeof window === 'undefined' || !answer) return;
 
@@ -118,13 +64,20 @@ function sendQuizStepEvent(step: number, questionText: string, answer: string | 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        keepalive: true, // Permite que a requisição continue mesmo se a página mudar
+        keepalive: true,
     });
   } catch (error) {
       console.error("Failed to send quiz step event", error)
   }
 }
 
+const iconMap: { [key: string]: React.ElementType } = {
+  Camera: Camera,
+  HeartCrack: HeartCrack,
+  Frown: Frown,
+  Hand: Hand,
+  GlassWater: GlassWater,
+};
 
 function QuizComponent() {
   const router = useRouter();
@@ -136,13 +89,11 @@ function QuizComponent() {
       const savedAnswers = localStorage.getItem('quizAnswers');
       if (savedAnswers) {
         try {
-          // A simple check to see if it's a valid array.
           const parsed = JSON.parse(savedAnswers);
           if (Array.isArray(parsed)) {
             return parsed;
           }
         } catch (e) {
-          // Not a valid JSON, clear it.
           localStorage.removeItem('quizAnswers');
         }
       }
@@ -155,10 +106,8 @@ function QuizComponent() {
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lb'>('kg');
   const [height, setHeight] = useState(165);
   const [heightUnit, setHeightUnit] = useState<'cm' | 'pol'>('cm');
-  const [imcCategory, setImcCategory] = useState<ImcCategory | null>(null);
 
   useEffect(() => {
-    // Save answers to localStorage whenever they change
     if (typeof window !== 'undefined') {
       localStorage.setItem('quizAnswers', JSON.stringify(answers));
     }
@@ -212,13 +161,13 @@ function QuizComponent() {
     const question = quizQuestions[currentStep];
     if (question?.type === 'loading') {
       const timer = setTimeout(() => {
-        handleNext();
+        handleNext(true); // Pass a flag to indicate it's from loading
       }, 11000);
       return () => clearTimeout(timer);
     }
   }, [currentStep]);
 
-  const handleNext = () => {
+  const handleNext = (fromLoading = false) => {
     const question = quizQuestions[currentStep];
     let answerToStore: Answer | null = null;
     let answerValueForWebhook: string | string[] | number | null = null;
@@ -249,8 +198,7 @@ function QuizComponent() {
       }
     }
 
-    // Send event for questions that use the "Continue" button
-    if (answerValueForWebhook) {
+    if (!fromLoading && answerValueForWebhook) {
       sendQuizStepEvent(currentStep + 1, question.question, answerValueForWebhook);
     }
 
@@ -262,19 +210,11 @@ function QuizComponent() {
     }
 
     if (currentStep < quizQuestions.length - 1) {
-      if (quizQuestions[currentStep + 1].type === 'results') {
-        const { category } = calculateImc(newAnswers);
-        setImcCategory(category);
-      }
       setCurrentStep(currentStep + 1);
     } else {
-      // Last step, navigate to offer
-      const nameAnswer =
-        (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
-      const currentWeightAnswer =
-        (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
-      const desiredWeightAnswer =
-        (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
+      const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
+      const currentWeightAnswer = (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
+      const desiredWeightAnswer = (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
       
       const queryParams = new URLSearchParams({
           name: nameAnswer,
@@ -282,7 +222,7 @@ function QuizComponent() {
           desiredWeight: desiredWeightAnswer
       });
       
-      router.push(`/offer?${queryParams.toString()}`);
+      router.push(`/results?${queryParams.toString()}`);
     }
   };
 
@@ -299,23 +239,19 @@ function QuizComponent() {
 
     setTimeout(() => {
       if (currentStep < quizQuestions.length - 1) {
-        if (quizQuestions[currentStep + 1].type === 'results') {
-          const { category } = calculateImc(newAnswers);
-          setImcCategory(category);
-        }
         setCurrentStep(currentStep + 1);
       } else {
-        const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
+         const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
         const currentWeightAnswer = (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
         const desiredWeightAnswer = (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
-
+        
         const queryParams = new URLSearchParams({
             name: nameAnswer,
             currentWeight: currentWeightAnswer,
             desiredWeight: desiredWeightAnswer
         });
-
-        router.push(`/offer?${queryParams.toString()}`);
+        
+        router.push(`/results?${queryParams.toString()}`);
       }
     }, 150);
   };
@@ -655,9 +591,7 @@ function QuizComponent() {
           </div>
         );
       case 'loading':
-        return <LoadingStep onComplete={handleNext} />;
-      case 'results':
-        return <ResultsStep answers={answers} onNext={handleNext} imcCategory={imcCategory} />;
+        return <LoadingStep />;
       default:
         return null;
     }
@@ -666,13 +600,12 @@ function QuizComponent() {
   const isButtonDisabled = () => {
     if (
       question.type === 'promise' ||
-      question.type === 'testimonial' ||
-      question.type === 'results'
+      question.type === 'testimonial'
     ) {
       return false;
     }
     if (question.type === 'loading') {
-      return true; // Always disable for loading
+      return true;
     }
     if (['text', 'number', 'multiple-choice'].includes(question.type)) {
       return (
@@ -686,7 +619,7 @@ function QuizComponent() {
 
   const showButton =
     question.buttonText &&
-    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading', 'results'].includes(
+    !['single-choice', 'single-choice-column', 'single-choice-image', 'loading'].includes(
       question.type,
     );
 
@@ -861,15 +794,8 @@ function QuizComponent() {
             height={50}
             className="h-auto w-auto"
           />
-          {(question.type !== 'loading' && question.type !== 'results') && (
+          {(question.type !== 'loading') && (
             <Progress
-              value={progress}
-              className="h-2 w-full max-w-xs mt-2"
-              style={{ backgroundColor: '#e0e0e0' }}
-            />
-          )}
-          {question.type === 'results' && (
-             <Progress
               value={progress}
               className="h-2 w-full max-w-xs mt-2"
               style={{ backgroundColor: '#e0e0e0' }}
@@ -883,17 +809,11 @@ function QuizComponent() {
           className={`mx-auto w-full ${
             question.type === 'text'
               ? 'max-w-xs'
-              : question.type === 'results'
-              ? 'max-w-2xl'
               : question.type === 'single-choice-image' ? 'max-w-xl' : 'max-w-md'
           }`}
         >
-          {question.type !== 'loading' &&
-            question.type !== 'results' &&
-            getQuestionTitle()}
-          {question.type !== 'loading' &&
-            question.type !== 'results' &&
-            getSubtitle()}
+          {question.type !== 'loading' && getQuestionTitle()}
+          {question.type !== 'loading' && getSubtitle()}
 
           <div
             className={`flex items-center justify-center ${
@@ -903,7 +823,6 @@ function QuizComponent() {
                 'testimonial',
                 'weight-slider',
                 'height-slider',
-                'results',
               ].includes(question.type)
                 ? 'flex-col'
                 : ''
@@ -915,7 +834,7 @@ function QuizComponent() {
           {showButton && (
             <div className="text-center mt-8">
               <Button
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 disabled={isButtonDisabled()}
                 size="lg"
                 className="w-full max-w-xs h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
@@ -933,12 +852,13 @@ function QuizComponent() {
 
 export default function QuizPage() {
   return (
-    // No need for Suspense here anymore as we don't rely on URL params
-    <QuizComponent />
+    <Suspense fallback={<div>Carregando quiz...</div>}>
+      <QuizComponent />
+    </Suspense>
   );
 }
 
-function LoadingStep({ onComplete }: { onComplete: () => void }) {
+function LoadingStep() {
   const [progress, setProgress] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
@@ -950,8 +870,8 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
   ];
 
   useEffect(() => {
-    const totalDuration = 11000; // 11 seconds
-    const intervalTime = 100; // update every 100ms
+    const totalDuration = 11000;
+    const intervalTime = 100;
     let elapsedTime = 0;
 
     const interval = setInterval(() => {
@@ -1034,222 +954,6 @@ function LoadingStep({ onComplete }: { onComplete: () => void }) {
           ))}
         </div>
       </Carousel>
-    </div>
-  );
-}
-
-function ResultsStep({ answers, onNext, imcCategory }: { answers: Answer[]; onNext: () => void; imcCategory: ImcCategory | null }) {
-  const name = (answers.find((a) => a.questionId === 4)?.value as string) || 'Olá';
-  const { imc, category } = calculateImc(answers);
-  const finalCategory = imcCategory || category;
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-        const N8N_WEBHOOK_URL_ADD_TO_CART = "https://redis-n8n.rzilkp.easypanel.host/webhook/addtocartfb";
-        const campaignParams = getCampaignParams();
-        
-        const payload = {
-            eventName: 'AddToCart' as const,
-            eventTime: Math.floor(Date.now() / 1000),
-            userData: {
-                external_id: getCookie('my_session_id'),
-                fbc: getCookie('_fbc'),
-                fbp: getCookie('_fbp'),
-                client_user_agent: navigator.userAgent,
-            },
-            customData: {
-                value: 5,
-                currency: 'USD',
-                ad_id: campaignParams.ad_id || null,
-                adset_id: campaignParams.adset_id || null,
-                campaign_id: campaignParams.campaign_id || null,
-            },
-            event_source_url: window.location.href,
-            action_source: 'website' as const,
-        };
-        
-        try {
-            fetch(N8N_WEBHOOK_URL_ADD_TO_CART, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-                keepalive: true,
-            });
-        } catch(error) {
-            console.error("Failed to send AddToCart event to N8N", error);
-        }
-
-        if (window.fbq) {
-            window.fbq('track', 'AddToCart', { value: 5, currency: 'USD' });
-        }
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-
-  const markerPositions: Record<ImcCategory, string> = {
-    'Abaixo do peso': '12.5%',
-    'Normal': '37.5%',
-    'Sobrepeso': '62.5%',
-    'Obesidade': '87.5%',
-  };
-
-  const markerPosition = markerPositions[finalCategory] || '37.5%';
-
-  return (
-    <div className="container mx-auto max-w-2xl bg-white p-4 text-center">
-      <div className="space-y-6">
-        <h2 className="text-left text-xl font-bold">
-          {name}, aqui está a análise do seu perfil:
-        </h2>
-
-        <div className="rounded-lg bg-[#e8f5e9] p-4 text-center">
-          <p className="font-medium">
-            Seu IMC (Índice de Massa Corporal) é:{' '}
-            <span className="font-bold">{imc}</span> -{' '}
-            <span className="font-bold">{finalCategory}</span>
-          </p>
-        </div>
-
-        <div className="w-full text-left">
-          <div className="relative w-full pt-8">
-            <div className="h-4 w-full flex rounded-full overflow-hidden">
-              <div className="w-1/4 bg-yellow-400"></div>
-              <div className="w-1/4 bg-green-500"></div>
-              <div className="w-1/4 bg-orange-400"></div>
-              <div className="w-1/4 bg-red-500"></div>
-            </div>
-            <div
-              className="absolute top-0 h-full transition-all duration-500"
-              style={{
-                left: markerPosition,
-                transform: 'translateX(-50%)',
-              }}
-            >
-              <div className="relative flex flex-col items-center">
-                <div className="whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white shadow-lg z-10">
-                  Você está aqui
-                </div>
-                <div className="h-3 w-3 -mt-1 rotate-45 transform bg-black"></div>
-              </div>
-            </div>
-            <div className="mt-2 flex justify-between text-xs text-gray-500">
-              <span className="w-1/4 text-center">Abaixo do peso</span>
-              <span className="w-1/4 text-center">Normal</span>
-              <span className="w-1/4 text-center">Sobrepeso</span>
-              <span className="w-1/4 text-center">Obesidade</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 rounded-lg bg-[#fff9c4] p-4 text-left">
-          <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-yellow-600" />
-          <div>
-            <h3 className="font-bold">
-              Seu metabolismo pode estar te sabotando sem que você perceba!
-            </h3>
-            <p className="text-sm text-gray-700">
-              Mesmo estando em um peso normal, seu corpo pode estar retendo
-              toxinas que inflamam suas células e dificultam a queima de gordura,
-              especialmente na região abdominal. Isso pode levar ao acúmulo de
-              gordura visceral, a mais perigosa para a saúde.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 rounded-lg bg-[#ffebee] p-4 text-left">
-          <Siren className="mt-1 h-6 w-6 shrink-0 text-red-600" />
-          <div>
-            <h3 className="font-bold">Alguns sinais de alerta:</h3>
-            <ul className="mt-2 space-y-1 text-sm">
-              <li className="flex items-center gap-2 font-bold text-red-800">
-                <XCircle className="h-4 w-4" />
-                Metabolismo lento e dificuldade para perder peso
-              </li>
-              <li className="flex items-center gap-2 font-bold text-red-800">
-                <XCircle className="h-4 w-4" />
-                Cansaço constante e falta de energia
-              </li>
-              <li className="flex items-center gap-2 font-bold text-red-800">
-                <XCircle className="h-4 w-4" />
-                Acúmulo de gordura, principalmente na barriga
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 rounded-lg bg-[#e3f2fd] p-4 text-left">
-          <Lightbulb className="mt-1 h-6 w-6 shrink-0 text-blue-600" />
-          <div>
-            <h3 className="font-bold">
-              Com o Mounjaro dos Pobres, seu corpo acelera a queima de gordura de
-              forma natural.
-            </h3>
-            <p className="text-sm text-gray-700">
-              A combinação ideal de ingredientes da nossa fórmula{' '}
-              <span className="font-bold text-blue-800">
-                pode ativar seu metabolismo, reduzir a retenção de líquidos e
-                aumentar sua energia
-              </span>
-              , promovendo a queima da gordura visceral e uma desintoxicação
-              completa do organismo.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-6 mt-10">
-        <div className="space-y-4 rounded-lg border bg-gray-50 p-4">
-            <h1 className="text-2xl font-bold">Veja a transformação da Silvia!</h1>
-            <Image
-            src="/silvia.webp"
-            alt="Transformação da Silvia"
-            width={580}
-            height={400}
-            className="mx-auto rounded-lg h-auto w-auto"
-            data-ai-hint="woman before after weight loss"
-            />
-            <p className="text-gray-600 text-left italic">
-            "Oiii comprei porque uma amiga me indicou... O resultado é incrível 😅
-            Recomendo muito. estou a 1 mês e estou com muito menos vontade de comer
-            besteiras, perdi peso e desinchei bastante! Meu maior medo era ficar com
-            flacidez, morria de medo disso, mas graças a Deus isso não aconteceu e
-            to emagrecendo com muita saude, obrigada, recuperei minha autoestima,
-            me sinto jovem de novo!"
-            </p>
-        </div>
-
-        <p className="text-gray-800 text-left">
-            A partir dos dados coletados e do resultado do seu IMC, nós elaboramos um programa de acompanhamento individual para que você alcance seus resultados no menor tempo possível, com a melhor qualidade de vida projetada de acordo com seus objetivos — em apenas 4 semanas.
-        </p>
-
-        <div className="rounded-lg border bg-gray-50 p-4 text-left">
-          <p className="font-bold">
-            Nível de Sucesso com o Mounjaro dos Pobres
-          </p>
-          <p className="text-sm text-gray-500">
-            Baseado nos dados de clientes do Mounjaro dos Pobres que registram
-            seu progresso no aplicativo.
-          </p>
-          <div className="mt-2 flex items-center gap-2">
-            <Progress
-              value={93}
-              className="h-4 flex-1"
-              style={{ backgroundColor: '#e0e0e0' }}
-            />
-            <span className="font-bold text-green-700">93%</span>
-          </div>
-        </div>
-        <Button
-            onClick={onNext}
-            size="lg"
-            className="w-full max-w-md h-14 text-lg bg-[#5a8230] hover:bg-[#5a8230]/90"
-        >
-            Continuar para a oferta
-            <ChevronRight className="h-6 w-6" />
-        </Button>
-      </div>
     </div>
   );
 }
