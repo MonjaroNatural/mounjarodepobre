@@ -1,5 +1,6 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { z } from 'zod';
 
 const WEBHOOK_URL_QUIZ =
@@ -8,6 +9,7 @@ const WEBHOOK_URL_QUIZ =
 const UserDataSchema = z.object({
   external_id: z.string().nullable(),
   client_user_agent: z.string().nullable(),
+  client_ip_address: z.string().nullable(), // Added IP address field
 });
 
 const CustomDataSchema = z.object({
@@ -30,7 +32,20 @@ const EventSchema = z.object({
 
 export async function trackEvent(payload: z.infer<typeof EventSchema>) {
   try {
-    const validatedPayload = EventSchema.parse(payload);
+    // Get client IP from headers
+    const headersList = headers();
+    const ip = (headersList.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0].trim();
+
+    // Add client IP to the payload
+    const payloadWithIp = {
+      ...payload,
+      userData: {
+        ...payload.userData,
+        client_ip_address: ip,
+      },
+    };
+    
+    const validatedPayload = EventSchema.parse(payloadWithIp);
     
     let targetUrl: string | null = null;
 
@@ -46,7 +61,6 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validatedPayload),
-        // Use keepalive for quiz steps if needed, but not critical for server actions
       });
     }
 
