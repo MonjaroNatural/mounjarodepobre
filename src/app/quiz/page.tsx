@@ -33,44 +33,6 @@ import {
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
 
-function getCookie(name: string): string | null {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
-}
-
-function sendQuizStepEvent(step: number, questionText: string, answer: string | string[] | number | null) {
-  if (typeof window === 'undefined' || !answer) return;
-
-  const externalId = getCookie('my_session_id');
-  if (!externalId) {
-    console.warn('External ID not found, skipping webhook.');
-    return;
-  }
-
-  const N8N_WEBHOOK_URL_QUIZ_STEP = 'https://redis-n8n.rzilkp.easypanel.host/webhook/quizn8n';
-
-  const payload = {
-    external_id: externalId,
-    quiz_step: step,
-    quiz_question: questionText,
-    quiz_answer: answer,
-  };
-  
-  try {
-    fetch(N8N_WEBHOOK_URL_QUIZ_STEP, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        keepalive: true,
-    });
-  } catch (error) {
-      console.error("Failed to send quiz step event", error)
-  }
-}
-
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
   HeartCrack: HeartCrack,
@@ -170,23 +132,19 @@ function QuizComponent() {
   const handleNext = (fromLoading = false) => {
     const question = quizQuestions[currentStep];
     let answerToStore: Answer | null = null;
-    let answerValueForWebhook: string | string[] | number | null = null;
 
     if (question.type === 'weight-slider') {
       const value = `${weight}${weightUnit}`;
       answerToStore = { questionId: question.id, value };
-      answerValueForWebhook = value;
     } else if (question.type === 'height-slider') {
       const value = `${height}${heightUnit}`;
       answerToStore = { questionId: question.id, value };
-      answerValueForWebhook = value;
     } else if (
       currentAnswer !== null &&
       currentAnswer !== '' &&
       (!Array.isArray(currentAnswer) || currentAnswer.length > 0)
     ) {
       answerToStore = { questionId: question.id, value: currentAnswer };
-      answerValueForWebhook = currentAnswer;
     } else {
       if (
         question.type === 'text' ||
@@ -196,10 +154,6 @@ function QuizComponent() {
         console.warn('Answer is required');
         return;
       }
-    }
-
-    if (!fromLoading && answerValueForWebhook) {
-      sendQuizStepEvent(currentStep + 1, question.question, answerValueForWebhook);
     }
 
     let newAnswers = answers;
@@ -231,8 +185,6 @@ function QuizComponent() {
     setCurrentAnswer(value);
     const questionId = question.id;
     
-    sendQuizStepEvent(currentStep + 1, question.question, value);
-
     const otherAnswers = answers.filter((a) => a.questionId !== questionId);
     const newAnswers = [...otherAnswers, { questionId: questionId, value: value }];
     setAnswers(newAnswers);
