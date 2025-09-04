@@ -40,24 +40,30 @@ const EventSchema = z.object({
 });
 
 export async function trackEvent(payload: z.infer<typeof EventSchema>) {
+  console.log('[SERVER ACTION] Evento recebido no servidor:', payload.eventName);
   try {
     const validatedPayload = EventSchema.parse(payload);
+    console.log('[SERVER ACTION] Payload validado com sucesso.');
     
     let targetUrl: string | null = null;
 
     switch (validatedPayload.eventName) {
       case 'HomePageView':
         targetUrl = WEBHOOK_URL_PAGEVIEW;
+        console.log('[SERVER ACTION] Evento de HomePageView. URL Alvo:', targetUrl);
         break;
       case 'QuizStep':
         targetUrl = WEBHOOK_URL_QUIZ;
+        console.log('[SERVER ACTION] Evento de QuizStep. URL Alvo:', targetUrl);
         break;
       case 'OfferView':
         targetUrl = WEBHOOK_URL_OFFER;
+        console.log('[SERVER ACTION] Evento de OfferView. URL Alvo:', targetUrl);
         break;
     }
 
     if (targetUrl) {
+      console.log('[SERVER ACTION] Enviando para:', targetUrl);
       const response = await fetch(targetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,8 +72,12 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
       });
       if (!response.ok) {
           const responseBody = await response.text();
-          console.error('[SERVER ACTION] Erro na resposta do Webhook:', responseBody);
+          console.error('[SERVER ACTION] Erro na resposta do Webhook:', response.status, responseBody);
+      } else {
+        console.log('[SERVER ACTION] Webhook enviado com sucesso para:', targetUrl);
       }
+    } else {
+        console.log('[SERVER ACTION] Nenhuma URL alvo correspondente para o evento:', validatedPayload.eventName);
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
