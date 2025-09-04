@@ -2,8 +2,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { trackHomePageView } from '@/app/actions';
+import { usePathname } from 'next/navigation';
+import { trackEvent } from '@/app/actions';
 
 function getCampaignParams() {
     if (typeof window === 'undefined') return {};
@@ -17,7 +17,6 @@ function getCampaignParams() {
 
 export function N8NTracker() {
     const pathname = usePathname();
-    const searchParams = useSearchParams();
 
     useEffect(() => {
         function getCookie(name: string): string | null {
@@ -46,7 +45,7 @@ export function N8NTracker() {
           });
         }
         
-        // Capture and store campaign params
+        // Capture and store campaign params from URL
         const currentParams = new URLSearchParams(window.location.search);
         const ad_id = currentParams.get('utm_source');
         const adset_id = currentParams.get('utm_medium');
@@ -61,41 +60,44 @@ export function N8NTracker() {
             localStorage.setItem('campaign_params', JSON.stringify(campaignParams));
         }
 
-        async function sendHomePageViewEvent() {
-            const sessionId = getCookie('my_session_id') || generateUUID();
-            if (!getCookie('my_session_id')) {
-                setCookie('my_session_id', sessionId, 30); 
-            }
-            
-            const fbcCookie = getCookie('_fbc');
-            const fbpCookie = getCookie('_fbp');
+        // Set session ID cookie if it doesn't exist
+        let sessionId = getCookie('my_session_id');
+        if (!sessionId) {
+            sessionId = generateUUID();
+            setCookie('my_session_id', sessionId, 30); 
+        }
+
+        async function sendHomePageViewEvent(sid: string) {
             const campaignParams = getCampaignParams();
 
-            const payload = {
-                external_id: sessionId,
-                fbc: fbcCookie,
-                fbp: fbpCookie,
-                client_user_agent: navigator.userAgent,
-                ad_id: campaignParams.ad_id || null,
-                adset_id: campaignParams.adset_id || null,
-                campaign_id: campaignParams.campaign_id || null,
+            await trackEvent({
+                eventName: 'HomePageView',
+                eventTime: Math.floor(Date.now() / 1000),
+                userData: {
+                    external_id: sid,
+                    client_user_agent: navigator.userAgent,
+                },
+                customData: {
+                    ad_id: campaignParams.ad_id || null,
+                    adset_id: campaignParams.adset_id || null,
+                    campaign_id: campaignParams.campaign_id || null,
+                },
                 event_source_url: window.location.href,
-            };
-            
-            // Call the server action
-            await trackHomePageView(payload);
+                action_source: 'website' as const,
+            });
         }
         
         // Only run on the initial page ('/')
         if (pathname === '/') {
-            const timer = setTimeout(() => {
-                sendHomePageViewEvent();
-            }, 1500); // Reduced delay for faster tracking on the homepage
-
-            return () => clearTimeout(timer);
+            // Check if we've already sent this event for this session
+            const eventSent = sessionStorage.getItem('homePageViewSent');
+            if (!eventSent && sessionId) {
+                sendHomePageViewEvent(sessionId);
+                sessionStorage.setItem('homePageViewSent', 'true');
+            }
         }
 
-    }, [pathname, searchParams]);
+    }, [pathname]);
 
     return null;
 }

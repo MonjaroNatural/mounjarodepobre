@@ -70,7 +70,6 @@ function QuizComponent() {
   const [height, setHeight] = useState(165);
   const [heightUnit, setHeightUnit] = useState<'cm' | 'pol'>('cm');
 
-  // Helper functions for cookies and UUID
   const getCookie = (name: string): string | null => {
     if (typeof document === 'undefined') return null;
     const value = `; ${document.cookie}`;
@@ -79,33 +78,9 @@ function QuizComponent() {
     return null;
   };
 
-  const setCookie = (name: string, value: string, days: number): void => {
-    if (typeof document === 'undefined') return;
-    let expires = "";
-    if (days) {
-      const date = new Date();
-      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-      expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
-  };
-
-  const generateUUID = (): string => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  };
-
-  // Manage user ID and track quiz start
   useEffect(() => {
-    let sessionId = getCookie('my_session_id');
-    if (!sessionId) {
-      sessionId = generateUUID();
-      setCookie('my_session_id', sessionId, 30);
-    }
-    
-    // Track the start of the quiz (Step 2 of the funnel)
+    // Just track the start of the quiz
+    const sessionId = getCookie('my_session_id');
     trackEvent({
       eventName: 'QuizStep',
       eventTime: Math.floor(Date.now() / 1000),
@@ -114,7 +89,7 @@ function QuizComponent() {
         client_user_agent: navigator.userAgent
       },
       customData: {
-        quiz_step: 1, // Funnel starts at step 1
+        quiz_step: 2, // HomepageView is step 1, so quiz starts at 2
         quiz_question: 'Início do Quiz',
         quiz_answer: 'Usuário chegou na página do quiz'
       },
@@ -143,7 +118,7 @@ function QuizComponent() {
         client_user_agent: navigator.userAgent,
       },
       customData: {
-        quiz_step: currentStep + 2, // +1 for 0-index, +1 because homepage is step 1
+        quiz_step: currentStep + 2, // +2 because homepage is step 1 and currentStep is 0-indexed
         quiz_question: question.question,
         quiz_answer: formattedAnswer,
       },
