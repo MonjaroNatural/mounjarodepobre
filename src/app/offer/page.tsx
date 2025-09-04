@@ -129,13 +129,9 @@ function OfferContent() {
   name = name || 'Seu Plano';
 
   useEffect(() => {
-    console.log('[OFFER PAGE] Componente montado. Iniciando rastreamento de OfferView.');
     const external_id = getCookie('my_session_id');
     const campaignParams = getCampaignParams();
     
-    console.log('[OFFER PAGE] External ID recuperado:', external_id);
-    console.log('[OFFER PAGE] Parâmetros de campanha recuperados:', campaignParams);
-
     if (external_id) {
         const payload = {
             eventName: 'OfferView' as const,
@@ -155,9 +151,7 @@ function OfferContent() {
             event_source_url: window.location.href,
             action_source: 'website' as const,
         };
-        console.log('[OFFER PAGE] Preparando para enviar payload:', payload);
         trackEvent(payload);
-        console.log('[OFFER PAGE] Chamada para trackEvent realizada.');
     } else {
       console.error('[OFFER PAGE] Erro: external_id (my_session_id) não encontrado no cookie. O evento não será enviado.');
     }
