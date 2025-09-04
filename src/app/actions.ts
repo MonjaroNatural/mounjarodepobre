@@ -8,7 +8,7 @@ const WEBHOOK_URL_QUIZ =
 const WEBHOOK_URL_PAGEVIEW =
   'https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb';
 const WEBHOOK_URL_OFFER = 
-  'https://redis-n8n.rzilkp.easypanel.host/webhook-test/offer';
+  'https://redis-n8n.rzilkp.easypanel.host/webhook/offer';
 
 
 const UserDataSchema = z.object({
@@ -75,3 +75,4 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
     }
   }
 }
+
