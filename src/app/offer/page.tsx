@@ -142,6 +142,7 @@ function OfferContent() {
                 client_ip_address: null, // IP is fetched on server side in other events, can be null here
                 fbc: getCookie('_fbc'),
                 fbp: getCookie('_fbp'),
+                fbclid: campaignParams.fbclid || null,
             },
             customData: {
                 ad_id: campaignParams.ad_id || null,
@@ -153,7 +154,6 @@ function OfferContent() {
         };
         trackEvent(payload);
     } else {
-      console.error('[OFFER PAGE] Erro: external_id (my_session_id) não encontrado no cookie. O evento não será enviado.');
     }
 
     if (window.fbq) {
@@ -188,6 +188,7 @@ function OfferContent() {
             external_id: external_id,
             fbc: getCookie('_fbc'),
             fbp: getCookie('_fbp'),
+            fbclid: campaignParams.fbclid || null,
             client_user_agent: navigator.userAgent,
             client_ip_address: null, // Not needed for this client-side event logic
         },

@@ -22,7 +22,6 @@ async function getClientIp(): Promise<string | null> {
         const data = await response.json();
         return data.ip || null;
     } catch (error) {
-        console.error("Could not fetch IP address.", error);
         return null;
     }
 }
@@ -66,12 +65,16 @@ export function N8NTracker() {
         const ad_id = searchParams.get('utm_source');
         const adset_id = searchParams.get('utm_medium');
         const campaign_id = searchParams.get('utm_campaign');
+        const fbclid = searchParams.get('fbclid');
 
-        if (ad_id || adset_id || campaign_id) {
+        if (ad_id || adset_id || campaign_id || fbclid) {
+            const existingParams = getCampaignParams();
             const campaignParams = {
-                ad_id: ad_id || undefined,
-                adset_id: adset_id || undefined,
-                campaign_id: campaign_id || undefined,
+                ...existingParams,
+                ad_id: ad_id || existingParams.ad_id,
+                adset_id: adset_id || existingParams.adset_id,
+                campaign_id: campaign_id || existingParams.campaign_id,
+                fbclid: fbclid || existingParams.fbclid,
             };
             localStorage.setItem('campaign_params', JSON.stringify(campaignParams));
         }
@@ -82,64 +85,66 @@ export function N8NTracker() {
             setCookie('my_session_id', sessionId, 30); 
         }
 
-        async function sendEvents(sid: string, ip: string) {
+        async function sendHomePageViewEvent(sid: string, ip: string) {
             const campaignParams = getCampaignParams();
-            const firstStepSent = sessionStorage.getItem('firstQuizStepSent');
+            const fbc = getCookie('_fbc');
+            const fbp = getCookie('_fbp');
 
-            if (!firstStepSent) {
-                const quizStepPayload = {
-                    eventName: 'QuizStep' as const,
-                    eventTime: Math.floor(Date.now() / 1000),
-                    userData: {
-                        external_id: sid,
-                        client_user_agent: navigator.userAgent,
-                        client_ip_address: ip,
-                    },
-                    customData: {
-                        quiz_step: 1,
-                        quiz_question: 'Início do Funil',
-                        quiz_answer: 'Usuário chegou na página inicial',
-                    },
-                    event_source_url: window.location.href,
-                    action_source: 'website' as const,
-                };
-                await trackEvent(quizStepPayload);
-                sessionStorage.setItem('firstQuizStepSent', 'true');
-            }
-
-            const pageViewSent = sessionStorage.getItem('homePageViewSent');
-            if (!pageViewSent) {
-                setTimeout(async () => {
-                    const fbc = getCookie('_fbc');
-                    const fbp = getCookie('_fbp');
-
-                    const pageViewPayload = {
-                        eventName: 'HomePageView' as const,
-                        eventTime: Math.floor(Date.now() / 1000),
-                        userData: {
-                            external_id: sid,
-                            client_user_agent: navigator.userAgent,
-                            client_ip_address: ip,
-                            fbc: fbc,
-                            fbp: fbp
-                        },
-                        customData: {
-                            ad_id: campaignParams.ad_id || null,
-                            adset_id: campaignParams.adset_id || null,
-                            campaign_id: campaignParams.campaign_id || null,
-                        },
-                        event_source_url: window.location.href,
-                        action_source: 'website' as const,
-                    };
-                    await trackEvent(pageViewPayload);
-                }, 4000); 
-                sessionStorage.setItem('homePageViewSent', 'true');
-            }
+            const pageViewPayload = {
+                eventName: 'HomePageView' as const,
+                eventTime: Math.floor(Date.now() / 1000),
+                userData: {
+                    external_id: sid,
+                    client_user_agent: navigator.userAgent,
+                    client_ip_address: ip,
+                    fbc: fbc,
+                    fbp: fbp,
+                    fbclid: campaignParams.fbclid || null,
+                },
+                customData: {
+                    ad_id: campaignParams.ad_id || null,
+                    adset_id: campaignParams.adset_id || null,
+                    campaign_id: campaignParams.campaign_id || null,
+                },
+                event_source_url: window.location.href,
+                action_source: 'website' as const,
+            };
+            await trackEvent(pageViewPayload);
         }
         
-        if (pathname === '/') {
-            if (ipAddress && sessionId) {
-                 sendEvents(sessionId, ipAddress);
+        async function sendFirstQuizStepEvent(sid: string, ip: string) {
+             const quizStepPayload = {
+                eventName: 'QuizStep' as const,
+                eventTime: Math.floor(Date.now() / 1000),
+                userData: {
+                    external_id: sid,
+                    client_user_agent: navigator.userAgent,
+                    client_ip_address: ip,
+                },
+                customData: {
+                    quiz_step: 1,
+                    quiz_question: 'Início do Funil',
+                    quiz_answer: 'Usuário chegou na página inicial',
+                },
+                event_source_url: window.location.href,
+                action_source: 'website' as const,
+            };
+            await trackEvent(quizStepPayload);
+        }
+        
+        if (pathname === '/' && ipAddress && sessionId) {
+            const firstStepSent = sessionStorage.getItem('firstQuizStepSent');
+            if (!firstStepSent) {
+                sendFirstQuizStepEvent(sessionId, ipAddress);
+                sessionStorage.setItem('firstQuizStepSent', 'true');
+            }
+            
+            const pageViewSent = sessionStorage.getItem('homePageViewSent');
+            if (!pageViewSent) {
+                setTimeout(() => {
+                    sendHomePageViewEvent(sessionId, ipAddress);
+                }, 4000);
+                sessionStorage.setItem('homePageViewSent', 'true');
             }
         }
 

@@ -17,6 +17,7 @@ const UserDataSchema = z.object({
   client_ip_address: z.string().nullable(),
   fbc: z.string().nullable().optional(),
   fbp: z.string().nullable().optional(),
+  fbclid: z.string().nullable().optional(),
 });
 
 const CustomDataSchema = z.object({
@@ -66,14 +67,11 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
       });
       if (!response.ok) {
           const responseBody = await response.text();
-          console.error('[SERVER ACTION] Erro na resposta do Webhook:', response.status, responseBody);
       }
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('[SERVER ACTION] Erro de validação Zod:', error.errors);
     } else {
-      console.error('[SERVER ACTION] Erro ao enviar evento para N8N:', error);
     }
   }
 }
