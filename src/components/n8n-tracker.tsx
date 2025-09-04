@@ -11,18 +11,24 @@ function getCampaignParams() {
         const storedParams = localStorage.getItem('campaign_params');
         return storedParams ? JSON.parse(storedParams) : {};
     } catch (e) {
+        console.log('[N8N TRACKER] Erro ao ler campaign_params do localStorage.');
         return {};
     }
 }
 
 async function getClientIp(): Promise<string | null> {
+    console.log('[N8N TRACKER] Buscando IP do cliente...');
     try {
         const response = await fetch('https://api.ipify.org?format=json');
-        if (!response.ok) return null;
+        if (!response.ok) {
+            console.error("[N8N TRACKER] Falha ao buscar IP: Resposta não OK.");
+            return null;
+        }
         const data = await response.json();
+        console.log('[N8N TRACKER] IP do cliente obtido:', data.ip);
         return data.ip || null;
     } catch (error) {
-        console.error("Could not fetch IP address.", error);
+        console.error("[N8N TRACKER] Erro ao buscar IP do cliente.", error);
         return null;
     }
 }
@@ -33,6 +39,7 @@ export function N8NTracker() {
     const [ipAddress, setIpAddress] = useState<string | null>(null);
 
     useEffect(() => {
+        console.log('[N8N TRACKER] Componente montado.');
         getClientIp().then(setIpAddress);
     }, []);
 
@@ -57,10 +64,12 @@ export function N8NTracker() {
         }
 
         function generateUUID(): string {
-          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
           });
+          console.log('[N8N TRACKER] UUID gerado:', uuid);
+          return uuid;
         }
         
         const ad_id = searchParams.get('utm_source');
@@ -68,6 +77,7 @@ export function N8NTracker() {
         const campaign_id = searchParams.get('utm_campaign');
 
         if (ad_id || adset_id || campaign_id) {
+            console.log('[N8N TRACKER] Parâmetros UTM encontrados na URL. Salvando no localStorage.');
             const campaignParams = {
                 ad_id: ad_id || undefined,
                 adset_id: adset_id || undefined,
@@ -78,18 +88,22 @@ export function N8NTracker() {
 
         let sessionId = getCookie('my_session_id');
         if (!sessionId) {
+            console.log('[N8N TRACKER] Session ID não encontrado. Criando um novo.');
             sessionId = generateUUID();
             setCookie('my_session_id', sessionId, 30); 
+        } else {
+            console.log('[N8N TRACKER] Session ID encontrado:', sessionId);
         }
 
         async function sendEvents(sid: string, ip: string) {
+            console.log('[N8N TRACKER] Função sendEvents chamada.');
             const campaignParams = getCampaignParams();
 
             // Track First Quiz Step
             const firstStepSent = sessionStorage.getItem('firstQuizStepSent');
             if (!firstStepSent) {
-                await trackEvent({
-                    eventName: 'QuizStep',
+                const quizStepPayload = {
+                    eventName: 'QuizStep' as const,
                     eventTime: Math.floor(Date.now() / 1000),
                     userData: {
                         external_id: sid,
@@ -103,21 +117,27 @@ export function N8NTracker() {
                     },
                     event_source_url: window.location.href,
                     action_source: 'website' as const,
-                });
+                };
+                console.log('[N8N TRACKER] Preparando para enviar evento QuizStep (Etapa 1). Payload:', JSON.stringify(quizStepPayload, null, 2));
+                await trackEvent(quizStepPayload);
                 sessionStorage.setItem('firstQuizStepSent', 'true');
+                console.log('[N8N TRACKER] Flag "firstQuizStepSent" setada no sessionStorage.');
+            } else {
+                console.log('[N8N TRACKER] Evento QuizStep (Etapa 1) já foi enviado nesta sessão.');
             }
 
 
             // Track Page View
             const pageViewSent = sessionStorage.getItem('homePageViewSent');
             if (!pageViewSent) {
-                // Wait 4 seconds for Meta Pixel to set cookies
+                console.log('[N8N TRACKER] Agendando envio do evento HomePageView para daqui a 4 segundos.');
                 setTimeout(async () => {
                     const fbc = getCookie('_fbc');
                     const fbp = getCookie('_fbp');
+                    console.log(`[N8N TRACKER] Cookies da Meta lidos: _fbc=${fbc}, _fbp=${fbp}`);
 
-                    await trackEvent({
-                        eventName: 'HomePageView',
+                    const pageViewPayload = {
+                        eventName: 'HomePageView' as const,
                         eventTime: Math.floor(Date.now() / 1000),
                         userData: {
                             external_id: sid,
@@ -133,14 +153,27 @@ export function N8NTracker() {
                         },
                         event_source_url: window.location.href,
                         action_source: 'website' as const,
-                    });
+                    };
+                    console.log('[N8N TRACKER] Preparando para enviar evento HomePageView. Payload:', JSON.stringify(pageViewPayload, null, 2));
+                    await trackEvent(pageViewPayload);
                 }, 4000); 
                 sessionStorage.setItem('homePageViewSent', 'true');
+                console.log('[N8N TRACKER] Flag "homePageViewSent" setada no sessionStorage.');
+            } else {
+                 console.log('[N8N TRACKER] Evento HomePageView já foi enviado nesta sessão.');
             }
         }
         
-        if (pathname === '/' && ipAddress && sessionId) {
-            sendEvents(sessionId, ipAddress);
+        if (pathname === '/') {
+            console.log('[N8N TRACKER] Está na página inicial ("/").');
+            if (ipAddress && sessionId) {
+                 console.log('[N8N TRACKER] IP e Session ID estão disponíveis. Chamando sendEvents.');
+                 sendEvents(sessionId, ipAddress);
+            } else {
+                console.log('[N8N TRACKER] Aguardando IP e Session ID para chamar sendEvents.');
+            }
+        } else {
+             console.log(`[N8N TRACKER] Não está na página inicial (pathname: ${pathname}). Nenhum evento será enviado daqui.`);
         }
 
     }, [pathname, ipAddress, searchParams]);
