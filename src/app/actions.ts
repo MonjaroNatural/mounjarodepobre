@@ -9,7 +9,7 @@ const WEBHOOK_URL_QUIZ =
 const UserDataSchema = z.object({
   external_id: z.string().nullable(),
   client_user_agent: z.string().nullable(),
-  client_ip_address: z.string().nullable(), // Added IP address field
+  client_ip_address: z.string().nullable(),
 });
 
 const CustomDataSchema = z.object({
@@ -32,11 +32,16 @@ const EventSchema = z.object({
 
 export async function trackEvent(payload: z.infer<typeof EventSchema>) {
   try {
-    // Get client IP from headers
     const headersList = headers();
-    const ip = (headersList.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0].trim();
+    
+    // Improved IP detection logic
+    const ip = (
+      headersList.get('x-forwarded-for') ??
+      headersList.get('x-real-ip') ??
+      headersList.get('cf-connecting-ip') ??
+      '127.0.0.1'
+    ).split(',')[0].trim();
 
-    // Add client IP to the payload
     const payloadWithIp = {
       ...payload,
       userData: {
