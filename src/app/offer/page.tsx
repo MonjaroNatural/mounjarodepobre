@@ -102,6 +102,17 @@ function getCampaignParams() {
     }
 }
 
+function getMetaTrackingData() {
+    if (typeof window === 'undefined') return { fbc: null, fbp: null };
+    try {
+        const storedData = localStorage.getItem('meta_tracking_data');
+        return storedData ? JSON.parse(storedData) : { fbc: null, fbp: null };
+    } catch (e) {
+        return { fbc: null, fbp: null };
+    }
+}
+
+
 function OfferContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -131,6 +142,7 @@ function OfferContent() {
   useEffect(() => {
     const external_id = getCookie('my_session_id');
     const campaignParams = getCampaignParams();
+    const metaData = getMetaTrackingData();
     
     if (external_id) {
         const payload = {
@@ -140,8 +152,8 @@ function OfferContent() {
                 external_id: external_id,
                 client_user_agent: navigator.userAgent,
                 client_ip_address: null, // IP is fetched on server side in other events, can be null here
-                fbc: getCookie('_fbc'),
-                fbp: getCookie('_fbp'),
+                fbc: metaData.fbc || getCookie('_fbc'),
+                fbp: metaData.fbp || getCookie('_fbp'),
                 fbclid: campaignParams.fbclid || null,
             },
             customData: {
@@ -153,7 +165,6 @@ function OfferContent() {
             action_source: 'website' as const,
         };
         trackEvent(payload);
-    } else {
     }
 
     if (window.fbq) {
@@ -180,14 +191,15 @@ function OfferContent() {
     const N8N_WEBHOOK_URL_CHECKOUT = "https://redis-n8n.rzilkp.easypanel.host/webhook/checkoutfb";
 
     const campaignParams = getCampaignParams();
+    const metaData = getMetaTrackingData();
 
     const checkoutPayload = {
         eventName: 'InitiateCheckout' as const,
         eventTime: Math.floor(Date.now() / 1000),
         userData: {
             external_id: external_id,
-            fbc: getCookie('_fbc'),
-            fbp: getCookie('_fbp'),
+            fbc: metaData.fbc || getCookie('_fbc'),
+            fbp: metaData.fbp || getCookie('_fbp'),
             fbclid: campaignParams.fbclid || null,
             client_user_agent: navigator.userAgent,
             client_ip_address: null, // Not needed for this client-side event logic

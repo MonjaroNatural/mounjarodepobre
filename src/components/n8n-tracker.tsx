@@ -85,10 +85,27 @@ export function N8NTracker() {
             setCookie('my_session_id', sessionId, 30); 
         }
 
-        async function sendHomePageViewEvent(sid: string, ip: string) {
-            const campaignParams = getCampaignParams();
+        // Store FBC and FBP in localStorage if they exist
+        setTimeout(() => {
             const fbc = getCookie('_fbc');
             const fbp = getCookie('_fbp');
+            const metaData = JSON.parse(localStorage.getItem('meta_tracking_data') || '{}');
+
+            if (fbc && !metaData.fbc) {
+                metaData.fbc = fbc;
+            }
+            if (fbp && !metaData.fbp) {
+                metaData.fbp = fbp;
+            }
+
+            if (fbc || fbp) {
+                localStorage.setItem('meta_tracking_data', JSON.stringify(metaData));
+            }
+        }, 1000); // Wait 1s for Meta pixel to set cookies
+
+        async function sendHomePageViewEvent(sid: string, ip: string) {
+            const campaignParams = getCampaignParams();
+            const metaData = JSON.parse(localStorage.getItem('meta_tracking_data') || '{}');
 
             const pageViewPayload = {
                 eventName: 'HomePageView' as const,
@@ -97,8 +114,8 @@ export function N8NTracker() {
                     external_id: sid,
                     client_user_agent: navigator.userAgent,
                     client_ip_address: ip,
-                    fbc: fbc,
-                    fbp: fbp,
+                    fbc: metaData.fbc || getCookie('_fbc'),
+                    fbp: metaData.fbp || getCookie('_fbp'),
                     fbclid: campaignParams.fbclid || null,
                 },
                 customData: {
