@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { trackEvent } from '@/app/actions';
 
@@ -15,8 +15,25 @@ function getCampaignParams() {
     }
 }
 
+async function getClientIp(): Promise<string | null> {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.ip || null;
+    } catch (error) {
+        console.error("Could not fetch IP address.", error);
+        return null;
+    }
+}
+
 export function N8NTracker() {
     const pathname = usePathname();
+    const [ipAddress, setIpAddress] = useState<string | null>(null);
+
+    useEffect(() => {
+        getClientIp().then(setIpAddress);
+    }, []);
 
     useEffect(() => {
         function getCookie(name: string): string | null {
@@ -67,7 +84,7 @@ export function N8NTracker() {
             setCookie('my_session_id', sessionId, 30); 
         }
 
-        async function sendHomePageViewEvent(sid: string) {
+        async function sendHomePageViewEvent(sid: string, ip: string | null) {
             const campaignParams = getCampaignParams();
 
             await trackEvent({
@@ -76,6 +93,7 @@ export function N8NTracker() {
                 userData: {
                     external_id: sid,
                     client_user_agent: navigator.userAgent,
+                    client_ip_address: ip,
                 },
                 customData: {
                     ad_id: campaignParams.ad_id || null,
@@ -87,17 +105,17 @@ export function N8NTracker() {
             });
         }
         
-        // Only run on the initial page ('/')
-        if (pathname === '/') {
+        // Only run on the initial page ('/') and when ipAddress is available
+        if (pathname === '/' && ipAddress) {
             // Check if we've already sent this event for this session
             const eventSent = sessionStorage.getItem('homePageViewSent');
             if (!eventSent && sessionId) {
-                sendHomePageViewEvent(sessionId);
+                sendHomePageViewEvent(sessionId, ipAddress);
                 sessionStorage.setItem('homePageViewSent', 'true');
             }
         }
 
-    }, [pathname]);
+    }, [pathname, ipAddress]);
 
     return null;
 }

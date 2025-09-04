@@ -42,10 +42,23 @@ const iconMap: { [key: string]: React.ElementType } = {
   GlassWater: GlassWater,
 };
 
+async function getClientIp(): Promise<string | null> {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.ip || null;
+    } catch (error) {
+        console.error("Could not fetch IP address.", error);
+        return null;
+    }
+}
+
 function QuizComponent() {
   const router = useRouter();
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [ipAddress, setIpAddress] = useState<string | null>(null);
   
   const [answers, setAnswers] = useState<Answer[]>(() => {
     if (typeof window !== 'undefined') {
@@ -79,6 +92,12 @@ function QuizComponent() {
   };
 
   useEffect(() => {
+    getClientIp().then(setIpAddress);
+  }, []);
+
+  useEffect(() => {
+    if (!ipAddress) return;
+
     // Just track the start of the quiz
     const sessionId = getCookie('my_session_id');
     trackEvent({
@@ -86,7 +105,8 @@ function QuizComponent() {
       eventTime: Math.floor(Date.now() / 1000),
       userData: {
         external_id: sessionId,
-        client_user_agent: navigator.userAgent
+        client_user_agent: navigator.userAgent,
+        client_ip_address: ipAddress
       },
       customData: {
         quiz_step: 2, // HomepageView is step 1, so quiz starts at 2
@@ -96,12 +116,12 @@ function QuizComponent() {
       event_source_url: window.location.href,
       action_source: 'website'
     });
-  }, []);
+  }, [ipAddress]);
 
 
   const sendQuizStepEvent = (question: QuizQuestion, answer: any) => {
     const external_id = getCookie('my_session_id');
-    if (!external_id) return;
+    if (!external_id || !ipAddress) return;
 
     let formattedAnswer: string;
     if (Array.isArray(answer)) {
@@ -116,9 +136,10 @@ function QuizComponent() {
       userData: {
         external_id: external_id,
         client_user_agent: navigator.userAgent,
+        client_ip_address: ipAddress,
       },
       customData: {
-        quiz_step: currentStep + 2, // +2 because homepage is step 1 and currentStep is 0-indexed
+        quiz_step: currentStep + 3, // +3 because homepage=1, quiz-start=2, first-q=3
         quiz_question: question.question,
         quiz_answer: formattedAnswer,
       },

@@ -32,25 +32,7 @@ const EventSchema = z.object({
 
 export async function trackEvent(payload: z.infer<typeof EventSchema>) {
   try {
-    const headersList = headers();
-    
-    // Improved IP detection logic
-    const ip = (
-      headersList.get('x-forwarded-for') ??
-      headersList.get('x-real-ip') ??
-      headersList.get('cf-connecting-ip') ??
-      '127.0.0.1'
-    ).split(',')[0].trim();
-
-    const payloadWithIp = {
-      ...payload,
-      userData: {
-        ...payload.userData,
-        client_ip_address: ip,
-      },
-    };
-    
-    const validatedPayload = EventSchema.parse(payloadWithIp);
+    const validatedPayload = EventSchema.parse(payload);
     
     let targetUrl: string | null = null;
 
@@ -66,6 +48,8 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validatedPayload),
+        // Use keepalive for quiz steps to ensure delivery on page navigation
+        keepalive: validatedPayload.eventName === 'QuizStep',
       });
     }
 
