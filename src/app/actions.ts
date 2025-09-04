@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { z } from 'zod';
 
 const WEBHOOK_URL_QUIZ =
-  'https://redis-n8n.rzilkp.easypanel.host/webhook/pilatesn8n';
+  'https://redis-n8n.rzilkp.easypanel.host/webhook-test/quizn8n';
 
 const N8N_WEBHOOK_URL_HOMEPAGE =
   'https://redis-n8n.rzilkp.easypanel.host/webhook/paginainicial';
