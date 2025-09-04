@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { trackEvent } from '@/app/actions';
 
 function getCampaignParams() {
@@ -29,6 +29,7 @@ async function getClientIp(): Promise<string | null> {
 
 export function N8NTracker() {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [ipAddress, setIpAddress] = useState<string | null>(null);
 
     useEffect(() => {
@@ -63,10 +64,9 @@ export function N8NTracker() {
         }
         
         // Capture and store campaign params from URL
-        const currentParams = new URLSearchParams(window.location.search);
-        const ad_id = currentParams.get('utm_source');
-        const adset_id = currentParams.get('utm_medium');
-        const campaign_id = currentParams.get('utm_campaign');
+        const ad_id = searchParams.get('utm_source');
+        const adset_id = searchParams.get('utm_medium');
+        const campaign_id = searchParams.get('utm_campaign');
 
         if (ad_id || adset_id || campaign_id) {
             const campaignParams = {
@@ -123,7 +123,7 @@ export function N8NTracker() {
             }
         }
 
-    }, [pathname, ipAddress]);
+    }, [pathname, ipAddress, searchParams]);
 
     return null;
 }

@@ -54,6 +54,7 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validatedPayload),
+        cache: 'no-cache',
       });
     }
 
