@@ -92,11 +92,8 @@ function QuizComponent() {
   };
 
   useEffect(() => {
-    console.log('[QUIZ PAGE] Componente montado. Buscando IP...');
     getClientIp().then(ip => {
-      console.log(`[QUIZ PAGE] IP obtido: ${ip}. Disparando evento de início do quiz.`);
       setIpAddress(ip);
-
       const sessionId = getCookie('my_session_id');
       const payload = {
         eventName: 'QuizStep' as const,
@@ -114,8 +111,6 @@ function QuizComponent() {
         event_source_url: window.location.href,
         action_source: 'website' as const,
       };
-
-      console.log('[QUIZ PAGE] Enviando evento "Início do Quiz" (Etapa 2). Payload:', JSON.stringify(payload, null, 2));
       trackEvent(payload);
     });
   }, []);
@@ -123,7 +118,6 @@ function QuizComponent() {
   const sendQuizStepEvent = (question: QuizQuestion, answer: any) => {
     const external_id = getCookie('my_session_id');
     if (!external_id || !ipAddress) {
-      console.error('[QUIZ PAGE] Tentativa de enviar evento sem external_id ou IP. Abortado.');
       return;
     }
 
@@ -152,8 +146,6 @@ function QuizComponent() {
       event_source_url: window.location.href,
       action_source: 'website' as const,
     };
-
-    console.log(`[QUIZ PAGE] Enviando evento de QUIZ (Etapa ${quizStepNumber}). Payload:`, JSON.stringify(payload, null, 2));
     trackEvent(payload);
   };
 
@@ -167,12 +159,9 @@ function QuizComponent() {
   useEffect(() => {
     const question = quizQuestions[currentStep];
     if (!question) return;
-    console.log(`[QUIZ PAGE] Carregando Etapa ${currentStep + 3}. Pergunta: "${question.question}"`);
-
     const previousAnswer = answers.find((a) => a.questionId === question.id);
 
     if (previousAnswer) {
-       console.log('[QUIZ PAGE] Resposta anterior encontrada:', previousAnswer.value);
       if (
         question.type === 'weight-slider' ||
         question.type === 'height-slider'
@@ -194,7 +183,6 @@ function QuizComponent() {
         setCurrentAnswer(previousAnswer.value);
       }
     } else {
-      console.log('[QUIZ PAGE] Nenhuma resposta anterior encontrada. Resetando o estado da resposta atual.');
       if (question.type === 'multiple-choice') {
         setCurrentAnswer([]);
       } else if (question.type === 'weight-slider') {
@@ -214,9 +202,7 @@ function QuizComponent() {
   useEffect(() => {
     const question = quizQuestions[currentStep];
     if (question?.type === 'loading') {
-      console.log('[QUIZ PAGE] Etapa de carregamento iniciada. Timer de 11 segundos.');
       const timer = setTimeout(() => {
-        console.log('[QUIZ PAGE] Timer da etapa de carregamento concluído. Avançando...');
         handleNext(true); // Pass a flag to indicate it's from loading
       }, 11000);
       return () => clearTimeout(timer);
@@ -225,7 +211,6 @@ function QuizComponent() {
 
   const handleNext = (fromLoading = false) => {
     const question = quizQuestions[currentStep];
-    console.log(`[QUIZ PAGE] handleNext chamado para a pergunta: "${question.question}". fromLoading: ${fromLoading}`);
     let answerToStore: Answer | null = null;
     let answerForWebhook: any = null;
 
@@ -251,32 +236,25 @@ function QuizComponent() {
         question.type === 'multiple-choice'
       ) {
         if (!fromLoading) {
-            console.warn('[QUIZ PAGE] Resposta é obrigatória. Avanço bloqueado.');
             return;
         }
       }
     }
 
     if (!fromLoading) {
-       console.log(`[QUIZ PAGE] Resposta para webhook:`, answerForWebhook);
        sendQuizStepEvent(question, answerForWebhook);
-    } else {
-      console.log('[QUIZ PAGE] Evento de webhook pulado (avanço automático da tela de loading).')
     }
 
     let newAnswers = answers;
     if (answerToStore) {
       const otherAnswers = answers.filter((a) => a.questionId !== question.id);
       newAnswers = [...otherAnswers, answerToStore];
-      console.log('[QUIZ PAGE] Resposta salva no estado local:', answerToStore);
       setAnswers(newAnswers);
     }
 
     if (currentStep < quizQuestions.length - 1) {
-      console.log(`[QUIZ PAGE] Navegando para a próxima pergunta (de ${currentStep} para ${currentStep + 1}).`);
       setCurrentStep(currentStep + 1);
     } else {
-      console.log('[QUIZ PAGE] Fim do quiz. Preparando para redirecionar para a página de resultados.');
       const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
       const currentWeightAnswer = (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
       const desiredWeightAnswer = (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
@@ -286,14 +264,12 @@ function QuizComponent() {
           currentWeight: currentWeightAnswer,
           desiredWeight: desiredWeightAnswer
       });
-      console.log(`[QUIZ PAGE] Redirecionando para /results com os parâmetros: ${queryParams.toString()}`);
       router.push(`/results?${queryParams.toString()}`);
     }
   };
 
   const handleSingleChoice = (value: string) => {
     const question = quizQuestions[currentStep];
-    console.log(`[QUIZ PAGE] handleSingleChoice chamado para a pergunta "${question.question}" com o valor: "${value}"`);
     setCurrentAnswer(value);
     
     // Envia o evento de webhook imediatamente
@@ -303,16 +279,13 @@ function QuizComponent() {
     
     const otherAnswers = answers.filter((a) => a.questionId !== questionId);
     const newAnswers = [...otherAnswers, { questionId: questionId, value: value }];
-    console.log('[QUIZ PAGE] Resposta salva no estado local:', { questionId: questionId, value: value });
     setAnswers(newAnswers);
 
     // Avança para a próxima pergunta após um pequeno delay
     setTimeout(() => {
       if (currentStep < quizQuestions.length - 1) {
-        console.log(`[QUIZ PAGE] Avançando automaticamente para a próxima pergunta (de ${currentStep} para ${currentStep + 1}).`);
         setCurrentStep(currentStep + 1);
       } else {
-        console.log('[QUIZ PAGE] Fim do quiz. Preparando para redirecionar para a página de resultados.');
         const nameAnswer = (newAnswers.find((a) => a.questionId === 4)?.value as string) || '';
         const currentWeightAnswer = (newAnswers.find((a) => a.questionId === 11)?.value as string) || '';
         const desiredWeightAnswer = (newAnswers.find((a) => a.questionId === 13)?.value as string) || '';
@@ -322,24 +295,18 @@ function QuizComponent() {
             currentWeight: currentWeightAnswer,
             desiredWeight: desiredWeightAnswer
         });
-        console.log(`[QUIZ PAGE] Redirecionando para /results com os parâmetros: ${queryParams.toString()}`);
         router.push(`/results?${queryParams.toString()}`);
       }
     }, 150);
   };
 
   const handleMultipleChoice = (value: string) => {
-    console.log(`[QUIZ PAGE] handleMultipleChoice chamado. Valor "${value}" foi clicado.`);
     setCurrentAnswer((prev) => {
       const newAnswers = Array.isArray(prev) ? [...prev] : [];
       if (newAnswers.includes(value)) {
-        const filtered = newAnswers.filter((v) => v !== value);
-        console.log(`[QUIZ PAGE] Resposta "${value}" removida. Novo estado:`, filtered);
-        return filtered;
+        return newAnswers.filter((v) => v !== value);
       } else {
-        const added = [...newAnswers, value];
-        console.log(`[QUIZ PAGE] Resposta "${value}" adicionada. Novo estado:`, added);
-        return added;
+        return [...newAnswers, value];
       }
     });
   };
@@ -1034,5 +1001,3 @@ function LoadingStep() {
     </div>
   );
 }
-
-    

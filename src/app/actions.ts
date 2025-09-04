@@ -35,8 +35,6 @@ const EventSchema = z.object({
 });
 
 export async function trackEvent(payload: z.infer<typeof EventSchema>) {
-  console.log('[SERVER ACTION] trackEvent recebido. Payload:', JSON.stringify(payload, null, 2));
-
   try {
     const validatedPayload = EventSchema.parse(payload);
     
@@ -45,31 +43,24 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
     switch (validatedPayload.eventName) {
       case 'HomePageView':
         targetUrl = WEBHOOK_URL_PAGEVIEW;
-        console.log(`[SERVER ACTION] Evento é HomePageView. URL do Webhook: ${targetUrl}`);
         break;
       case 'QuizStep':
         targetUrl = WEBHOOK_URL_QUIZ;
-        console.log(`[SERVER ACTION] Evento é QuizStep. URL do Webhook: ${targetUrl}`);
         break;
     }
 
     if (targetUrl) {
-      console.log(`[SERVER ACTION] Enviando payload para ${targetUrl}...`);
       const response = await fetch(targetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validatedPayload),
         cache: 'no-cache',
       });
-      console.log(`[SERVER ACTION] Resposta do Webhook: Status ${response.status}`);
       if (!response.ok) {
           const responseBody = await response.text();
           console.error('[SERVER ACTION] Erro na resposta do Webhook:', responseBody);
       }
-    } else {
-       console.log('[SERVER ACTION] Nenhuma URL de webhook correspondente para o evento.');
     }
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('[SERVER ACTION] Erro de validação Zod:', error.errors);
