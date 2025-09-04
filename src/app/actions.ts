@@ -12,6 +12,8 @@ const UserDataSchema = z.object({
   external_id: z.string().nullable(),
   client_user_agent: z.string().nullable(),
   client_ip_address: z.string().nullable(),
+  fbc: z.string().nullable().optional(),
+  fbp: z.string().nullable().optional(),
 });
 
 const CustomDataSchema = z.object({

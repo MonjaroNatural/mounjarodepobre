@@ -94,6 +94,8 @@ export function N8NTracker() {
                     external_id: sid,
                     client_user_agent: navigator.userAgent,
                     client_ip_address: ip,
+                    fbc: getCookie('_fbc'),
+                    fbp: getCookie('_fbp')
                 },
                 customData: {
                     ad_id: campaignParams.ad_id || null,
