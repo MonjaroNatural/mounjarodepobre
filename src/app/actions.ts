@@ -1,10 +1,12 @@
+
 'use server';
 
-import { headers } from 'next/headers';
 import { z } from 'zod';
 
 const WEBHOOK_URL_QUIZ =
   'https://redis-n8n.rzilkp.easypanel.host/webhook-test/quizn8n';
+const WEBHOOK_URL_PAGEVIEW =
+  'https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb';
 
 const UserDataSchema = z.object({
   external_id: z.string().nullable(),
@@ -38,6 +40,8 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
 
     switch (validatedPayload.eventName) {
       case 'HomePageView':
+        targetUrl = WEBHOOK_URL_PAGEVIEW;
+        break;
       case 'QuizStep':
         targetUrl = WEBHOOK_URL_QUIZ;
         break;
