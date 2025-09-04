@@ -32,6 +32,7 @@ import {
   Check,
 } from 'lucide-react';
 import { Meter } from '@/components/ui/meter';
+import { trackEvent } from '@/app/actions';
 
 const iconMap: { [key: string]: React.ElementType } = {
   Camera: Camera,
@@ -68,6 +69,89 @@ function QuizComponent() {
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lb'>('kg');
   const [height, setHeight] = useState(165);
   const [heightUnit, setHeightUnit] = useState<'cm' | 'pol'>('cm');
+
+  // Helper functions for cookies and UUID
+  const getCookie = (name: string): string | null => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+  };
+
+  const setCookie = (name: string, value: string, days: number): void => {
+    if (typeof document === 'undefined') return;
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  };
+
+  const generateUUID = (): string => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  };
+
+  // Manage user ID and track quiz start
+  useEffect(() => {
+    let sessionId = getCookie('my_session_id');
+    if (!sessionId) {
+      sessionId = generateUUID();
+      setCookie('my_session_id', sessionId, 30);
+    }
+    
+    // Track the start of the quiz (Step 2 of the funnel)
+    trackEvent({
+      eventName: 'QuizStep',
+      eventTime: Math.floor(Date.now() / 1000),
+      userData: {
+        external_id: sessionId,
+        client_user_agent: navigator.userAgent
+      },
+      customData: {
+        quiz_step: 1, // Funnel starts at step 1
+        quiz_question: 'Início do Quiz',
+        quiz_answer: 'Usuário chegou na página do quiz'
+      },
+      event_source_url: window.location.href,
+      action_source: 'website'
+    });
+  }, []);
+
+
+  const sendQuizStepEvent = (question: QuizQuestion, answer: any) => {
+    const external_id = getCookie('my_session_id');
+    if (!external_id) return;
+
+    let formattedAnswer: string;
+    if (Array.isArray(answer)) {
+      formattedAnswer = answer.join(', ');
+    } else {
+      formattedAnswer = String(answer);
+    }
+
+    trackEvent({
+      eventName: 'QuizStep',
+      eventTime: Math.floor(Date.now() / 1000),
+      userData: {
+        external_id: external_id,
+        client_user_agent: navigator.userAgent,
+      },
+      customData: {
+        quiz_step: currentStep + 2, // +1 for 0-index, +1 because homepage is step 1
+        quiz_question: question.question,
+        quiz_answer: formattedAnswer,
+      },
+      event_source_url: window.location.href,
+      action_source: 'website' as const,
+    });
+  };
+
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -132,28 +216,39 @@ function QuizComponent() {
   const handleNext = (fromLoading = false) => {
     const question = quizQuestions[currentStep];
     let answerToStore: Answer | null = null;
+    let answerForWebhook: any = null;
 
     if (question.type === 'weight-slider') {
       const value = `${weight}${weightUnit}`;
       answerToStore = { questionId: question.id, value };
+      answerForWebhook = value;
     } else if (question.type === 'height-slider') {
       const value = `${height}${heightUnit}`;
       answerToStore = { questionId: question.id, value };
+      answerForWebhook = value;
     } else if (
       currentAnswer !== null &&
       currentAnswer !== '' &&
       (!Array.isArray(currentAnswer) || currentAnswer.length > 0)
     ) {
       answerToStore = { questionId: question.id, value: currentAnswer };
+      answerForWebhook = currentAnswer;
     } else {
       if (
         question.type === 'text' ||
         question.type === 'number' ||
         question.type === 'multiple-choice'
       ) {
-        console.warn('Answer is required');
-        return;
+        // Only block if there's no auto-advance logic
+        if (!fromLoading) {
+            console.warn('Answer is required');
+            return;
+        }
       }
+    }
+
+    if (!fromLoading) {
+      sendQuizStepEvent(question, answerForWebhook);
     }
 
     let newAnswers = answers;
@@ -183,6 +278,8 @@ function QuizComponent() {
   const handleSingleChoice = (value: string) => {
     const question = quizQuestions[currentStep];
     setCurrentAnswer(value);
+    sendQuizStepEvent(question, value);
+
     const questionId = question.id;
     
     const otherAnswers = answers.filter((a) => a.questionId !== questionId);
