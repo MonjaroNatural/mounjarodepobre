@@ -63,7 +63,6 @@ export function N8NTracker() {
           });
         }
         
-        // Capture and store campaign params from URL
         const ad_id = searchParams.get('utm_source');
         const adset_id = searchParams.get('utm_medium');
         const campaign_id = searchParams.get('utm_campaign');
@@ -77,50 +76,71 @@ export function N8NTracker() {
             localStorage.setItem('campaign_params', JSON.stringify(campaignParams));
         }
 
-        // Set session ID cookie if it doesn't exist
         let sessionId = getCookie('my_session_id');
         if (!sessionId) {
             sessionId = generateUUID();
             setCookie('my_session_id', sessionId, 30); 
         }
 
-        async function sendHomePageViewEvent(sid: string, ip: string | null) {
+        async function sendEvents(sid: string, ip: string) {
             const campaignParams = getCampaignParams();
 
-            // Wait 4 seconds for Meta Pixel to set cookies
-            setTimeout(async () => {
-                const fbc = getCookie('_fbc');
-                const fbp = getCookie('_fbp');
-
+            // Track First Quiz Step
+            const firstStepSent = sessionStorage.getItem('firstQuizStepSent');
+            if (!firstStepSent) {
                 await trackEvent({
-                    eventName: 'HomePageView',
+                    eventName: 'QuizStep',
                     eventTime: Math.floor(Date.now() / 1000),
                     userData: {
                         external_id: sid,
                         client_user_agent: navigator.userAgent,
                         client_ip_address: ip,
-                        fbc: fbc,
-                        fbp: fbp
                     },
                     customData: {
-                        ad_id: campaignParams.ad_id || null,
-                        adset_id: campaignParams.adset_id || null,
-                        campaign_id: campaignParams.campaign_id || null,
+                        quiz_step: 1,
+                        quiz_question: 'Início do Funil',
+                        quiz_answer: 'Usuário chegou na página inicial',
                     },
                     event_source_url: window.location.href,
                     action_source: 'website' as const,
                 });
-            }, 4000); // 4-second delay
-        }
-        
-        // Only run on the initial page ('/') and when ipAddress is available
-        if (pathname === '/' && ipAddress) {
-            // Check if we've already sent this event for this session
-            const eventSent = sessionStorage.getItem('homePageViewSent');
-            if (!eventSent && sessionId) {
-                sendHomePageViewEvent(sessionId, ipAddress);
+                sessionStorage.setItem('firstQuizStepSent', 'true');
+            }
+
+
+            // Track Page View
+            const pageViewSent = sessionStorage.getItem('homePageViewSent');
+            if (!pageViewSent) {
+                // Wait 4 seconds for Meta Pixel to set cookies
+                setTimeout(async () => {
+                    const fbc = getCookie('_fbc');
+                    const fbp = getCookie('_fbp');
+
+                    await trackEvent({
+                        eventName: 'HomePageView',
+                        eventTime: Math.floor(Date.now() / 1000),
+                        userData: {
+                            external_id: sid,
+                            client_user_agent: navigator.userAgent,
+                            client_ip_address: ip,
+                            fbc: fbc,
+                            fbp: fbp
+                        },
+                        customData: {
+                            ad_id: campaignParams.ad_id || null,
+                            adset_id: campaignParams.adset_id || null,
+                            campaign_id: campaignParams.campaign_id || null,
+                        },
+                        event_source_url: window.location.href,
+                        action_source: 'website' as const,
+                    });
+                }, 4000); 
                 sessionStorage.setItem('homePageViewSent', 'true');
             }
+        }
+        
+        if (pathname === '/' && ipAddress && sessionId) {
+            sendEvents(sessionId, ipAddress);
         }
 
     }, [pathname, ipAddress, searchParams]);
