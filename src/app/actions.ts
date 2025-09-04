@@ -7,6 +7,9 @@ const WEBHOOK_URL_QUIZ =
   'https://redis-n8n.rzilkp.easypanel.host/webhook/quizn8n';
 const WEBHOOK_URL_PAGEVIEW =
   'https://redis-n8n.rzilkp.easypanel.host/webhook-test/pageviewfb';
+const WEBHOOK_URL_OFFER = 
+  'https://redis-n8n.rzilkp.easypanel.host/webhook-test/offer';
+
 
 const UserDataSchema = z.object({
   external_id: z.string().nullable(),
@@ -23,10 +26,12 @@ const CustomDataSchema = z.object({
   quiz_step: z.number().optional(),
   quiz_question: z.string().optional(),
   quiz_answer: z.string().optional(),
+  value: z.number().optional(),
+  currency: z.string().optional(),
 });
 
 const EventSchema = z.object({
-  eventName: z.enum(['HomePageView', 'QuizStep']),
+  eventName: z.enum(['HomePageView', 'QuizStep', 'OfferView', 'InitiateCheckout']),
   eventTime: z.number(),
   userData: UserDataSchema,
   customData: CustomDataSchema,
@@ -46,6 +51,9 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
         break;
       case 'QuizStep':
         targetUrl = WEBHOOK_URL_QUIZ;
+        break;
+      case 'OfferView':
+        targetUrl = WEBHOOK_URL_OFFER;
         break;
     }
 

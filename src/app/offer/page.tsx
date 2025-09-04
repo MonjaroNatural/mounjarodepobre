@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import {
 import Autoplay from 'embla-carousel-autoplay';
 import { ShieldCheck, Trophy, Lock } from 'lucide-react';
 import { useState } from 'react';
+import { trackEvent } from '@/app/actions';
 
 const faqData = [
   {
@@ -127,6 +128,36 @@ function OfferContent() {
 
   name = name || 'Seu Plano';
 
+  useEffect(() => {
+    const external_id = getCookie('my_session_id');
+    const campaignParams = getCampaignParams();
+    
+    if (external_id) {
+        const payload = {
+            eventName: 'OfferView' as const,
+            eventTime: Math.floor(Date.now() / 1000),
+            userData: {
+                external_id: external_id,
+                client_user_agent: navigator.userAgent,
+                client_ip_address: null, // IP is fetched on server side in other events, can be null here
+                fbc: getCookie('_fbc'),
+                fbp: getCookie('_fbp'),
+            },
+            customData: {
+                ad_id: campaignParams.ad_id || null,
+                adset_id: campaignParams.adset_id || null,
+                campaign_id: campaignParams.campaign_id || null,
+            },
+            event_source_url: window.location.href,
+            action_source: 'website' as const,
+        };
+        trackEvent(payload);
+    }
+
+    if (window.fbq) {
+      window.fbq('track', 'ViewContent');
+    }
+  }, []);
 
   const handleCheckoutClick = () => {
     if (typeof window === 'undefined') return;
@@ -156,10 +187,11 @@ function OfferContent() {
             fbc: getCookie('_fbc'),
             fbp: getCookie('_fbp'),
             client_user_agent: navigator.userAgent,
+            client_ip_address: null, // Not needed for this client-side event logic
         },
         customData: {
             value: 5,
-            currency: 'USD',
+            currency: 'BRL',
             ad_id: campaignParams.ad_id || null,
             adset_id: campaignParams.adset_id || null,
             campaign_id: campaignParams.campaign_id || null,
@@ -180,7 +212,7 @@ function OfferContent() {
     }
 
     if (window.fbq) {
-        window.fbq('track', 'InitiateCheckout', { value: 5, currency: 'USD' });
+        window.fbq('track', 'InitiateCheckout', { value: 5, currency: 'BRL' });
     }
 
     router.push(checkoutUrl);
