@@ -87,24 +87,30 @@ export function N8NTracker() {
         async function sendHomePageViewEvent(sid: string, ip: string | null) {
             const campaignParams = getCampaignParams();
 
-            await trackEvent({
-                eventName: 'HomePageView',
-                eventTime: Math.floor(Date.now() / 1000),
-                userData: {
-                    external_id: sid,
-                    client_user_agent: navigator.userAgent,
-                    client_ip_address: ip,
-                    fbc: getCookie('_fbc'),
-                    fbp: getCookie('_fbp')
-                },
-                customData: {
-                    ad_id: campaignParams.ad_id || null,
-                    adset_id: campaignParams.adset_id || null,
-                    campaign_id: campaignParams.campaign_id || null,
-                },
-                event_source_url: window.location.href,
-                action_source: 'website' as const,
-            });
+            // Wait 4 seconds for Meta Pixel to set cookies
+            setTimeout(async () => {
+                const fbc = getCookie('_fbc');
+                const fbp = getCookie('_fbp');
+
+                await trackEvent({
+                    eventName: 'HomePageView',
+                    eventTime: Math.floor(Date.now() / 1000),
+                    userData: {
+                        external_id: sid,
+                        client_user_agent: navigator.userAgent,
+                        client_ip_address: ip,
+                        fbc: fbc,
+                        fbp: fbp
+                    },
+                    customData: {
+                        ad_id: campaignParams.ad_id || null,
+                        adset_id: campaignParams.adset_id || null,
+                        campaign_id: campaignParams.campaign_id || null,
+                    },
+                    event_source_url: window.location.href,
+                    action_source: 'website' as const,
+                });
+            }, 4000); // 4-second delay
         }
         
         // Only run on the initial page ('/') and when ipAddress is available

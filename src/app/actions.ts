@@ -54,8 +54,6 @@ export async function trackEvent(payload: z.infer<typeof EventSchema>) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validatedPayload),
-        // Use keepalive for quiz steps to ensure delivery on page navigation
-        keepalive: validatedPayload.eventName === 'QuizStep',
       });
     }
 
