@@ -397,7 +397,7 @@ function OfferContent() {
           data-ai-hint="bonus gift"
         />
         <Image
-          src="/oferta.webp"
+          src="/29,90.png"
           alt="Oferta"
           width={600}
           height={400}
