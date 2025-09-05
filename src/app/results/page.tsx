@@ -103,7 +103,7 @@ function ResultsComponent() {
           currentWeight: currentWeight,
           desiredWeight: desiredWeight
       });
-      router.push(`/vsl?${queryParams.toString()}`);
+      router.push(`/offer?${queryParams.toString()}`);
   }
 
   const markerPositions: Record<ImcCategory, string> = {
